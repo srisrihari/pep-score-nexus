@@ -2,8 +2,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
+export type StatusType = "Good" | "Progress" | "Deteriorate";
+
 interface StatusBadgeProps {
-  status: "Good" | "Progress" | "Deteriorate";
+  status: StatusType;
   className?: string;
 }
 

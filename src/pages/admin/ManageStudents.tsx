@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import StatusBadge from "@/components/common/StatusBadge";
+import StatusBadge, { StatusType } from "@/components/common/StatusBadge";
 import { studentList } from "@/data/mockData";
 import { Search, ArrowUpDown, Eye } from "lucide-react";
 
@@ -131,7 +131,7 @@ const ManageStudents: React.FC = () => {
                     <td className="p-3">{student.course}</td>
                     <td className="p-3">{student.totalScore}/100</td>
                     <td className="p-3">
-                      <StatusBadge status={student.overallStatus} />
+                      <StatusBadge status={student.overallStatus as StatusType} />
                     </td>
                     <td className="p-3">
                       <Button
@@ -194,7 +194,7 @@ const ManageStudents: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Status</p>
-                  <StatusBadge status={selectedStudent.overallStatus} />
+                  <StatusBadge status={selectedStudent.overallStatus as StatusType} />
                 </div>
               </div>
 
@@ -209,7 +209,7 @@ const ManageStudents: React.FC = () => {
                       >
                         <div className="flex justify-between items-center">
                           <h4 className="font-medium">{quadrant.name}</h4>
-                          <StatusBadge status={quadrant.status} />
+                          <StatusBadge status={quadrant.status as StatusType} />
                         </div>
                         <p className="mt-1">
                           Score: {quadrant.obtained}/{quadrant.weightage}
