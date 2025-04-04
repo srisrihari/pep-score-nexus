@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Layout from "./components/layout/Layout";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import Index from "./pages/Index";
 
 // Student pages
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -46,20 +47,10 @@ const ProtectedRoute = ({
 };
 
 const AppRoutes = () => {
-  const { isAuthenticated, userRole } = useAuth();
-
-  // Redirect logged in users to their dashboard
-  if (isAuthenticated && window.location.pathname === "/") {
-    if (userRole === "student") {
-      return <Navigate to="/student" replace />;
-    } else if (userRole === "admin") {
-      return <Navigate to="/admin" replace />;
-    }
-  }
-
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/index" element={<Index />} />
       
       {/* Student Routes */}
       <Route path="/student" element={
