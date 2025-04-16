@@ -24,7 +24,10 @@ import {
   LogOut,
   ClipboardEdit,
   FileBarChart,
-  FileSpreadsheet
+  FileSpreadsheet,
+  GraduationCap,
+  PenTool,
+  CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -39,15 +42,30 @@ export function AppSidebar() {
     { title: "Settings", path: "/student/settings", icon: Settings },
   ];
 
+  const teacherMenuItems = [
+    { title: "Dashboard", path: "/teacher", icon: Home },
+    { title: "My Students", path: "/teacher/students", icon: GraduationCap },
+    { title: "Feedback", path: "/teacher/feedback", icon: MessageSquare },
+    { title: "Settings", path: "/teacher/settings", icon: Settings },
+  ];
+
   const adminMenuItems = [
     { title: "Dashboard", path: "/admin", icon: Home },
     { title: "Manage Students", path: "/admin/students", icon: Users },
+    { title: "Manage Teachers", path: "/admin/teachers", icon: PenTool },
     { title: "Input Scores", path: "/admin/scores", icon: ClipboardEdit },
     { title: "Reports", path: "/admin/reports", icon: FileBarChart },
     { title: "Data Import", path: "/admin/import", icon: FileSpreadsheet },
   ];
 
-  const menuItems = userRole === "admin" ? adminMenuItems : studentMenuItems;
+  let menuItems;
+  if (userRole === "admin") {
+    menuItems = adminMenuItems;
+  } else if (userRole === "teacher") {
+    menuItems = teacherMenuItems;
+  } else {
+    menuItems = studentMenuItems;
+  }
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -94,10 +112,10 @@ export function AppSidebar() {
             <User className="h-5 w-5 text-muted-foreground" />
             <div className="space-y-0.5">
               <p className="text-sm font-medium">
-                {userRole === "student" ? "Student User" : "Admin User"}
+                {userRole === "student" ? "Student User" : userRole === "teacher" ? "Teacher User" : "Admin User"}
               </p>
               <p className="text-xs text-muted-foreground">
-                {userRole === "student" ? "Batch 2024" : "Management"}
+                {userRole === "student" ? "Batch 2024" : userRole === "teacher" ? "Wellness Instructor" : "Management"}
               </p>
             </div>
           </div>

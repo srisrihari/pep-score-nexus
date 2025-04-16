@@ -14,6 +14,8 @@ const Index = () => {
         navigate("/student");
       } else if (userRole === "admin") {
         navigate("/admin");
+      } else if (userRole === "teacher") {
+        navigate("/teacher");
       }
     } else {
       // Redirect to login page if not authenticated

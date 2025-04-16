@@ -19,12 +19,19 @@ import Settings from "./pages/student/Settings";
 import EligibilityPage from "./pages/student/EligibilityPage";
 import ImprovementPlan from "./pages/student/ImprovementPlan";
 
+// Teacher pages
+import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+import TeacherStudents from "./pages/teacher/TeacherStudents";
+import InterventionScoring from "./pages/teacher/InterventionScoring";
+import TeacherFeedback from "./pages/teacher/TeacherFeedback";
+
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageStudents from "./pages/admin/ManageStudents";
 import InputScores from "./pages/admin/InputScores";
 import Reports from "./pages/admin/Reports";
 import DataImport from "./pages/admin/DataImport";
+import ManageTeachers from "./pages/admin/ManageTeachers";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +41,7 @@ const ProtectedRoute = ({
   requiredRole
 }: {
   children: React.ReactNode;
-  requiredRole: "student" | "admin";
+  requiredRole: "student" | "admin" | "teacher";
 }) => {
   const { isAuthenticated, userRole } = useAuth();
 
@@ -99,6 +106,43 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
+      {/* Teacher Routes */}
+      <Route path="/teacher" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <TeacherDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/students" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <TeacherStudents />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/score/:studentId" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <InterventionScoring />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/feedback" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <TeacherFeedback />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/settings" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <Settings />
+          </Layout>
+        </ProtectedRoute>
+      } />
+
       {/* Admin Routes */}
       <Route path="/admin" element={
         <ProtectedRoute requiredRole="admin">
@@ -132,6 +176,13 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="admin">
           <Layout>
             <DataImport />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/teachers" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <ManageTeachers />
           </Layout>
         </ProtectedRoute>
       } />

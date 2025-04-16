@@ -17,19 +17,21 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       toast.error("Please enter both username and password");
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       const success = await login(username, password);
       if (success) {
         if (username === "admin") {
           navigate("/admin");
+        } else if (username === "teacher") {
+          navigate("/teacher");
         } else {
           navigate("/student");
         }
@@ -77,9 +79,9 @@ const Login: React.FC = () => {
                 />
               </div>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
@@ -88,10 +90,15 @@ const Login: React.FC = () => {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>Demo Credentials:</p>
-            <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="grid grid-cols-3 gap-2 mt-2">
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Student</p>
                 <p>Username: student</p>
+                <p>Password: password</p>
+              </div>
+              <div className="bg-muted p-2 rounded-md">
+                <p className="font-medium">Teacher</p>
+                <p>Username: teacher</p>
                 <p>Password: password</p>
               </div>
               <div className="bg-muted p-2 rounded-md">

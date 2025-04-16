@@ -1,13 +1,14 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { studentList, termComparisonData } from "@/data/mockData";
-import { Search } from "lucide-react";
+import { Search, PenTool, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 const batchSummary = {
   totalStudents: 120,
@@ -64,6 +65,7 @@ const redFlagStudents = [
 ];
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<typeof studentList>([]);
   const [selectedTerm, setSelectedTerm] = useState("Term1");
@@ -328,6 +330,62 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Teacher Management</CardTitle>
+            <CardDescription>Manage teachers and their assignments</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border rounded-md p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <h3 className="font-medium">Active Teachers</h3>
+                  </div>
+                  <p className="text-3xl font-bold">12</p>
+                  <p className="text-sm text-muted-foreground">Currently active teachers</p>
+                </div>
+
+                <div className="border rounded-md p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle className="h-5 w-5 text-amber-500" />
+                    <h3 className="font-medium">Pending Assignments</h3>
+                  </div>
+                  <p className="text-3xl font-bold">8</p>
+                  <p className="text-sm text-muted-foreground">Teachers without students</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium">Teacher Specialization</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Persona</span>
+                    <Badge variant="outline">3 Teachers</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Wellness</span>
+                    <Badge variant="outline">4 Teachers</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Behavior</span>
+                    <Badge variant="outline">3 Teachers</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Discipline</span>
+                    <Badge variant="outline">2 Teachers</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Button variant="outline" className="w-full mt-4" onClick={() => navigate("/admin/teachers")}>
+              Manage Teachers
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card className="bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800">
           <CardHeader>
             <CardTitle className="text-lg text-amber-700 dark:text-amber-400">Attendance Issues</CardTitle>
