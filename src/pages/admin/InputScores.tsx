@@ -24,12 +24,12 @@ import { Upload } from "lucide-react";
 const InputScores: React.FC = () => {
   const [selectedStudent, setSelectedStudent] = useState<string>("");
   const [quadrantScores, setQuadrantScores] = useState({
-    persons: {} as Record<string, number>,
+    persona: {} as Record<string, number>,
     wellness: {} as Record<string, number>,
     behavior: {} as Record<string, number>,
     discipline: {} as Record<string, number>,
   });
-  const [currentTab, setCurrentTab] = useState("persons");
+  const [currentTab, setCurrentTab] = useState("persona");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleScoreChange = (
@@ -58,7 +58,7 @@ const InputScores: React.FC = () => {
       // Reset form
       setSelectedStudent("");
       setQuadrantScores({
-        persons: {},
+        persona: {},
         wellness: {},
         behavior: {},
         discipline: {},
@@ -153,13 +153,13 @@ const InputScores: React.FC = () => {
                 className="w-full"
               >
                 <TabsList className="grid grid-cols-4 w-full">
-                  <TabsTrigger value="persons">Persons</TabsTrigger>
+                  <TabsTrigger value="persona">Persona</TabsTrigger>
                   <TabsTrigger value="wellness">Wellness</TabsTrigger>
                   <TabsTrigger value="behavior">Behavior</TabsTrigger>
                   <TabsTrigger value="discipline">Discipline</TabsTrigger>
                 </TabsList>
-                <TabsContent value="persons" className="mt-4">
-                  {renderQuadrantInputs("persons")}
+                <TabsContent value="persona" className="mt-4">
+                  {renderQuadrantInputs("persona")}
                 </TabsContent>
                 <TabsContent value="wellness" className="mt-4">
                   {renderQuadrantInputs("wellness")}

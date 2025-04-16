@@ -14,16 +14,17 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { 
-  Home, 
-  User, 
-  BarChart3, 
-  Settings, 
-  MessageSquare, 
-  Users, 
-  LogOut, 
+import {
+  Home,
+  User,
+  BarChart3,
+  Settings,
+  MessageSquare,
+  Users,
+  LogOut,
   ClipboardEdit,
-  FileBarChart
+  FileBarChart,
+  FileSpreadsheet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -43,6 +44,7 @@ export function AppSidebar() {
     { title: "Manage Students", path: "/admin/students", icon: Users },
     { title: "Input Scores", path: "/admin/scores", icon: ClipboardEdit },
     { title: "Reports", path: "/admin/reports", icon: FileBarChart },
+    { title: "Data Import", path: "/admin/import", icon: FileSpreadsheet },
   ];
 
   const menuItems = userRole === "admin" ? adminMenuItems : studentMenuItems;

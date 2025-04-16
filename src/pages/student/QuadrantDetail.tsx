@@ -1,11 +1,15 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// Progress is used in the StudentDashboard but not here
 import StatusBadge from "@/components/common/StatusBadge";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
 import { studentData, leaderboardData, timeSeriesData } from "@/data/mockData";
+import BehaviorRatingScale from "@/components/student/BehaviorRatingScale";
 import {
   LineChart,
   Line,
@@ -15,13 +19,16 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle, TrendingDown, CheckCircle2, BookOpen, Target } from "lucide-react";
 
 const QuadrantDetail: React.FC = () => {
   const { quadrantId } = useParams<{ quadrantId: string }>();
   const navigate = useNavigate();
+  const [selectedTermId, setSelectedTermId] = useState<string>(studentData.currentTerm);
 
-  const quadrant = studentData.quadrants.find((q) => q.id === quadrantId);
+  // Find the selected term data
+  const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
+  const quadrant = selectedTerm.quadrants.find((q) => q.id === quadrantId);
   const leaderboard = leaderboardData.quadrants[quadrantId || ""];
   const chartData = timeSeriesData[quadrantId as keyof typeof timeSeriesData] || [];
 
@@ -36,7 +43,7 @@ const QuadrantDetail: React.FC = () => {
 
   const getGradientClass = () => {
     switch (quadrantId) {
-      case "persons":
+      case "persona":
         return "card-gradient-primary";
       case "wellness":
         return "card-gradient-secondary";
@@ -51,20 +58,37 @@ const QuadrantDetail: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/student")}
-          className="mr-2"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">{quadrant.name} Quadrant</h1>
-          <p className="text-muted-foreground">
-            Detailed breakdown of your performance in {quadrant.name.toLowerCase()}
-          </p>
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/student")}
+            className="mr-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">{quadrant.name} Quadrant</h1>
+            <p className="text-muted-foreground">
+              Detailed breakdown of your performance in {quadrant.name.toLowerCase()}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium">Term:</span>
+          <Select value={selectedTermId} onValueChange={setSelectedTermId}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Term" />
+            </SelectTrigger>
+            <SelectContent>
+              {studentData.terms.map((term) => (
+                <SelectItem key={term.termId} value={term.termId}>
+                  {term.termName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -77,11 +101,23 @@ const QuadrantDetail: React.FC = () => {
                 {quadrant.obtained}/{quadrant.weightage}
               </div>
               <div className="inline-flex">
-                <StatusBadge 
-                  status={quadrant.status} 
-                  className="border border-white/20" 
+                <StatusBadge
+                  status={quadrant.status}
+                  className="border border-white/20"
                 />
               </div>
+
+              {quadrant.attendance && (
+                <div className="mt-3 text-sm">
+                  <p className="text-white/70">Attendance: {quadrant.attendance}%</p>
+                  <p className="text-white/70">
+                    Status:
+                    <Badge variant={quadrant.eligibility === "Eligible" ? "outline" : "destructive"} className="ml-2">
+                      {quadrant.eligibility}
+                    </Badge>
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="mt-4 pt-4 border-t border-white/20">
@@ -94,6 +130,12 @@ const QuadrantDetail: React.FC = () => {
                   <p className="text-xs text-white/70">Batch Best</p>
                   <p className="font-bold">{leaderboard.batchBest}/{quadrant.weightage}</p>
                 </div>
+                {quadrant.rank && (
+                  <div className="col-span-2 mt-2">
+                    <p className="text-xs text-white/70">Your Rank</p>
+                    <p className="font-bold">#{quadrant.rank} in batch</p>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -110,7 +152,7 @@ const QuadrantDetail: React.FC = () => {
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="term" />
                 <YAxis domain={[0, quadrant.weightage]} />
                 <Tooltip />
                 <Line
@@ -126,37 +168,120 @@ const QuadrantDetail: React.FC = () => {
         </Card>
       </div>
 
-      <h2 className="text-xl font-semibold mt-8">Component Breakdown</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {quadrant.components.map((component) => (
-          <Card key={component.id}>
-            <CardContent className="pt-6">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium">{component.name}</h3>
-                {component.status && (
-                  <StatusBadge status={component.status} />
-                )}
-              </div>
-              <div className="mt-2">
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Score</span>
-                  <span className="font-bold">
-                    {component.score}/{component.maxScore}
-                  </span>
-                </div>
-                <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full"
-                    style={{
-                      width: `${(component.score / component.maxScore) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div>
+        <h2 className="text-xl font-semibold mt-8">Component Breakdown</h2>
+
+        {quadrantId === "persona" && (
+          <>
+            <h3 className="text-lg font-medium mt-4 mb-2">SHL Competencies (80%)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {quadrant.components
+                .filter(component => component.category === "SHL")
+                .map((component) => (
+                  <Card key={component.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium">{component.name}</h3>
+                        {component.status && (
+                          <StatusBadge status={component.status} />
+                        )}
+                      </div>
+                      <div className="mt-2">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Score</span>
+                          <span className="font-bold">
+                            {component.score}/{component.maxScore}
+                          </span>
+                        </div>
+                        <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full"
+                            style={{
+                              width: `${(component.score / component.maxScore) * 100}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+
+            <h3 className="text-lg font-medium mt-6 mb-2">Professional Readiness (20%)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {quadrant.components
+                .filter(component => component.category === "Professional")
+                .map((component) => (
+                  <Card key={component.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium">{component.name}</h3>
+                        {component.status && (
+                          <StatusBadge status={component.status} />
+                        )}
+                      </div>
+                      <div className="mt-2">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Score</span>
+                          <span className="font-bold">
+                            {component.score}/{component.maxScore}
+                          </span>
+                        </div>
+                        <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-full"
+                            style={{
+                              width: `${(component.score / component.maxScore) * 100}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+          </>
+        )}
+
+        {quadrantId !== "persona" && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {quadrant.components.map((component) => (
+              <Card key={component.id}>
+                <CardContent className="pt-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium">{component.name}</h3>
+                    {component.status && (
+                      <StatusBadge status={component.status} />
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Score</span>
+                      <span className="font-bold">
+                        {component.score}/{component.maxScore}
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{
+                          width: `${(component.score / component.maxScore) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
+
+      {quadrantId === "behavior" && (
+        <div className="mt-8">
+          <BehaviorRatingScale />
+        </div>
+      )}
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         <LeaderboardCard
@@ -164,35 +289,122 @@ const QuadrantDetail: React.FC = () => {
           userRank={leaderboard.userRank}
           maxScore={quadrant.weightage}
         />
-        
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Improvement Tips</CardTitle>
+            <CardTitle className="text-lg">Improvement Recommendations</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
-              {quadrant.components
-                .filter(c => c.status === "Progress" || c.status === "Deteriorate")
-                .slice(0, 3)
-                .map(component => (
-                  <li key={component.id} className="flex items-start gap-2">
-                    <div className={`w-2 h-2 mt-2 rounded-full ${component.status === 'Deteriorate' ? 'bg-red-500' : 'bg-yellow-500'}`}></div>
-                    <p>
-                      <span className="font-medium">{component.name}:</span>{" "}
-                      {component.status === "Deteriorate"
-                        ? `Focus on improving your ${component.name.toLowerCase()} skills as this area shows significant decline.`
-                        : `Continue working on your ${component.name.toLowerCase()} abilities to reach the optimal score.`}
-                    </p>
-                  </li>
-                ))}
-                
+            {quadrant.eligibility === "Not Eligible" ? (
+              <div className="flex items-start gap-2 text-amber-600">
+                <AlertCircle className="h-5 w-5 mt-0.5" />
+                <div>
+                  <p className="font-medium">Attendance Shortage</p>
+                  <p>Your attendance is below the required 80% threshold for this quadrant. Please improve your attendance to become eligible.</p>
+                  <ul className="mt-3 space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <Target className="h-4 w-4 mt-0.5 text-amber-600" />
+                      <span>Set a goal to attend at least 90% of remaining sessions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <BookOpen className="h-4 w-4 mt-0.5 text-amber-600" />
+                      <span>Request make-up sessions if available for missed classes</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {quadrant.components
+                  .filter(c => c.status === "Progress" || c.status === "Deteriorate")
+                  .slice(0, 3)
+                  .map(component => {
+                    // Generate specific recommendations based on component and quadrant
+                    const specificRecommendations = [];
+
+                    if (quadrantId === "persona") {
+                      if (component.name.includes("Critical Thinking")) {
+                        specificRecommendations.push("Practice analytical exercises and case studies");
+                        specificRecommendations.push("Participate in debate clubs or discussion forums");
+                      } else if (component.name.includes("Communication")) {
+                        specificRecommendations.push("Join public speaking workshops or Toastmasters");
+                        specificRecommendations.push("Practice written communication through essays and reports");
+                      } else if (component.name.includes("Leadership")) {
+                        specificRecommendations.push("Take initiative in group projects and activities");
+                        specificRecommendations.push("Volunteer for leadership roles in student organizations");
+                      } else if (component.name.includes("Teamwork")) {
+                        specificRecommendations.push("Focus on active listening and collaboration skills");
+                        specificRecommendations.push("Seek feedback from team members on your contributions");
+                      } else if (component.name.includes("Negotiation")) {
+                        specificRecommendations.push("Practice conflict resolution techniques");
+                        specificRecommendations.push("Study effective negotiation strategies and apply them");
+                      } else if (component.category === "Professional") {
+                        specificRecommendations.push("Dedicate more time to professional development activities");
+                        specificRecommendations.push("Seek mentorship from industry professionals");
+                      }
+                    } else if (quadrantId === "wellness") {
+                      specificRecommendations.push("Establish a regular fitness routine focusing on this area");
+                      specificRecommendations.push("Consult with the wellness instructor for personalized guidance");
+                    } else if (quadrantId === "behavior") {
+                      specificRecommendations.push("Set specific, measurable goals for improvement in this area");
+                      specificRecommendations.push("Request feedback from instructors on your progress");
+                    } else if (quadrantId === "discipline") {
+                      specificRecommendations.push("Create a structured schedule to improve consistency");
+                      specificRecommendations.push("Use productivity tools to track and manage your commitments");
+                    }
+
+                    return (
+                      <div key={component.id} className="border-l-2 pl-4 py-1 border-l-amber-500">
+                        <div className="flex items-start gap-2">
+                          {component.status === "Deteriorate" ? (
+                            <TrendingDown className="h-5 w-5 text-red-500 mt-0.5" />
+                          ) : (
+                            <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                          )}
+                          <div>
+                            <p className="font-medium">{component.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {component.status === "Deteriorate"
+                                ? `This area shows significant decline and requires immediate attention.`
+                                : `This area needs continued focus to reach optimal performance.`}
+                            </p>
+
+                            {specificRecommendations.length > 0 && (
+                              <ul className="mt-2 space-y-1 text-sm">
+                                {specificRecommendations.map((rec, idx) => (
+                                  <li key={idx} className="flex items-start gap-2">
+                                    <Target className="h-4 w-4 mt-0.5 text-primary" />
+                                    <span>{rec}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
                 {quadrant.components.filter(c => c.status === "Progress" || c.status === "Deteriorate").length === 0 && (
-                  <li className="text-green-600 flex items-center gap-2">
-                    <div className="w-2 h-2 mt-1 rounded-full bg-green-500"></div>
-                    <p>All components are in good standing. Keep up the excellent work!</p>
-                  </li>
+                  <div className="flex items-start gap-2 text-green-600">
+                    <CheckCircle2 className="h-5 w-5 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Excellent Performance</p>
+                      <p>All components are in good standing. Keep up the excellent work!</p>
+                      <p className="text-sm text-muted-foreground mt-2">Consider mentoring peers who may be struggling in this area.</p>
+                    </div>
+                  </div>
                 )}
-            </ul>
+
+                {quadrant.components.filter(c => c.status === "Progress" || c.status === "Deteriorate").length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-dashed">
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => navigate('/student/improvement')}>
+                      View Complete Improvement Plan
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

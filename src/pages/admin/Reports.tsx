@@ -15,32 +15,48 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Download, FileBarChart } from "lucide-react";
 
 const quadrantDistribution = [
-  { name: "Persons", value: 40 },
+  { name: "Persona", value: 50 }, // Updated to match Excel (50 instead of 40)
   { name: "Wellness", value: 30 },
-  { name: "Behavior", value: 20 },
+  { name: "Behavior", value: 10 }, // Updated to match Excel (10 instead of 20)
   { name: "Discipline", value: 10 },
 ];
 
 const scoreDistribution = [
-  { range: "90-100", count: 18, label: "Excellent" },
-  { range: "80-89", count: 42, label: "Good" },
-  { range: "70-79", count: 35, label: "Satisfactory" },
-  { range: "60-69", count: 20, label: "Needs Improvement" },
-  { range: "Below 60", count: 5, label: "Critical" },
+  { range: "A+", count: 25, label: "Excellent (>80)" },
+  { range: "A", count: 35, label: "Good (66-79)" },
+  { range: "B", count: 20, label: "Average (50-65)" },
+  { range: "C/D", count: 15, label: "Marginal (34-49)" },
+  { range: "E", count: 3, label: "Poor (<34)" },
+  { range: "IC", count: 2, label: "Incomplete" },
 ];
 
-const quarterlyProgress = [
-  { quarter: "Q1", avgScore: 75 },
-  { quarter: "Q2", avgScore: 79 },
-  { quarter: "Q3", avgScore: 82 },
-  { quarter: "Q4", avgScore: 84 },
+// Attendance distribution data
+const attendanceDistribution = [
+  { range: "90-100%", count: 45, status: "Excellent" },
+  { range: "80-89%", count: 35, status: "Good" },
+  { range: "70-79%", count: 15, status: "At Risk" },
+  { range: "Below 70%", count: 5, status: "Critical" },
+];
+
+const termProgress = [
+  { term: "Term 1", avgScore: 75 },
+  { term: "Term 2", avgScore: 79 },
+  { term: "Term 3", avgScore: 82 },
+  { term: "Term 4", avgScore: 84 },
+  { term: "Term 5", avgScore: 86 },
 ];
 
 const quadrantPerformance = [
-  { name: "Persons", actual: 36, target: 40 },
+  { name: "Persona", actual: 42, target: 50 }, // Updated to match Excel (50 instead of 40)
   { name: "Wellness", actual: 26, target: 30 },
-  { name: "Behavior", actual: 18, target: 20 },
+  { name: "Behavior", actual: 8, target: 10 }, // Updated to match Excel (10 instead of 20)
   { name: "Discipline", actual: 8, target: 10 },
+];
+
+// Eligibility status data
+const eligibilityStatus = [
+  { status: "Eligible", count: 95 },
+  { status: "Not Eligible", count: 5 },
 ];
 
 const COLORS = ['#7e3af2', '#0694a2', '#6875f5', '#8c6dfd'];
@@ -49,6 +65,7 @@ const Reports: React.FC = () => {
   const [batchFilter, setBatchFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("2023-2024");
   const [reportType, setReportType] = useState("overview");
+  const [termFilter, setTermFilter] = useState("all");
 
   const handleDownload = (format: "pdf" | "excel") => {
     toast.success(`Downloading report in ${format.toUpperCase()} format`);
@@ -79,13 +96,13 @@ const Reports: React.FC = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Quarterly Progress</CardTitle>
+                  <CardTitle>Term Progress</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={quarterlyProgress}>
+                    <LineChart data={termProgress}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="quarter" />
+                      <XAxis dataKey="term" />
                       <YAxis domain={[60, 100]} />
                       <Tooltip />
                       <Line
@@ -159,18 +176,66 @@ const Reports: React.FC = () => {
         );
       case "detailed":
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Detailed Reports</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-center text-muted-foreground py-8">
-                Detailed reports are currently being processed.
-                <br />
-                Please check back later or select another report type.
-              </p>
-            </CardContent>
-          </Card>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Attendance Distribution</CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={attendanceDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="range" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Eligibility Status</CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={eligibilityStatus}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="count"
+                        label={({ status, percent }) =>
+                          `${status} ${(percent * 100).toFixed(0)}%`
+                        }
+                      >
+                        <Cell fill="#4CAF50" />
+                        <Cell fill="#F44336" />
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Term-wise Performance Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-muted-foreground py-8">
+                  Detailed term-wise analysis is currently being processed.
+                  <br />
+                  Please check back later or select another report type.
+                </p>
+              </CardContent>
+            </Card>
+          </>
         );
       default:
         return null;
@@ -217,6 +282,23 @@ const Reports: React.FC = () => {
                   <SelectItem value="2023-2024">2023-2024</SelectItem>
                   <SelectItem value="2022-2023">2022-2023</SelectItem>
                   <SelectItem value="2021-2022">2021-2022</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="term-filter">Term</Label>
+              <Select value={termFilter} onValueChange={setTermFilter}>
+                <SelectTrigger id="term-filter">
+                  <SelectValue placeholder="Select term" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Terms</SelectItem>
+                  <SelectItem value="term1">Term 1</SelectItem>
+                  <SelectItem value="term2">Term 2</SelectItem>
+                  <SelectItem value="term3">Term 3</SelectItem>
+                  <SelectItem value="term4">Term 4</SelectItem>
+                  <SelectItem value="term5">Term 5</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -16,20 +16,23 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import QuadrantDetail from "./pages/student/QuadrantDetail";
 import Feedback from "./pages/student/Feedback";
 import Settings from "./pages/student/Settings";
+import EligibilityPage from "./pages/student/EligibilityPage";
+import ImprovementPlan from "./pages/student/ImprovementPlan";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ManageStudents from "./pages/admin/ManageStudents";
 import InputScores from "./pages/admin/InputScores";
 import Reports from "./pages/admin/Reports";
+import DataImport from "./pages/admin/DataImport";
 
 const queryClient = new QueryClient();
 
 // Protected route component
-const ProtectedRoute = ({ 
-  children, 
-  requiredRole 
-}: { 
+const ProtectedRoute = ({
+  children,
+  requiredRole
+}: {
   children: React.ReactNode;
   requiredRole: "student" | "admin";
 }) => {
@@ -51,7 +54,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/index" element={<Index />} />
-      
+
       {/* Student Routes */}
       <Route path="/student" element={
         <ProtectedRoute requiredRole="student">
@@ -81,7 +84,21 @@ const AppRoutes = () => {
           </Layout>
         </ProtectedRoute>
       } />
-      
+      <Route path="/student/eligibility" element={
+        <ProtectedRoute requiredRole="student">
+          <Layout>
+            <EligibilityPage />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/student/improvement" element={
+        <ProtectedRoute requiredRole="student">
+          <Layout>
+            <ImprovementPlan />
+          </Layout>
+        </ProtectedRoute>
+      } />
+
       {/* Admin Routes */}
       <Route path="/admin" element={
         <ProtectedRoute requiredRole="admin">
@@ -111,7 +128,14 @@ const AppRoutes = () => {
           </Layout>
         </ProtectedRoute>
       } />
-      
+      <Route path="/admin/import" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <DataImport />
+          </Layout>
+        </ProtectedRoute>
+      } />
+
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
