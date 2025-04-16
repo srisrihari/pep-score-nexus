@@ -1,10 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Progress is used in the StudentDashboard but not here
 import StatusBadge from "@/components/common/StatusBadge";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
@@ -25,12 +26,28 @@ const QuadrantDetail: React.FC = () => {
   const { quadrantId } = useParams<{ quadrantId: string }>();
   const navigate = useNavigate();
   const [selectedTermId, setSelectedTermId] = useState<string>(studentData.currentTerm);
+  const [activeQuadrant, setActiveQuadrant] = useState<string>(quadrantId || "persona");
+
+  // Update active quadrant when URL param changes
+  useEffect(() => {
+    if (quadrantId) {
+      setActiveQuadrant(quadrantId);
+    }
+  }, [quadrantId]);
+
+  // Handle quadrant change
+  const handleQuadrantChange = (newQuadrantId: string) => {
+    if (newQuadrantId !== activeQuadrant) {
+      navigate(`/student/quadrant/${newQuadrantId}`);
+      setActiveQuadrant(newQuadrantId);
+    }
+  };
 
   // Find the selected term data
   const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
-  const quadrant = selectedTerm.quadrants.find((q) => q.id === quadrantId);
-  const leaderboard = leaderboardData.quadrants[quadrantId || ""];
-  const chartData = timeSeriesData[quadrantId as keyof typeof timeSeriesData] || [];
+  const quadrant = selectedTerm.quadrants.find((q) => q.id === activeQuadrant);
+  const leaderboard = leaderboardData.quadrants[activeQuadrant || ""];
+  const chartData = timeSeriesData[activeQuadrant as keyof typeof timeSeriesData] || [];
 
   if (!quadrant || !leaderboard) {
     return (
@@ -42,7 +59,7 @@ const QuadrantDetail: React.FC = () => {
   }
 
   const getGradientClass = () => {
-    switch (quadrantId) {
+    switch (activeQuadrant) {
       case "persona":
         return "card-gradient-primary";
       case "wellness":
@@ -90,6 +107,25 @@ const QuadrantDetail: React.FC = () => {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <Tabs value={activeQuadrant} onValueChange={handleQuadrantChange} className="w-full">
+          <TabsList className="grid grid-cols-4 w-full">
+            {selectedTerm.quadrants.map((q) => (
+              <TabsTrigger key={q.id} value={q.id} className="flex items-center justify-center">
+                <div className="flex items-center">
+                  <span className="mr-1">{q.name}</span>
+                  {q.status && (
+                    <Badge variant={q.status === "Cleared" ? "outline" : "destructive"} className="ml-1 text-xs py-0 h-5">
+                      {q.obtained}/{q.weightage}
+                    </Badge>
+                  )}
+                </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -171,7 +207,7 @@ const QuadrantDetail: React.FC = () => {
       <div>
         <h2 className="text-xl font-semibold mt-8">Component Breakdown</h2>
 
-        {quadrantId === "persona" && (
+        {activeQuadrant === "persona" && (
           <>
             <h3 className="text-lg font-medium mt-4 mb-2">SHL Competencies (80%)</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -243,7 +279,7 @@ const QuadrantDetail: React.FC = () => {
           </>
         )}
 
-        {quadrantId !== "persona" && (
+        {activeQuadrant !== "persona" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {quadrant.components.map((component) => (
               <Card key={component.id}>
@@ -277,7 +313,7 @@ const QuadrantDetail: React.FC = () => {
         )}
       </div>
 
-      {quadrantId === "behavior" && (
+      {activeQuadrant === "behavior" && (
         <div className="mt-8">
           <BehaviorRatingScale />
         </div>
@@ -322,7 +358,7 @@ const QuadrantDetail: React.FC = () => {
                     // Generate specific recommendations based on component and quadrant
                     const specificRecommendations = [];
 
-                    if (quadrantId === "persona") {
+                    if (activeQuadrant === "persona") {
                       if (component.name.includes("Critical Thinking")) {
                         specificRecommendations.push("Practice analytical exercises and case studies");
                         specificRecommendations.push("Participate in debate clubs or discussion forums");
@@ -342,13 +378,13 @@ const QuadrantDetail: React.FC = () => {
                         specificRecommendations.push("Dedicate more time to professional development activities");
                         specificRecommendations.push("Seek mentorship from industry professionals");
                       }
-                    } else if (quadrantId === "wellness") {
+                    } else if (activeQuadrant === "wellness") {
                       specificRecommendations.push("Establish a regular fitness routine focusing on this area");
                       specificRecommendations.push("Consult with the wellness instructor for personalized guidance");
-                    } else if (quadrantId === "behavior") {
+                    } else if (activeQuadrant === "behavior") {
                       specificRecommendations.push("Set specific, measurable goals for improvement in this area");
                       specificRecommendations.push("Request feedback from instructors on your progress");
-                    } else if (quadrantId === "discipline") {
+                    } else if (activeQuadrant === "discipline") {
                       specificRecommendations.push("Create a structured schedule to improve consistency");
                       specificRecommendations.push("Use productivity tools to track and manage your commitments");
                     }
