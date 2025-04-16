@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "sonner";
 
-type UserRole = "student" | "admin" | null;
+type UserRole = "student" | "admin" | "teacher" | null;
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -29,7 +29,8 @@ interface AuthProviderProps {
 // Mock user credentials
 const MOCK_CREDENTIALS = {
   student: { username: "student", password: "password", userId: "2024-Ajith" },
-  admin: { username: "admin", password: "password", userId: "admin-001" }
+  admin: { username: "admin", password: "password", userId: "admin-001" },
+  teacher: { username: "teacher", password: "password", userId: "teacher-001", specialization: "wellness" }
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -50,6 +51,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUserRole("admin");
       setUserId(MOCK_CREDENTIALS.admin.userId);
       toast.success("Logged in as Admin");
+      return true;
+    } else if (username === MOCK_CREDENTIALS.teacher.username && password === MOCK_CREDENTIALS.teacher.password) {
+      setIsAuthenticated(true);
+      setUserRole("teacher");
+      setUserId(MOCK_CREDENTIALS.teacher.userId);
+      toast.success("Logged in as Teacher");
       return true;
     } else {
       toast.error("Invalid credentials");
