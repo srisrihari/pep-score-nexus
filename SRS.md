@@ -1548,7 +1548,7 @@ classDiagram
 - Data Flow
 - UI Components
 
-#### 4.8 Change Log
+#### 4.4 Change Log
 
 | Version | Date | Author | Changes |
 |---------|------|---------|----------|
