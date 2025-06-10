@@ -1548,12 +1548,3 @@ classDiagram
 - Data Flow
 - UI Components
 
-#### 4.4 Change Log
-
-| Version | Date | Author | Changes |
-|---------|------|---------|----------|
-| 1.0.0 | 2024-03-20 | Initial | Initial SRS document creation |
-| 1.1.0 | 2024-03-21 | Update | Added system architecture diagrams |
-| 1.2.0 | 2024-03-21 | Update | Added data architecture and security sections |
-| 1.3.0 | 2024-03-21 | Update | Reorganized content according to IEEE 830 |
-| 1.4.0 | 2024-03-21 | Update | Added missing sections and enhanced documentation | 
