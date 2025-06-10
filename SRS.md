@@ -10,47 +10,150 @@
 ### 1. Introduction
 
 #### 1.1 Purpose
-The PEP Score Nexus is a web application designed to manage and track student performance in a Personality Enhancement Program (PEP). It provides a comprehensive platform for students, teachers, and administrators to monitor, assess, and improve student performance across multiple assessment quadrants.
+The PEP Score Nexus is a comprehensive web application designed to manage and track student performance in Personality Enhancement Programs (PEP). This system addresses the critical need for efficient, data-driven assessment and monitoring of student development across multiple dimensions.
+
+**Key Pain Points Addressed:**
+- Manual tracking inefficiencies in student performance assessment
+- Lack of standardized evaluation across different personality dimensions
+- Difficulty in monitoring and analyzing student progress over time
+- Challenges in providing timely interventions and feedback
+- Complex reporting and analytics for program effectiveness
+
+**Intended Use Cases:**
+- Academic institutions implementing personality development programs
+- Corporate training programs focusing on professional development
+- Educational institutions with structured personality enhancement curricula
+- Organizations requiring standardized personality assessment frameworks
 
 #### 1.2 Scope
-The system covers the complete lifecycle of student performance tracking, including:
-- Performance assessment across four main quadrants
-- Progress tracking and visualization
-- Intervention management
-- Reporting and analytics
+The system encompasses the complete lifecycle of student performance tracking, from initial assessment to final evaluation, including:
+
+**In Scope:**
+- Quadrant-based performance assessment
+- Real-time progress tracking
+- Automated analytics and reporting
 - Role-based access control
 - Term-wise performance tracking
 - Batch-wide performance comparison
 - Improvement recommendations
 - Attendance monitoring
+- Intervention management
+- Data export and reporting
 
-#### 1.3 Definitions, Acronyms, Abbreviations
-- PEP: Personality Enhancement Program
-- SHL: Standardized assessment tool for competencies
-- IC: Incomplete status
-- Quadrant: Major assessment category in the program
-- Term: Academic period for assessment
-- Batch: Group of students in the same program cohort
+**Out of Scope:**
+- Real-time proctoring or monitoring
+- Gamification features
+- Offline functionality
+- Multilingual support
+- Mobile application development
+- Integration with Learning Management Systems (LMS)
+- Video conferencing or virtual classrooms
+- Payment processing
+- Student registration and enrollment
+
+**Future Integration Possibilities:**
+- LMS integration for seamless data flow
+- HR system integration for corporate training
+- Analytics platform integration
+- Mobile application development
+- Multilingual support
+- Offline functionality
+
+#### 1.3 Definitions, Acronyms, and Abbreviations
+
+#### Domain Terms
+- **PEP**: Personality Enhancement Program
+- **SHL**: Saville and Holdsworth Ltd. (Assessment Provider)
+- **Quadrant**: Major assessment category (Persona, Wellness, Behavior, Discipline)
+- **Component**: Sub-category within a quadrant
+- **Term**: Academic period for assessment
+- **Batch**: Group of students
+- **Intervention**: Improvement program
+- **Eligibility**: Status based on attendance and performance criteria
+- **Status Type**: Current state of assessment (Pending, InProgress, Completed, NeedsReview)
+
+#### Technical Terms
+- **API**: Application Programming Interface
+- **JWT**: JSON Web Token
+- **RBAC**: Role-Based Access Control
+- **UI**: User Interface
+- **UX**: User Experience
+- **REST**: Representational State Transfer
+- **HTTPS**: Hypertext Transfer Protocol Secure
+- **WCAG**: Web Content Accessibility Guidelines
+- **GDPR**: General Data Protection Regulation
 
 #### 1.4 References
-1. IEEE 830-1998 - IEEE Recommended Practice for Software Requirements Specifications
-2. React Documentation - https://react.dev/
-3. TypeScript Documentation - https://www.typescriptlang.org/
-4. Tailwind CSS Documentation - https://tailwindcss.com/
-5. Recharts Documentation - https://recharts.org/
-6. JWT Authentication Best Practices - https://jwt.io/introduction
-7. REST API Design Guidelines - https://restfulapi.net/
 
-#### 1.5 Overview
-The PEP Score Nexus is a web-based application built using modern frontend technologies:
-- React with TypeScript
-- Vite as the build tool
-- shadcn-ui for UI components
-- Tailwind CSS for styling
-- React Query for data management
-- Recharts for data visualization
-- React Router for navigation
-- Lucide icons for UI elements
+#### Standards and Guidelines
+- IEEE 830-1998: IEEE Recommended Practice for Software Requirements Specifications
+- WCAG 2.1 Level AA: Web Content Accessibility Guidelines
+- GDPR: General Data Protection Regulation
+- REST API Design Guidelines
+- JWT Best Practices
+
+#### Technical Documentation
+- React Documentation
+- TypeScript Documentation
+- Vite Documentation
+- Tailwind CSS Documentation
+- PostgreSQL Documentation
+- Node.js Documentation
+
+#### Educational Standards
+- Bloom's Taxonomy
+- Competency-Based Education Standards
+- Educational Assessment Frameworks
+- Student Performance Evaluation Guidelines
+
+#### 1.5 System Overview
+
+#### Technology Stack
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS
+- **Backend**: Node.js, Express
+- **Database**: PostgreSQL/MySQL
+- **Authentication**: JWT, bcrypt
+- **API**: RESTful
+- **Deployment**: Docker, Kubernetes (optional)
+
+#### System Architecture
+```mermaid
+graph TB
+    subgraph Frontend
+        UI[React UI Components]
+        State[State Management]
+        Router[React Router]
+    end
+    
+    subgraph Backend
+        API[API Layer]
+        Auth[Authentication]
+        DB[(Database)]
+    end
+    
+    subgraph External
+        Email[Email Service]
+        Storage[File Storage]
+    end
+    
+    UI --> State
+    State --> Router
+    Router --> API
+    API --> Auth
+    Auth --> DB
+    API --> Email
+    API --> Storage
+```
+
+#### Key Benefits
+- Streamlined assessment process
+- Data-driven decision making
+- Improved student outcomes
+- Efficient resource allocation
+- Standardized evaluation
+- Real-time progress tracking
+- Automated reporting
+- Enhanced intervention management
 
 ### 2. Overall Description
 
@@ -79,29 +182,148 @@ The system covers the complete lifecycle of student performance tracking, includ
 
 #### 2.3 User Classes and Characteristics
 
-1. **Students**
-   - Primary users who need to track their performance
-   - Access to personal dashboard and improvement plans
-   - View performance across all quadrants
-   - Compare performance with batch averages
-   - Track attendance and eligibility
-   - Receive personalized improvement recommendations
+#### 2.3.1 Primary Users
 
-2. **Teachers**
-   - Assess student performance
-   - Provide feedback and interventions
-   - Track class-wide progress
-   - Input scores for components
-   - Manage student interventions
-   - View student analytics
+##### Students
+**Characteristics:**
+- Age Range: 18-25 years
+- Technical Proficiency: Moderate to High
+- Usage Frequency: Daily to Weekly
+- Primary Goals: Track performance, view improvements, monitor progress
+- Key Capabilities:
+  - View performance dashboard
+  - Track quadrant scores
+  - Access improvement plans
+  - View leaderboard rankings
+  - Monitor attendance status
+  - Receive recommendations
+  - Compare with batch performance
+  - Track term-wise progress
+  - View detailed component breakdowns
+  - Access eligibility status
 
-3. **Administrators**
-   - Oversee program effectiveness
-   - Generate reports and analytics
-   - Manage system-wide settings
-   - Monitor batch performance
-   - Track attendance trends
-   - Export performance data
+##### Teachers
+**Characteristics:**
+- Age Range: 25-60 years
+- Technical Proficiency: Moderate
+- Usage Frequency: Daily
+- Primary Goals: Assess students, provide feedback, track progress
+- Key Capabilities:
+  - Input student scores
+  - Provide feedback
+  - Track class progress
+  - Manage interventions
+  - View student analytics
+  - Monitor attendance
+  - Generate progress reports
+  - Set improvement goals
+  - Track intervention effectiveness
+  - Behavior assessment scoring
+
+##### Administrators
+**Characteristics:**
+- Age Range: 30-65 years
+- Technical Proficiency: Moderate to High
+- Usage Frequency: Weekly to Monthly
+- Primary Goals: System management, reporting, configuration
+- Key Capabilities:
+  - System configuration
+  - User management
+  - Report generation
+  - Performance analytics
+  - Batch management
+  - Term management
+  - Intervention tracking
+  - System monitoring
+  - Data export capabilities
+  - Security settings
+
+#### 2.3.2 Secondary Users
+
+##### Program Coordinators
+**Characteristics:**
+- Age Range: 25-50 years
+- Technical Proficiency: Moderate
+- Usage Frequency: Weekly
+- Primary Goals: Program oversight, curriculum alignment
+- Key Capabilities:
+  - View program analytics
+  - Monitor curriculum effectiveness
+  - Track program outcomes
+  - Generate program reports
+  - Review intervention strategies
+
+##### Parents/Guardians
+**Characteristics:**
+- Age Range: 35-65 years
+- Technical Proficiency: Basic to Moderate
+- Usage Frequency: Monthly
+- Primary Goals: Monitor student progress, view reports
+- Key Capabilities:
+  - View student performance
+  - Access progress reports
+  - Receive notifications
+  - View improvement plans
+  - Track attendance
+
+##### External Assessors
+**Characteristics:**
+- Age Range: 25-60 years
+- Technical Proficiency: High
+- Usage Frequency: Quarterly
+- Primary Goals: Evaluate program effectiveness, provide external assessment
+- Key Capabilities:
+  - Access assessment data
+  - Generate evaluation reports
+  - Compare program outcomes
+  - Provide external feedback
+  - Track program metrics
+
+#### 2.3.3 User Interaction Patterns
+
+##### Daily Operations
+- Students: Check performance, view updates
+- Teachers: Input scores, provide feedback
+- Administrators: Monitor system, handle issues
+
+##### Weekly Operations
+- Students: Review progress, plan improvements
+- Teachers: Generate reports, track interventions
+- Administrators: Review analytics, manage users
+- Program Coordinators: Monitor program effectiveness
+
+##### Monthly Operations
+- Students: Term review, goal setting
+- Teachers: Progress assessment, intervention planning
+- Administrators: System maintenance, backup
+- Parents: Progress review, report access
+
+##### Quarterly Operations
+- All Users: Term transition, performance review
+- External Assessors: Program evaluation, feedback
+
+#### 2.3.4 User Experience Requirements
+
+##### Accessibility
+- WCAG 2.1 Level AA compliance
+- Screen reader compatibility
+- Keyboard navigation
+- High contrast mode
+- Font size adjustment
+
+##### Usability
+- Intuitive navigation
+- Clear feedback messages
+- Consistent interface
+- Mobile responsiveness
+- Help documentation
+
+##### Performance
+- Quick page loads
+- Responsive interactions
+- Offline capabilities
+- Data caching
+- Error recovery
 
 #### 2.4 Operating Environment
 1. **Browser Requirements**
@@ -188,241 +410,501 @@ The system covers the complete lifecycle of student performance tracking, includ
    - Best practices guide
 
 #### 2.7 Assumptions and Dependencies
-- Modern web browser with JavaScript enabled
-- Internet connectivity for real-time updates
-- User authentication system
-- Data storage and retrieval system
-- Support for file uploads and downloads
-- Access to student records and assessment data
+
+##### 2.7.1 Assumptions
+1. **Authentication**
+   - JWT-based authentication system
+   - Institutional email system for user registration
+   - Single sign-on capability
+
+2. **Data Management**
+   - Reliable database system
+   - Regular backup procedures
+   - Data integrity maintenance
+
+3. **User Access**
+   - Modern web browser support
+   - Stable internet connection
+   - JavaScript enabled
+
+4. **System Integration**
+   - SHL API availability
+   - File storage system
+   - Email service integration
+
+##### 2.7.2 Dependencies
+1. **Frontend Dependencies**
+   - React 18+
+   - TypeScript 4+
+   - Tailwind CSS
+   - Recharts
+   - React Router
+   - React Query
+   - shadcn-ui components
+
+2. **Backend Dependencies**
+   - Node.js 16+
+   - Express.js
+   - PostgreSQL/MySQL
+   - JWT authentication
+   - REST API framework
+
+3. **Development Dependencies**
+   - Vite
+   - ESLint
+   - Prettier
+   - TypeScript
+   - Testing frameworks
+
+4. **External Services**
+   - SHL Assessment API
+   - File storage service
+   - Email service
+   - CDN service
+   - Monitoring service
 
 ### 3. Specific Requirements
 
 #### 3.1 Functional Requirements
 
-#### 3.1.1 Assessment Quadrants
-1. **Persona (50% weightage)**
-   - SHL Competencies (80%)
-     - Critical Thinking
-     - Communication
-     - Leadership
-     - Teamwork
-     - Negotiation
-   - Professional Readiness (20%)
-   - Minimum attendance requirement: 80%
-   - Eligibility based on component completion
+##### 3.1.1 Use Case Descriptions
 
-2. **Wellness (30% weightage)**
-   - Fitness assessments
-   - Wellness activities
-   - Minimum attendance requirement: 80%
-   - Participation tracking
-   - Progress monitoring
+###### UC-01: Student Performance Assessment
+**Primary Actor:** Student
+**Secondary Actors:** System, Teacher
+**Preconditions:**
+- Student is logged in
+- Current term is active
+- Assessment data is available
 
-3. **Behavior (10% weightage)**
-   - Minimum score of 2 in each component
-   - Behavior rating scale
-   - Attendance tracking
-   - Component-specific assessments
-   - Progress indicators
+**Main Success Scenario:**
+1. Student accesses dashboard
+2. System displays current term performance
+3. Student views quadrant scores
+4. System shows detailed component status
+5. Student reviews attendance
+6. System calculates eligibility
+7. Student views improvement recommendations
+8. System updates progress indicators
 
-4. **Discipline (10% weightage)**
-   - Overall attendance tracking
-   - Regularity assessment
-   - Preparedness evaluation
-   - Meeting deadlines
-   - Participation metrics
-   - Code of conduct compliance
+**Alternative Flows:**
+- A1: No current term
+  1. System shows term selection
+  2. Student selects term
+  3. Continue with main flow
+- A2: Incomplete assessment
+  1. System highlights pending components
+  2. Student views requirements
+  3. Continue with main flow
 
-#### 3.1.2 Core Features
+**Post-conditions:**
+- Performance data is updated
+- Progress indicators are current
+- Recommendations are available
 
-1. **Student Features**
-   - View performance dashboard
-   - Track quadrant scores
-   - Access improvement plans
-   - View leaderboard rankings
-   - Monitor attendance status
-   - Receive recommendations
-   - Compare with batch performance
-   - Track term-wise progress
-   - View detailed component breakdowns
-   - Access eligibility status
-   - Term selection and management
-   - Priority-based improvement tracking
-   - Behavior rating scale assessment
-   - Intervention participation tracking
-   - Feedback review system
+###### UC-02: Teacher Assessment Input
+**Primary Actor:** Teacher
+**Secondary Actors:** Student, System
+**Preconditions:**
+- Teacher is logged in
+- Student records are accessible
+- Assessment period is active
 
-2. **Teacher Features**
-   - Input student scores
-   - Provide feedback
-   - Track class progress
-   - Manage interventions
-   - View student analytics
-   - Monitor attendance
-   - Generate progress reports
-   - Set improvement goals
-   - Track intervention effectiveness
-   - Behavior assessment scoring
-   - Term-wise performance tracking
-   - Batch performance analysis
-   - Student feedback management
-   - Intervention effectiveness tracking
-   - Priority-based improvement planning
+**Main Success Scenario:**
+1. Teacher accesses student list
+2. System displays student performance
+3. Teacher selects student
+4. System shows assessment form
+5. Teacher inputs scores
+6. System validates input
+7. Teacher adds feedback
+8. System saves assessment
+9. Teacher reviews batch performance
+10. System generates reports
 
-3. **Admin Features**
-   - System configuration
-   - User management
-   - Report generation
-   - Performance analytics
-   - Batch management
-   - Term management
-   - Intervention tracking
-   - System monitoring
-   - Data export capabilities
-   - Security settings
-   - Access control management
-   - Audit logging
-   - Backup management
-   - System health monitoring
+**Alternative Flows:**
+- A1: Invalid score input
+  1. System shows error
+  2. Teacher corrects input
+  3. Continue with main flow
+- A2: Student not eligible
+  1. System shows warning
+  2. Teacher reviews criteria
+  3. Continue with main flow
 
-#### 3.1.3 Assessment Components
+**Post-conditions:**
+- Assessment data is saved
+- Reports are updated
+- Notifications are sent
 
-1. **Behavior Rating Scale**
-   - Minimum score requirement: 2 per component
-   - Scale range: 1-5
-   - Component-specific assessments
-   - Progress tracking
-   - Improvement recommendations
-   - Teacher feedback integration
-   - Historical performance tracking
+###### UC-03: Admin Report Generation
+**Primary Actor:** Administrator
+**Secondary Actors:** System, Teachers
+**Preconditions:**
+- Admin is logged in
+- System data is available
+- Reports are configured
 
-2. **Intervention System**
-   - Priority-based intervention assignment
-   - Progress tracking
-   - Effectiveness measurement
-   - Teacher-student feedback loop
-   - Improvement goal setting
-   - Performance monitoring
-   - Intervention history
+**Main Success Scenario:**
+1. Admin accesses dashboard
+2. System shows overview
+3. Admin selects report type
+4. System displays options
+5. Admin sets parameters
+6. System generates report
+7. Admin reviews data
+8. System exports report
+9. Admin shares report
+10. System logs action
 
-3. **Feedback System**
-   - Teacher-student communication
-   - Improvement recommendations
-   - Progress tracking
-   - Historical feedback access
-   - Priority-based feedback
-   - Term-wise feedback organization
-   - Quadrant-specific feedback
+**Alternative Flows:**
+- A1: Data incomplete
+  1. System shows warning
+  2. Admin adjusts parameters
+  3. Continue with main flow
+- A2: Export fails
+  1. System shows error
+  2. Admin retries export
+  3. Continue with main flow
 
-4. **Term Management**
-   - Term creation and configuration
-   - Performance tracking per term
-   - Term-wise comparisons
-   - Historical data access
-   - Term transition handling
-   - Batch-term mapping
-   - Term status tracking
+**Post-conditions:**
+- Report is generated
+- Data is exported
+- Action is logged
+
+##### 3.1.2 API Endpoints
+
+###### Authentication
+```
+POST /api/auth/login
+POST /api/auth/refresh
+POST /api/auth/logout
+```
+
+###### Student Endpoints
+```
+GET /api/students/:id/performance
+GET /api/students/:id/quadrants
+GET /api/students/:id/improvements
+GET /api/students/:id/attendance
+GET /api/students/:id/leaderboard
+```
+
+###### Teacher Endpoints
+```
+POST /api/teachers/assessments
+GET /api/teachers/students
+POST /api/teachers/feedback
+GET /api/teachers/reports
+POST /api/teachers/interventions
+```
+
+###### Admin Endpoints
+```
+GET /api/admin/overview
+GET /api/admin/reports
+POST /api/admin/settings
+GET /api/admin/users
+POST /api/admin/batches
+```
+
+##### 3.1.3 Data Models
+
+###### Student
+```typescript
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  role: 'student';
+  currentTerm: string;
+  terms: Term[];
+}
+```
+
+###### Term
+```typescript
+interface Term {
+  termId: string;
+  name: string;
+  startDate: Date;
+  endDate: Date;
+  quadrants: Quadrant[];
+}
+```
+
+###### Quadrant
+```typescript
+interface Quadrant {
+  id: string;
+  name: string;
+  weightage: number;
+  obtained: number;
+  components: Component[];
+  status: StatusType;
+  attendance?: number;
+  eligibility?: 'Eligible' | 'Not Eligible';
+  rank?: number;
+}
+```
+
+###### Component
+```typescript
+interface Component {
+  id: string;
+  name: string;
+  score: number;
+  maxScore: number;
+  status: StatusType;
+  category: string;
+}
+```
 
 #### 3.2 Non-Functional Requirements
 
-##### 3.2.1 Performance
-- Page load time < 3 seconds
-- Real-time score updates
-- Responsive design
-- Optimized component rendering
-- Efficient data caching
-- Lazy loading of components
-- Optimized image loading
-- Efficient state management
-- Minimal API calls
-- Optimized database queries
+#### 3.2.1 Performance Requirements
 
-##### 3.2.2 Security
-1. **Authentication**
-   - JWT-based authentication
-   - Token expiration: 24 hours
-   - Refresh token rotation
-   - Secure password hashing (bcrypt)
-   - Session management
-   - Multi-factor authentication support
-   - Password policy enforcement
+##### Response Time
+- Page Load Time: < 3 seconds
+  - First load: < 5 seconds
+  - Subsequent loads: < 2 seconds
+  - Network: 4G/LTE (20Mbps)
+  - Device: Modern mobile/desktop
+  - Cache: Enabled
+- API Response Time: < 1 second
+  - 95th percentile: < 2 seconds
+  - 99th percentile: < 3 seconds
+- Database Query Time: < 500ms
+  - Complex queries: < 1 second
+  - Simple queries: < 100ms
 
-2. **Authorization**
-   - Role-based access control
-   - Resource-level permissions
-   - Session management
-   - IP-based restrictions
-   - API endpoint protection
-   - Feature-level access control
-   - Audit logging
+##### Throughput
+- Concurrent Users: 1000+
+  - Peak load: 2000 concurrent users
+  - Normal load: 500 concurrent users
+- Requests per Second: 100+
+  - Peak: 200 RPS
+  - Normal: 50 RPS
+- Data Processing: 1000 records/second
+  - Batch processing: 5000 records/minute
+  - Real-time processing: 100 records/second
 
-3. **Data Protection**
-   - HTTPS encryption
-   - Data encryption at rest
-   - Secure file storage
-   - Regular security audits
-   - XSS protection
-   - CSRF protection
-   - SQL injection prevention
-   - Input validation
-   - Output encoding
+##### Resource Utilization
+- CPU Usage: < 70%
+  - Peak: < 85%
+  - Normal: < 50%
+- Memory Usage: < 80%
+  - Peak: < 90%
+  - Normal: < 60%
+- Disk I/O: < 70%
+  - Peak: < 85%
+  - Normal: < 50%
 
-4. **Compliance**
-   - GDPR compliance
-   - Data privacy
-   - Data retention policies
-   - User consent management
-   - Data export capabilities
-   - Data deletion procedures
-   - Privacy policy enforcement
+##### Mobile Performance
+- App Size: < 10MB
+- Memory Usage: < 100MB
+- Battery Impact: < 5% per hour
+- Offline Capability: 24 hours
+- Data Usage: < 50MB per session
 
-##### 3.2.3 Reliability
-- 99.9% uptime
-- Data backup and recovery
-- Error handling
-- Data validation
-- State management
-- Transaction management
-- Graceful degradation
-- Automatic recovery
-- Health monitoring
-- Performance monitoring
+#### 3.2.2 Security Requirements
 
-##### 3.2.4 Maintainability
-- Modular code structure
-- Comprehensive documentation
-- Code review process
-- Testing requirements
-- Version control
-- Deployment procedures
-- Monitoring and logging
-- Error tracking
-- Performance monitoring
-- Code quality standards
+##### Authentication
+- JWT-based authentication
+  - Token expiration: 24 hours
+  - Refresh token rotation
+  - Secure password hashing (bcrypt)
+  - Multi-factor authentication (MFA)
+    - SMS/Email verification
+    - Authenticator apps
+    - Biometric (optional)
+- Session Management
+  - Secure session storage
+  - Session timeout: 30 minutes
+  - Concurrent session limits
+  - Session invalidation
 
-##### 3.2.5 Scalability
-- Support for multiple concurrent users
-- Efficient data caching
-- Load balancing
-- Database optimization
-- API rate limiting
-- Resource optimization
-- Horizontal scaling
-- Vertical scaling
-- Performance optimization
-- Resource management
+##### Authorization
+- Role-Based Access Control (RBAC)
+  - Fine-grained permissions
+  - Resource-level access control
+  - API endpoint protection
+  - Feature-level restrictions
+- Access Control Matrix
+  | Role | Student Data | Teacher Data | Admin Data | System Settings |
+  |------|-------------|--------------|------------|-----------------|
+  | Student | R | - | - | - |
+  | Teacher | R/W | R/W | - | - |
+  | Admin | R/W | R/W | R/W | R/W |
+  | Parent | R | - | - | - |
+  | Coordinator | R | R | R | - |
 
-##### 3.2.6 Usability
-- Intuitive user interface
-- Responsive design
-- Accessibility compliance
-- Error prevention
-- Help and documentation
-- User feedback system
-- Consistent design
-- Clear navigation
-- Mobile optimization
-- Cross-browser compatibility
+##### Data Protection
+- Encryption
+  - HTTPS (TLS 1.2+)
+  - Data encryption at rest
+  - Secure file storage
+  - Key rotation policies
+- Data Privacy
+  - GDPR compliance
+  - Data minimization
+  - Privacy by design
+  - Data retention policies
+- Security Monitoring
+  - Real-time threat detection
+  - Security event logging
+  - Intrusion detection
+  - Vulnerability scanning
+
+##### Security Testing
+- Penetration Testing
+  - Quarterly automated scans
+  - Annual manual testing
+  - Vulnerability assessment
+  - Security audit
+- Code Security
+  - Static code analysis
+  - Dependency scanning
+  - Security linting
+  - Code review process
+
+#### 3.2.3 Reliability Requirements
+
+##### Availability
+- Uptime: 99.9%
+  - Planned maintenance: 2 hours/month
+  - Unplanned downtime: < 43 minutes/month
+  - Backup window: Daily 1-2 AM UTC
+- Redundancy
+  - Load balancing
+  - Failover systems
+  - Data replication
+  - Geographic distribution
+
+##### Error Handling
+- Error Rates
+  - Critical errors: < 0.1%
+  - Non-critical errors: < 1%
+  - Warning messages: < 5%
+- Recovery
+  - Automatic retry (3 attempts)
+  - Fallback mechanisms
+  - Graceful degradation
+  - Error logging
+
+##### Data Integrity
+- Validation
+  - Input validation
+  - Data consistency checks
+  - Referential integrity
+  - Business rule validation
+- Backup
+  - Daily incremental
+  - Weekly full
+  - Monthly archives
+  - 90-day retention
+
+#### 3.2.4 Maintainability Requirements
+
+##### Code Quality
+- Standards
+  - ESLint configuration
+  - Prettier formatting
+  - TypeScript strict mode
+  - Unit test coverage > 80%
+- Documentation
+  - Code comments
+  - API documentation
+  - Architecture diagrams
+  - Deployment guides
+
+##### Maintenance
+- Updates
+  - Monthly security patches
+  - Quarterly feature updates
+  - Annual major releases
+  - Hotfix process
+- Technical Debt
+  - Regular code reviews
+  - Refactoring sprints
+  - Performance optimization
+  - Documentation updates
+
+#### 3.2.5 Scalability Requirements
+
+##### Horizontal Scaling
+- Load Balancing
+  - Round-robin distribution
+  - Session persistence
+  - Health checks
+  - Auto-scaling
+- Database Scaling
+  - Read replicas
+  - Sharding strategy
+  - Connection pooling
+  - Query optimization
+
+##### Vertical Scaling
+- Resource Allocation
+  - CPU scaling
+  - Memory scaling
+  - Storage scaling
+  - Network scaling
+- Performance Tuning
+  - Cache optimization
+  - Query optimization
+  - Resource limits
+  - Monitoring thresholds
+
+##### Cloud Infrastructure
+- AWS Services
+  - EC2 for compute
+  - RDS for database
+  - S3 for storage
+  - CloudFront for CDN
+- Containerization
+  - Docker containers
+  - Kubernetes orchestration
+  - Service mesh
+  - Container registry
+
+#### 3.2.6 Usability Requirements
+
+##### Accessibility
+- WCAG 2.1 Level AA
+  - Screen reader support
+  - Keyboard navigation
+  - Color contrast
+  - Text scaling
+- Internationalization
+  - Multi-language support
+  - RTL support
+  - Date/time formats
+  - Number formats
+
+##### User Experience
+- Interface Design
+  - Consistent layout
+  - Intuitive navigation
+  - Responsive design
+  - Error prevention
+- Feedback
+  - Clear messages
+  - Progress indicators
+  - Success confirmations
+  - Error recovery
+
+##### Documentation
+- User Guides
+  - Getting started
+  - Feature guides
+  - Troubleshooting
+  - FAQs
+- Help System
+  - Contextual help
+  - Tooltips
+  - Video tutorials
+  - Search functionality
 
 #### 3.3 External Interface Requirements
 
@@ -854,348 +1336,219 @@ The system covers the complete lifecycle of student performance tracking, includ
 
 ### 4. Supporting Information
 
-#### 4.1 Glossary
-```
-A+ : 80-100 (Excellent)
-A  : 66-79  (Good)
-B  : 50-65  (Average)
-C  : 40-49  (Marginal)
-D  : 34-39  (Poor)
-E  : <34    (Very Poor)
-IC : N/A    (Incomplete)
-```
+#### 4.1 System Architecture Diagrams
 
-#### 4.2 Diagrams
-
-### 8. System Architecture
-
-#### 8.1 High-Level Architecture
-
+#### 4.1.1 High-Level Architecture
 ```mermaid
 graph TB
     subgraph Frontend
         UI[React UI Components]
-        State[React Context/State]
+        State[State Management]
         Router[React Router]
-        Charts[Recharts]
     end
-
+    
     subgraph Backend
-        API[REST API]
+        API[API Layer]
         Auth[Authentication]
         DB[(Database)]
     end
-
-    subgraph External Systems
-        SHL[SHL Assessment API]
-        FileStorage[File Storage]
-        EmailService[Email Service]
+    
+    subgraph External
+        Email[Email Service]
+        Storage[File Storage]
     end
-
+    
     UI --> State
     State --> Router
-    UI --> Charts
-    UI --> API
+    Router --> API
     API --> Auth
-    API --> DB
-    API --> SHL
-    API --> FileStorage
-    API --> EmailService
+    Auth --> DB
+    API --> Email
+    API --> Storage
 ```
 
-#### 8.2 Component Architecture
-
-```mermaid
-graph TB
-    subgraph Pages
-        Login[Login Page]
-        Student[Student Dashboard]
-        Teacher[Teacher Dashboard]
-        Admin[Admin Dashboard]
-    end
-
-    subgraph Components
-        Common[Common Components]
-        StudentComp[Student Components]
-        TeacherComp[Teacher Components]
-        AdminComp[Admin Components]
-    end
-
-    subgraph State Management
-        AuthContext[Auth Context]
-        AppContext[App Context]
-    end
-
-    subgraph Data Layer
-        MockData[Mock Data]
-        API[API Integration]
-    end
-
-    Login --> AuthContext
-    Student --> StudentComp
-    Teacher --> TeacherComp
-    Admin --> AdminComp
-    StudentComp --> Common
-    TeacherComp --> Common
-    AdminComp --> Common
-    StudentComp --> AppContext
-    TeacherComp --> AppContext
-    AdminComp --> AppContext
-    AppContext --> MockData
-    AppContext --> API
-```
-
-#### 8.3 Deployment Architecture
-
-```mermaid
-graph TB
-    subgraph Production
-        CDN[CDN]
-        LB[Load Balancer]
-        App1[App Server 1]
-        App2[App Server 2]
-        Cache[Redis Cache]
-        DB[(Database)]
-    end
-
-    subgraph Development
-        DevServer[Dev Server]
-        MockAPI[Mock API]
-    end
-
-    CDN --> LB
-    LB --> App1
-    LB --> App2
-    App1 --> Cache
-    App2 --> Cache
-    App1 --> DB
-    App2 --> DB
-    DevServer --> MockAPI
-```
-
-### 9. Data Architecture
-
-#### 9.1 Entity Relationship Diagram
-
-```mermaid
-erDiagram
-    Student {
-        string id
-        string name
-        string email
-        string role
-        string currentTerm
-    }
-    
-    Term {
-        string termId
-        string name
-        date startDate
-        date endDate
-    }
-    
-    Quadrant {
-        string id
-        string name
-        number weightage
-        number obtained
-        string status
-        number attendance
-        string eligibility
-    }
-    
-    Component {
-        string id
-        string name
-        number score
-        number maxScore
-        string status
-        string category
-    }
-    
-    Student ||--o{ Term : "enrolled in"
-    Term ||--o{ Quadrant : "contains"
-    Quadrant ||--o{ Component : "has"
-```
-
-#### 9.2 Data Flow Diagram
-
+#### 4.1.2 Component Architecture
 ```mermaid
 graph LR
-    subgraph User Interface
-        Login[Login Form]
-        Dashboard[Dashboard]
-        Assessment[Assessment Form]
+    subgraph Pages
+        Student[Student Pages]
+        Teacher[Teacher Pages]
+        Admin[Admin Pages]
     end
-
-    subgraph Data Processing
-        Auth[Authentication]
-        Validation[Data Validation]
-        Scoring[Score Calculation]
+    
+    subgraph Components
+        Common[Common Components]
+        Layout[Layout Components]
+        UI[UI Components]
     end
-
-    subgraph Storage
-        UserDB[(User DB)]
-        ScoreDB[(Score DB)]
-        FileStorage[(File Storage)]
+    
+    subgraph Services
+        Auth[Auth Service]
+        API[API Service]
+        Storage[Storage Service]
     end
-
-    Login --> Auth
-    Auth --> UserDB
-    Dashboard --> Validation
-    Assessment --> Validation
-    Validation --> Scoring
-    Scoring --> ScoreDB
-    Assessment --> FileStorage
+    
+    Student --> Common
+    Teacher --> Common
+    Admin --> Common
+    Common --> Layout
+    Layout --> UI
+    UI --> Services
 ```
 
-#### 9.3 State Diagram for Assessment Workflow
+### 4.2 Data Flow Diagrams
 
-```mermaid
-stateDiagram-v2
-    [*] --> NotStarted
-    NotStarted --> InProgress: Start Assessment
-    InProgress --> UnderReview: Submit
-    UnderReview --> Approved: Teacher Approves
-    UnderReview --> Rejected: Teacher Rejects
-    Rejected --> InProgress: Revise
-    Approved --> [*]
-```
-
-### 10. Security Architecture
-
-#### 10.1 Authentication Flow
-
+#### 4.2.1 Assessment Flow
 ```mermaid
 sequenceDiagram
-    participant User
-    participant UI
-    participant Auth
-    participant API
-    participant DB
-
-    User->>UI: Enter Credentials
-    UI->>Auth: Validate Input
-    Auth->>API: Request Token
-    API->>DB: Verify Credentials
-    DB-->>API: User Data
-    API-->>Auth: JWT Token
-    Auth-->>UI: Update State
-    UI-->>User: Redirect to Dashboard
+    participant S as Student
+    participant T as Teacher
+    participant A as Admin
+    participant Sys as System
+    
+    S->>Sys: Access Dashboard
+    Sys->>S: Display Performance
+    T->>Sys: Input Assessment
+    Sys->>T: Validate Input
+    T->>Sys: Save Assessment
+    Sys->>A: Update Reports
+    A->>Sys: Generate Reports
+    Sys->>A: Export Data
 ```
 
-#### 10.2 Access Control Matrix
+#### 4.2.2 Authentication Flow
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Auth Service
+    participant S as System
+    
+    U->>A: Login Request
+    A->>S: Validate Credentials
+    S->>A: Return Token
+    A->>U: Set Session
+    U->>S: Access Resources
+    S->>U: Return Data
+```
 
-| Role | Student Data | Teacher Data | Admin Data | System Settings |
-|------|-------------|--------------|------------|-----------------|
-| Student | R | - | - | - |
-| Teacher | R/W | R/W | - | - |
-| Admin | R/W | R/W | R/W | R/W |
+### 4.3 UI Flow Diagrams
 
-#### 10.3 Data Protection Requirements
+#### 4.3.1 Student Dashboard Flow
+```mermaid
+graph TD
+    A[Login] --> B[Dashboard]
+    B --> C[Performance View]
+    B --> D[Quadrant Details]
+    B --> E[Improvements]
+    C --> F[Term Selection]
+    D --> G[Component Details]
+    E --> H[Recommendations]
+```
 
-1. **Authentication**
-   - JWT-based authentication
-   - Token expiration: 24 hours
-   - Refresh token rotation
-   - Secure password hashing (bcrypt)
+#### 4.3.2 Teacher Assessment Flow
+```mermaid
+graph TD
+    A[Login] --> B[Student List]
+    B --> C[Student Details]
+    C --> D[Assessment Form]
+    D --> E[Score Input]
+    E --> F[Feedback]
+    F --> G[Save]
+    G --> H[Reports]
+```
 
-2. **Authorization**
-   - Role-based access control
-   - Resource-level permissions
-   - Session management
-   - IP-based restrictions
+### 4.4 State Transition Diagrams
 
-3. **Data Protection**
-   - HTTPS encryption
-   - Data encryption at rest
-   - Secure file storage
-   - Regular security audits
+#### 4.4.1 Assessment Status
+```mermaid
+stateDiagram-v2
+    [*] --> Pending
+    Pending --> InProgress
+    InProgress --> Completed
+    InProgress --> NeedsReview
+    NeedsReview --> InProgress
+    Completed --> [*]
+```
 
-4. **Audit Logging**
-   - User actions
-   - System changes
-   - Security events
-   - Performance metrics
+#### 4.4.2 User Session
+```mermaid
+stateDiagram-v2
+    [*] --> LoggedOut
+    LoggedOut --> Authenticating
+    Authenticating --> LoggedIn
+    Authenticating --> Failed
+    Failed --> LoggedOut
+    LoggedIn --> SessionExpired
+    SessionExpired --> LoggedOut
+    LoggedIn --> [*]
+```
 
-### 11. Performance Requirements
+### 4.5 Data Model Diagrams
 
-#### 11.1 Response Time Requirements
-- Page Load Time: < 3 seconds
-  - Network: 4G/LTE (20Mbps)
-  - Device: Modern mobile/desktop
-  - Cache: Enabled
-  - First load: < 5 seconds
-  - Subsequent loads: < 2 seconds
+#### 4.5.1 Entity Relationship
+```mermaid
+erDiagram
+    Student ||--o{ Term : has
+    Term ||--o{ Quadrant : contains
+    Quadrant ||--o{ Component : includes
+    Teacher ||--o{ Assessment : creates
+    Assessment ||--o{ Component : evaluates
+```
 
-#### 11.2 Uptime Requirements
-- 99.9% uptime
-  - Maintenance window: Sunday 2-4 AM UTC
-  - Planned downtime: 2 hours/month
-  - Unplanned downtime: < 43 minutes/month
-  - Backup window: Daily 1-2 AM UTC
+#### 4.5.2 Class Hierarchy
+```mermaid
+classDiagram
+    class User {
+        +String id
+        +String name
+        +String email
+        +String role
+    }
+    class Student {
+        +String currentTerm
+        +Term[] terms
+    }
+    class Teacher {
+        +String department
+        +String[] batches
+    }
+    class Admin {
+        +String[] permissions
+    }
+    User <|-- Student
+    User <|-- Teacher
+    User <|-- Admin
+```
 
-#### 11.3 Error Handling
-1. **Network Errors**
-   - Automatic retry (3 attempts)
-   - Fallback to cached data
-   - User notification
-   - Error logging
+### 4.6 Glossary
 
-2. **Validation Errors**
-   - Client-side validation
-   - Server-side validation
-   - Clear error messages
-   - Recovery suggestions
+#### 4.6.1 Technical Terms
+- **API**: Application Programming Interface
+- **JWT**: JSON Web Token
+- **RBAC**: Role-Based Access Control
+- **UI**: User Interface
+- **UX**: User Experience
 
-3. **System Errors**
-   - Graceful degradation
-   - Error boundaries
-   - Automatic recovery
-   - Admin notification
+#### 4.6.2 Domain Terms
+- **Quadrant**: Major assessment category
+- **Component**: Sub-category within a quadrant
+- **Term**: Academic period for assessment
+- **Batch**: Group of students
+- **Intervention**: Improvement program
 
-### 12. Recovery Procedures
+### 4.7 Index
+- Assessment Components
+- Authentication
+- Data Models
+- Performance Metrics
+- Security Requirements
+- User Roles
+- API Endpoints
+- System Architecture
+- Data Flow
+- UI Components
 
-#### 12.1 Data Recovery
-1. **Backup Schedule**
-   - Daily incremental backups
-   - Weekly full backups
-   - Monthly archives
-   - 90-day retention
-
-2. **Recovery Process**
-   - Point-in-time recovery
-   - Data validation
-   - Integrity checks
-   - User notification
-
-#### 12.2 System Recovery
-1. **High Availability**
-   - Load balancing
-   - Failover systems
-   - Redundant storage
-   - Geographic distribution
-
-2. **Disaster Recovery**
-   - Recovery time objective: 4 hours
-   - Recovery point objective: 1 hour
-   - Backup verification
-   - Recovery testing
-
-#### 4.3 Index
-- Assessment Components: Section 3.1
-- Authentication: Section 10.1
-- Data Architecture: Section 9
-- Deployment: Section 8.3
-- Error Handling: Section 11.3
-- Performance: Section 11.1
-- Quadrants: Section 3.1
-- Recovery: Section 12
-- Security: Section 10
-- System Architecture: Section 8
-- User Classes: Section 2.3
-
-#### 4.4 Change Log
+#### 4.8 Change Log
 
 | Version | Date | Author | Changes |
 |---------|------|---------|----------|
