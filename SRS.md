@@ -279,19 +279,6 @@ graph TB
      - 3 retry attempts
      - Fallback to in-app notifications
 
-### 1.7 Change Log
-
-| Version | Date | Author | Changes |
-|---------|------|---------|----------|
-| 1.0.0 | 2024-03-20 | Initial | Initial SRS document creation |
-| 1.1.0 | 2024-03-21 | Update | Added system architecture diagrams |
-| 1.2.0 | 2024-03-21 | Update | Added data architecture and security sections |
-| 1.3.0 | 2024-03-21 | Update | Reorganized content according to IEEE 830 |
-| 1.4.0 | 2024-03-21 | Update | Added missing sections and enhanced documentation |
-| 1.5.0 | 2024-03-22 | Update | Added implementation notes and known limitations |
-| 1.6.0 | 2024-03-22 | Update | Enhanced diagrams with error states and cardinality |
-| 1.7.0 | 2024-03-22 | Update | Added user testing plan and acceptance criteria |
-
 ### 2. Overall Description
 
 #### 2.1 Product Perspective
@@ -319,104 +306,74 @@ The system covers the complete lifecycle of student performance tracking, includ
 
 #### 2.3 User Classes and Characteristics
 
-#### 2.3.1 Primary Users
+##### 2.3.1 Primary Users
+1. **Students**
+   - Age range: 18-25
+   - Technical proficiency: Moderate
+   - Usage frequency: Daily
+   - Primary goals:
+     - Track performance
+     - View assessments
+     - Monitor progress
+   - Key capabilities:
+     - View dashboard
+     - Access reports
+     - Track attendance
 
-##### Students
-**Characteristics:**
-- Age Range: 18-25 years
-- Technical Proficiency: Moderate to High
-- Usage Frequency: Daily to Weekly
-- Primary Goals: Track performance, view improvements, monitor progress
-- Key Capabilities:
-  - View performance dashboard
-  - Track quadrant scores
-  - Access improvement plans
-  - View leaderboard rankings
-  - Monitor attendance status
-  - Receive recommendations
-  - Compare with batch performance
-  - Track term-wise progress
-  - View detailed component breakdowns
-  - Access eligibility status
+2. **Teachers**
+   - Age range: 25-60
+   - Technical proficiency: Moderate
+   - Usage frequency: Daily
+   - Primary goals:
+     - Input assessments
+     - Monitor progress
+     - Generate reports
+   - Key capabilities:
+     - Manage students
+     - Input scores
+     - View analytics
 
-##### Teachers
-**Characteristics:**
-- Age Range: 25-60 years
-- Technical Proficiency: Moderate
-- Usage Frequency: Daily
-- Primary Goals: Assess students, provide feedback, track progress
-- Key Capabilities:
-  - Input student scores
-  - Provide feedback
-  - Track class progress
-  - Manage interventions
-  - View student analytics
-  - Monitor attendance
-  - Generate progress reports
-  - Set improvement goals
-  - Track intervention effectiveness
-  - Behavior assessment scoring
+3. **Administrators**
+   - Age range: 30-60
+   - Technical proficiency: High
+   - Usage frequency: Weekly
+   - Primary goals:
+     - System management
+     - Report generation
+     - User management
+   - Key capabilities:
+     - Manage users
+     - Configure system
+     - Generate reports
 
-##### Administrators
-**Characteristics:**
-- Age Range: 30-65 years
-- Technical Proficiency: Moderate to High
-- Usage Frequency: Weekly to Monthly
-- Primary Goals: System management, reporting, configuration
-- Key Capabilities:
-  - System configuration
-  - User management
-  - Report generation
-  - Performance analytics
-  - Batch management
-  - Term management
-  - Intervention tracking
-  - System monitoring
-  - Data export capabilities
-  - Security settings
+##### 2.3.2 Secondary Users
+1. **Program Coordinators**
+   - Age range: 30-60
+   - Technical proficiency: Moderate
+   - Usage frequency: Weekly
+   - Primary goals:
+     - Monitor program
+     - Review reports
+     - Track outcomes
+   - Key capabilities:
+     - View analytics
+     - Access reports
+     - Monitor progress
 
-#### 2.3.2 Secondary Users
+2. **External Assessors**
+   - Age range: 25-60
+   - Technical proficiency: Moderate
+   - Usage frequency: Monthly
+   - Primary goals:
+     - Evaluate students
+     - Provide feedback
+     - Submit assessments
+   - Key capabilities:
+     - Access assessments
+     - Submit evaluations
+     - View history
 
-##### Program Coordinators
-**Characteristics:**
-- Age Range: 25-50 years
-- Technical Proficiency: Moderate
-- Usage Frequency: Weekly
-- Primary Goals: Program oversight, curriculum alignment
-- Key Capabilities:
-  - View program analytics
-  - Monitor curriculum effectiveness
-  - Track program outcomes
-  - Generate program reports
-  - Review intervention strategies
-
-##### Parents/Guardians
-**Characteristics:**
-- Age Range: 35-65 years
-- Technical Proficiency: Basic to Moderate
-- Usage Frequency: Monthly
-- Primary Goals: Monitor student progress, view reports
-- Key Capabilities:
-  - View student performance
-  - Access progress reports
-  - Receive notifications
-  - View improvement plans
-  - Track attendance
-
-##### External Assessors
-**Characteristics:**
-- Age Range: 25-60 years
-- Technical Proficiency: High
-- Usage Frequency: Quarterly
-- Primary Goals: Evaluate program effectiveness, provide external assessment
-- Key Capabilities:
-  - Access assessment data
-  - Generate evaluation reports
-  - Compare program outcomes
-  - Provide external feedback
-  - Track program metrics
-
-#### 2.3.3 User Interaction Patterns
+##### 2.3.3 User Interaction Patterns
 
 ##### Daily Operations
 - Students: Check performance, view updates
@@ -2479,7 +2436,6 @@ classDiagram
 - Risk Analysis
 - Traceability Matrix
 - Implementation Notes
-- Change Log
 
 [End of Document]
 
