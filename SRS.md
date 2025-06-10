@@ -1119,115 +1119,39 @@ interface Component {
 
 #### 3.3 External Interface Requirements
 
-##### 3.3.1 User Interface
+#### 3.3.1 User Interfaces
 
-##### Design Principles
-- Modern, responsive design
-- Intuitive navigation
-- Consistent layout
-- Clear visual hierarchy
-- Accessible interface
-- Mobile-first approach
+##### Authentication Interface
+- **Login Form**
+  - Username/Password input fields
+  - Role-based redirection (Student/Teacher/Admin)
+  - Error handling and validation
+  - Demo credentials display
+  - Loading state management
 
-##### UI Components
-1. **Navigation**
-   - Top navigation bar
-   - Side menu for desktop
-   - Bottom navigation for mobile
-   - Breadcrumb navigation
-   - Tab-based navigation
+##### Student Interface
+- **Dashboard**
+  - Performance metrics display
+  - Quadrant scores visualization
+  - Attendance tracking
+  - Progress indicators
+  - Navigation menu
 
-2. **Layout**
-   - Grid-based layout
-   - Responsive containers
-   - Card-based components
-   - Modal dialogs
-   - Toast notifications
+##### Teacher Interface
+- **Assessment Panel**
+  - Student list management
+  - Score input forms
+  - Behavior rating scale
+  - Feedback submission
+  - Progress tracking
 
-3. **Data Visualization**
-   - Line charts for trends
-   - Bar charts for comparisons
-   - Pie charts for distributions
-   - Progress indicators
-   - Status badges
-
-##### Wireframes
-
-###### Student Dashboard
-```
-+----------------------------------+
-|  Header                          |
-+----------------------------------+
-|  |                              |
-|  |  Performance Overview        |
-|  |  +------------------------+  |
-|  |  | Quadrant Scores        |  |
-|  |  +------------------------+  |
-|  |                              |
-|  |  Recent Assessments         |
-|  |  +------------------------+  |
-|  |  | Assessment List        |  |
-|  |  +------------------------+  |
-|  |                              |
-|  |  Improvement Areas          |
-|  |  +------------------------+  |
-|  |  | Recommendations        |  |
-|  |  +------------------------+  |
-|  |                              |
-+----------------------------------+
-```
-
-###### Teacher Dashboard
-```
-+----------------------------------+
-|  Header                          |
-+----------------------------------+
-|  |                              |
-|  |  Batch Overview              |
-|  |  +------------------------+  |
-|  |  | Performance Stats      |  |
-|  |  +------------------------+  |
-|  |                              |
-|  |  Student List               |
-|  |  +------------------------+  |
-|  |  | Search & Filter        |  |
-|  |  | Student Cards          |  |
-|  |  +------------------------+  |
-|  |                              |
-|  |  Assessment Tools          |
-|  |  +------------------------+  |
-|  |  | Score Input            |  |
-|  |  | Feedback Form          |  |
-|  |  +------------------------+  |
-|  |                              |
-+----------------------------------+
-```
-
-###### Admin Dashboard
-```
-+----------------------------------+
-|  Header                          |
-+----------------------------------+
-|  |                              |
-|  |  System Overview            |
-|  |  +------------------------+  |
-|  |  | Key Metrics            |  |
-|  |  +------------------------+  |
-|  |                              |
-|  |  Reports                    |
-|  |  +------------------------+  |
-|  |  | Report Generator       |  |
-|  |  | Export Options         |  |
-|  |  +------------------------+  |
-|  |                              |
-|  |  Management                 |
-|  |  +------------------------+  |
-|  |  | User Management        |  |
-|  |  | System Settings        |  |
-|  |  +------------------------+  |
-|  |                              |
-+----------------------------------+
-```
+##### Admin Interface
+- **Management Console**
+  - User management
+  - System configuration
+  - Report generation
+  - Data import/export
+  - Analytics dashboard
 
 ##### UI States
 1. **Loading States**
@@ -1254,296 +1178,88 @@ interface Component {
    - Active states
    - Disabled states
 
-##### 3.3.2 Software Interfaces
+#### 3.3.2 Software Interfaces
 
-1. **API Endpoints**
-   - RESTful API design
-   - JSON data format
-   - JWT authentication
-   - Rate limiting
-   - Error handling
-   - Versioning support
-   - CORS configuration
-   - Request validation
-   - Response formatting
-   - Pagination support
+##### Frontend-Backend Communication
+- **Authentication API**
+  ```typescript
+  interface AuthResponse {
+    isAuthenticated: boolean;
+    userRole: 'student' | 'admin' | 'teacher' | null;
+    userId: string | null;
+  }
+  ```
 
-2. **Data Import/Export**
-   - CSV export
-   - PDF generation
-   - Excel integration
-   - Data validation
-   - Batch processing
-   - Error handling
-   - Progress tracking
-   - Format conversion
-   - Data mapping
-   - Template support
+- **Student Data API**
+  ```typescript
+  interface StudentData {
+    id: string;
+    name: string;
+    scores: {
+      persona: number;
+      wellness: number;
+      behavior: number;
+      discipline: number;
+    };
+    attendance: {
+      present: number;
+      total: number;
+    };
+    term: string;
+  }
+  ```
 
-3. **External Services**
-   - Email service integration
-   - File storage service
-   - Analytics service
-   - Monitoring service
-   - Backup service
-   - CDN integration
-   - Cache service
-   - Search service
-   - Notification service
-   - Authentication service
+- **Assessment API**
+  ```typescript
+  interface AssessmentData {
+    studentId: string;
+    term: string;
+    quadrant: string;
+    score: number;
+    feedback: string;
+    timestamp: string;
+  }
+  ```
 
-##### 3.3.3 Communication Interfaces
+##### External Service Integration
+- **SHL API Integration**
+  - Personality assessment data
+  - Score synchronization
+  - Result validation
 
-1. **HTTP/HTTPS**
-   - Secure communication
-   - TLS 1.2+
-   - Certificate management
-   - Header security
-   - Cookie management
-   - Cache control
-   - Compression
-   - Keep-alive
-   - Timeout handling
-   - Error responses
+- **Email Service**
+  - Notification delivery
+  - Report distribution
+  - Alert system
 
-2. **WebSocket**
-   - Real-time updates
-   - Connection management
-   - Heartbeat mechanism
-   - Reconnection handling
-   - Message queuing
-   - Error handling
-   - Security measures
-   - Performance optimization
-   - State management
-   - Event handling
+#### 3.3.3 Hardware Interfaces
+- **Client Requirements**
+  - Modern web browser
+  - Internet connection
+  - Minimum screen resolution: 1024x768
+  - Touch screen support (optional)
 
-##### 3.3.4 Hardware Interfaces
+- **Server Requirements**
+  - Node.js runtime
+  - PostgreSQL database
+  - Redis cache (optional)
+  - Load balancer (optional)
 
-1. **Server Requirements**
-   - CPU: 2+ cores
-   - RAM: 4GB+
-   - Storage: 50GB+
-   - Network: 100Mbps+
-   - Backup storage
-   - Load balancer
-   - Firewall
-   - Monitoring tools
-   - Security tools
-   - Backup systems
+#### 3.3.4 Communication Interfaces
+- **API Endpoints**
+  - RESTful architecture
+  - JSON data format
+  - JWT authentication
+  - Rate limiting
+  - CORS configuration
 
-2. **Client Requirements**
-   - Modern web browser
-   - JavaScript enabled
-   - HTTPS support
-   - Local storage
-   - Cookie support
-   - WebSocket support
-   - Responsive design
-   - Touch support
-   - Print capability
-   - Offline support
-
-##### 3.3.5 System Interfaces
-
-1. **Database**
-   - PostgreSQL/MySQL
-   - Connection pooling
-   - Query optimization
-   - Backup system
-   - Replication
-   - Monitoring
-   - Security
-   - Performance
-   - Scalability
-   - Maintenance
-
-2. **File System**
-   - Secure storage
-   - Access control
-   - Backup system
-   - Version control
-   - Compression
-   - Encryption
-   - Monitoring
-   - Quota management
-   - Cleanup policies
-   - Recovery procedures
+- **WebSocket Support**
+  - Real-time updates
+  - Live notifications
+  - Chat functionality (future)
+  - Progress tracking
 
 #### 3.4 System Features
-
-#### 3.4.1 Student Performance Tracking
-**Actor**: Student
-**Flow**:
-1. Log in to the system
-2. Access personal dashboard
-3. View quadrant scores and progress
-4. Check improvement recommendations
-5. Monitor attendance status
-6. View leaderboard position
-7. Compare with batch performance
-8. Track term-wise progress
-9. Access detailed component breakdowns
-10. View eligibility status
-
-#### 3.4.2 Teacher Assessment
-**Actor**: Teacher
-**Flow**:
-1. Log in to the system
-2. Access student list
-3. Select student for assessment
-4. Input scores for components
-5. Provide feedback
-6. Submit assessment
-7. Monitor intervention progress
-8. Track class performance
-9. Generate progress reports
-10. Set improvement goals
-
-#### 3.4.3 Admin Reporting
-**Actor**: Administrator
-**Flow**:
-1. Log in to the system
-2. Access admin dashboard
-3. Generate performance reports
-4. View quadrant analytics
-5. Export data
-6. Monitor program effectiveness
-7. Track batch performance
-8. Monitor attendance trends
-9. View term-wise comparisons
-10. Manage system settings
-
-#### 3.4.4 Traceability Matrices
-
-##### Requirements Traceability Matrix
-
-| Req ID | Description | Use Case | Test Case | Status |
-|--------|-------------|-----------|------------|---------|
-| FR-001 | Student Performance Tracking | UC-001 | TC-001 | Implemented |
-| FR-002 | Teacher Assessment | UC-002 | TC-002 | Implemented |
-| FR-003 | Admin Reporting | UC-003 | TC-003 | Implemented |
-| NFR-001 | Performance Requirements | - | TC-004 | Implemented |
-| NFR-002 | Security Requirements | - | TC-005 | Implemented |
-| NFR-003 | Reliability Requirements | - | TC-006 | Implemented |
-
-##### Component Traceability Matrix
-
-| Component | Requirements | Dependencies | Status |
-|-----------|--------------|--------------|---------|
-| Student Dashboard | FR-001, NFR-001 | React, Recharts | Implemented |
-| Teacher Dashboard | FR-002, NFR-002 | React, JWT | Implemented |
-| Admin Dashboard | FR-003, NFR-003 | React, API | Implemented |
-| Authentication | NFR-002 | JWT, API | Implemented |
-| Reporting | FR-003 | Recharts, API | Implemented |
-
-#### 3.4.5 Enhanced Use Case Scenarios
-
-##### UC-001: Student Performance Tracking (Enhanced)
-
-**Primary Actor**: Student
-**Secondary Actors**: Teacher, System
-**Preconditions**: 
-- Student is logged in
-- Current term is active
-- Assessment data is available
-
-**Main Success Scenario**:
-1. Student accesses dashboard
-2. System displays current term performance
-3. Student views quadrant scores
-4. System shows detailed component status
-5. Student reviews attendance
-6. System calculates eligibility
-7. Student views improvement recommendations
-8. System updates progress indicators
-
-**Alternative Flows**:
-- A1: No current term
-  1. System shows term selection
-  2. Student selects term
-  3. Continue with main flow
-- A2: Incomplete assessment
-  1. System highlights pending components
-  2. Student views requirements
-  3. Continue with main flow
-
-**Post-conditions**:
-- Performance data is updated
-- Progress indicators are current
-- Recommendations are available
-
-##### UC-002: Teacher Assessment (Enhanced)
-
-**Primary Actor**: Teacher
-**Secondary Actors**: Student, System
-**Preconditions**:
-- Teacher is logged in
-- Student records are accessible
-- Assessment period is active
-
-**Main Success Scenario**:
-1. Teacher accesses student list
-2. System displays student performance
-3. Teacher selects student
-4. System shows assessment form
-5. Teacher inputs scores
-6. System validates input
-7. Teacher adds feedback
-8. System saves assessment
-9. Teacher reviews batch performance
-10. System generates reports
-
-**Alternative Flows**:
-- A1: Invalid score input
-  1. System shows error
-  2. Teacher corrects input
-  3. Continue with main flow
-- A2: Student not eligible
-  1. System shows warning
-  2. Teacher reviews criteria
-  3. Continue with main flow
-
-**Post-conditions**:
-- Assessment data is saved
-- Reports are updated
-- Notifications are sent
-
-##### UC-003: Admin Reporting (Enhanced)
-
-**Primary Actor**: Administrator
-**Secondary Actors**: System, Teachers
-**Preconditions**:
-- Admin is logged in
-- System data is available
-- Reports are configured
-
-**Main Success Scenario**:
-1. Admin accesses dashboard
-2. System shows overview
-3. Admin selects report type
-4. System displays options
-5. Admin sets parameters
-6. System generates report
-7. Admin reviews data
-8. System exports report
-9. Admin shares report
-10. System logs action
-
-**Alternative Flows**:
-- A1: Data incomplete
-  1. System shows warning
-  2. Admin adjusts parameters
-  3. Continue with main flow
-- A2: Export fails
-  1. System shows error
-  2. Admin retries export
-  3. Continue with main flow
-
-**Post-conditions**:
-- Report is generated
-- Data is exported
-- Action is logged
 
 ##### 3.4.1 Error Handling Scenarios
 
@@ -1688,29 +1404,6 @@ interface Component {
      - Data repair tools
      - Manual verification
 
-###### Infrastructure
-1. **Server Failure**
-   - Risk: Application server crash
-   - Mitigation:
-     - Load balancing
-     - Auto-scaling
-     - Health monitoring
-   - Recovery:
-     - Auto-restart
-     - Failover to backup
-     - Manual intervention
-
-2. **Network Issues**
-   - Risk: Connectivity problems
-   - Mitigation:
-     - Multiple providers
-     - CDN caching
-     - Network monitoring
-   - Fallback:
-     - Offline mode
-     - Local processing
-     - Manual sync
-
 ##### 3.4.3 Monitoring and Alerts
 
 ###### System Health
@@ -1749,6 +1442,137 @@ interface Component {
    - Fix implementation
    - Verification
    - Documentation
+
+##### 3.4.4 Traceability Matrices
+
+###### Requirements Traceability Matrix
+
+| Req ID | Description | Use Case | Test Case | Status |
+|--------|-------------|-----------|------------|---------|
+| FR-001 | Student Performance Tracking | UC-001 | TC-001 | Implemented |
+| FR-002 | Teacher Assessment | UC-002 | TC-002 | Implemented |
+| FR-003 | Admin Reporting | UC-003 | TC-003 | Implemented |
+| NFR-001 | Performance Requirements | - | TC-004 | Implemented |
+| NFR-002 | Security Requirements | - | TC-005 | Implemented |
+| NFR-003 | Reliability Requirements | - | TC-006 | Implemented |
+
+###### Component Traceability Matrix
+
+| Component | Requirements | Dependencies | Status |
+|-----------|--------------|--------------|---------|
+| Student Dashboard | FR-001, NFR-001 | React, Recharts | Implemented |
+| Teacher Dashboard | FR-002, NFR-002 | React, JWT | Implemented |
+| Admin Dashboard | FR-003, NFR-003 | React, API | Implemented |
+| Authentication | NFR-002 | JWT, API | Implemented |
+| Reporting | FR-003 | Recharts, API | Implemented |
+
+##### 3.4.5 Enhanced Use Case Scenarios
+
+###### UC-001: Student Performance Tracking (Enhanced)
+
+**Primary Actor**: Student
+**Secondary Actors**: Teacher, System
+**Preconditions**: 
+- Student is logged in
+- Current term is active
+- Assessment data is available
+
+**Main Success Scenario**:
+1. Student accesses dashboard
+2. System displays current term performance
+3. Student views quadrant scores
+4. System shows detailed component status
+5. Student reviews attendance
+6. System calculates eligibility
+7. Student views improvement recommendations
+8. System updates progress indicators
+
+**Alternative Flows**:
+- A1: No current term
+  1. System shows term selection
+  2. Student selects term
+  3. Continue with main flow
+- A2: Incomplete assessment
+  1. System highlights pending components
+  2. Student views requirements
+  3. Continue with main flow
+
+**Post-conditions**:
+- Performance data is updated
+- Progress indicators are current
+- Recommendations are available
+
+###### UC-002: Teacher Assessment (Enhanced)
+
+**Primary Actor**: Teacher
+**Secondary Actors**: Student, System
+**Preconditions**:
+- Teacher is logged in
+- Student records are accessible
+- Assessment period is active
+
+**Main Success Scenario**:
+1. Teacher accesses student list
+2. System displays student performance
+3. Teacher selects student
+4. System shows assessment form
+5. Teacher inputs scores
+6. System validates input
+7. Teacher adds feedback
+8. System saves assessment
+9. Teacher reviews batch performance
+10. System generates reports
+
+**Alternative Flows**:
+- A1: Invalid score input
+  1. System shows error
+  2. Teacher corrects input
+  3. Continue with main flow
+- A2: Student not eligible
+  1. System shows warning
+  2. Teacher reviews criteria
+  3. Continue with main flow
+
+**Post-conditions**:
+- Assessment data is saved
+- Reports are updated
+- Notifications are sent
+
+###### UC-003: Admin Reporting (Enhanced)
+
+**Primary Actor**: Administrator
+**Secondary Actors**: System, Teachers
+**Preconditions**:
+- Admin is logged in
+- System data is available
+- Reports are configured
+
+**Main Success Scenario**:
+1. Admin accesses dashboard
+2. System shows overview
+3. Admin selects report type
+4. System displays options
+5. Admin sets parameters
+6. System generates report
+7. Admin reviews data
+8. System exports report
+9. Admin shares report
+10. System logs action
+
+**Alternative Flows**:
+- A1: Data incomplete
+  1. System shows warning
+  2. Admin adjusts parameters
+  3. Continue with main flow
+- A2: Export fails
+  1. System shows error
+  2. Admin retries export
+  3. Continue with main flow
+
+**Post-conditions**:
+- Report is generated
+- Data is exported
+- Action is logged
 
 ### 4. Supporting Information
 
