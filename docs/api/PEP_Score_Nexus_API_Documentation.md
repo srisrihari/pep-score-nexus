@@ -1,4 +1,4 @@
-# PEP(Personality Enhancement Program) APP - Complete API Documentation
+# PEP Score Nexus - Complete API Documentation
 
 ## Overview
 
