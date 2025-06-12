@@ -67,11 +67,11 @@ PEP Score Nexus is a sophisticated educational management platform designed to t
 - **shadcn/ui**: High-quality UI components
 - **Vite**: Fast build tool and development server
 
-### Backend (Planned)
-- **Node.js**: Runtime environment
-- **Express.js**: Web application framework
-- **PostgreSQL**: Primary database
-- **JWT**: Authentication and authorization
+### Backend (✅ Implemented)
+- **Node.js + Express.js**: RESTful API server
+- **PostgreSQL**: Production database with 31 tables
+- **pgAdmin4**: Database administration interface
+- **JWT**: Authentication and authorization (ready for implementation)
 
 ### Development Tools
 - **ESLint**: Code linting
@@ -82,34 +82,51 @@ PEP Score Nexus is a sophisticated educational management platform designed to t
 
 ```
 pep-score-nexus/
-├── src/
-│   ├── components/          # Reusable UI components
-│   │   ├── admin/          # Admin-specific components
-│   │   ├── common/         # Shared components
-│   │   ├── layout/         # Layout components
-│   │   ├── student/        # Student-specific components
-│   │   └── ui/             # Base UI components (shadcn/ui)
-│   ├── contexts/           # React contexts for state management
-│   ├── data/              # Mock data and constants
-│   ├── hooks/             # Custom React hooks
-│   ├── lib/               # Utility libraries
-│   ├── pages/             # Page components
-│   │   ├── admin/         # Admin pages
-│   │   ├── student/       # Student pages
-│   │   └── teacher/       # Teacher pages
-│   └── vite-env.d.ts      # Vite type definitions
-├── docs/                  # Documentation
+├── frontend/                # 🎨 React Frontend Application
+│   ├── src/
+│   │   ├── components/      # Reusable UI components
+│   │   │   ├── admin/      # Admin-specific components
+│   │   │   ├── common/     # Shared components
+│   │   │   ├── layout/     # Layout components
+│   │   │   ├── student/    # Student-specific components
+│   │   │   └── ui/         # Base UI components (shadcn/ui)
+│   │   ├── contexts/       # React contexts for state management
+│   │   ├── data/          # Mock data (to be replaced with API calls)
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── lib/           # Utility libraries
+│   │   ├── pages/         # Page components
+│   │   │   ├── admin/     # Admin pages
+│   │   │   ├── student/   # Student pages
+│   │   │   └── teacher/   # Teacher pages
+│   │   └── main.tsx       # App entry point
+│   ├── public/            # Static assets
+│   ├── package.json       # Frontend dependencies
+│   ├── vite.config.ts     # Vite configuration
+│   └── README.md          # Frontend documentation
+├── backend/                # 🚀 Node.js Backend API
+│   ├── src/
+│   │   ├── config/        # Database and app configuration
+│   │   ├── controllers/   # API route controllers
+│   │   ├── routes/        # API route definitions
+│   │   ├── middleware/    # Express middleware
+│   │   └── server.js      # Main server file
+│   ├── package.json       # Backend dependencies
+│   └── .env              # Environment variables
+├── docs/                  # 📚 Documentation
 │   ├── api/              # API documentation
 │   ├── architecture/     # Technical architecture
-│   ├── database/         # Database schema and design
+│   ├── database/         # Database schema and pgAdmin guides
 │   ├── requirements/     # Requirements and specifications
 │   ├── diagrams/         # User flow diagrams
 │   ├── assets/           # Documentation assets
 │   └── README.md         # Documentation index
-├── public/               # Static assets
-│   ├── lovable-uploads/  # Lovable platform uploads
-│   └── ...              # Other static files
-└── Configuration files   # Package.json, tsconfig, etc.
+├── database/             # 🗄️ Database Files
+│   ├── database_setup.sql           # Complete schema creation
+│   ├── sample_data.sql             # Sample data insertion
+│   └── pep_score_nexus_backup.sql  # Full database backup
+├── team_pgadmin_setup.sh # 🔧 Team setup script
+├── test_apis.sh          # 🧪 API testing script
+└── README.md             # Main project documentation
 ```
 
 ## 📚 Documentation
@@ -132,50 +149,102 @@ pep-score-nexus/
 
 ### Prerequisites
 - Node.js 18+ and npm (install with [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- PostgreSQL 14+ (for database)
 - Git for version control
 
-### Installation
+### Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone <YOUR_GIT_URL>
-   cd pep-score-nexus
-   ```
+#### 🗄️ **Database Setup (Required First)**
+```bash
+# 1. Start PostgreSQL service
+sudo systemctl start postgresql
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# 2. Create database and tables
+psql -U postgres -h localhost -c "CREATE DATABASE pep_score_nexus;"
+psql -U postgres -h localhost -d pep_score_nexus -f database_setup.sql
 
-3. **Start development server**
-   ```bash
-   npm run dev
-   ```
+# 3. Insert sample data
+psql -U postgres -h localhost -d pep_score_nexus -f sample_data.sql
 
-4. **Open in browser**
-   ```
-   http://localhost:5173
-   ```
+# 4. Setup pgAdmin for team access (optional)
+./team_pgadmin_setup.sh
+```
+
+#### 🚀 **Backend API Setup**
+```bash
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Install dependencies
+npm install
+
+# 3. Start API server
+npm run dev
+# Server runs on http://localhost:3001
+```
+
+#### 🎨 **Frontend Setup**
+```bash
+# 1. Navigate to frontend directory
+cd frontend
+
+# 2. Install dependencies
+npm install
+# Or use Bun: bun install
+
+# 3. Start development server
+npm run dev
+# Or use Bun: bun dev
+# Frontend runs on http://localhost:8080
+```
+
+#### ✅ **Verify Setup**
+```bash
+# Test API endpoints
+./test_apis.sh
+
+# Access pgAdmin (if installed)
+# http://127.0.0.1/pgadmin4
+```
 
 ## 💻 Development
 
 ### Available Scripts
 
+#### Frontend (in `frontend/` directory)
 ```bash
-# Start development server
-npm run dev
+# Development
+npm run dev          # Start frontend dev server (port 8080)
+bun dev             # Alternative with Bun
 
-# Build for production
-npm run build
+# Building
+npm run build       # Build for production
+npm run preview     # Preview production build
 
-# Preview production build
-npm run preview
+# Code Quality
+npm run lint        # Run ESLint
+```
 
-# Run linting
-npm run lint
+#### Backend (in `backend/` directory)
+```bash
+# Development
+npm run dev         # Start API server with nodemon (port 3001)
+npm start          # Start API server in production mode
 
-# Type checking
-npm run type-check
+# Testing
+npm test           # Run tests (when implemented)
+```
+
+#### Database
+```bash
+# Test database connection
+psql -U postgres -h localhost -d pep_score_nexus
+
+# Backup database
+pg_dump -U postgres -h localhost -d pep_score_nexus > backup.sql
+
+# Test APIs
+./test_apis.sh
 ```
 
 ### Development Workflow
