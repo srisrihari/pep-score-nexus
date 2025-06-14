@@ -1,4 +1,5 @@
-const { query, transaction } = require('../config/database');
+const { supabase, query } = require('../config/supabase');
+const { transaction } = require('../config/database');
 
 // Get all students with pagination
 const getAllStudents = async (req, res) => {
@@ -11,91 +12,89 @@ const getAllStudents = async (req, res) => {
     const section = req.query.section || '';
     const status = req.query.status || '';
 
-    let whereClause = 'WHERE s.status != \'Dropped\'';
-    const queryParams = [];
-    let paramCount = 0;
+    // Build Supabase query with filters
+    let studentsQuery = supabase
+      .from('students')
+      .select(`
+        id,
+        registration_no,
+        name,
+        course,
+        gender,
+        phone,
+        overall_score,
+        grade,
+        status,
+        current_term,
+        created_at,
+        batches:batch_id(name, year),
+        sections:section_id(name),
+        houses:house_id(name, color)
+      `)
+      .neq('status', 'Dropped');
 
+    // Apply filters
     if (search) {
-      paramCount++;
-      whereClause += ` AND (s.name ILIKE $${paramCount} OR s.registration_no ILIKE $${paramCount})`;
-      queryParams.push(`%${search}%`);
+      studentsQuery = studentsQuery.or(`name.ilike.%${search}%,registration_no.ilike.%${search}%`);
     }
 
     if (batch) {
-      paramCount++;
-      whereClause += ` AND b.name = $${paramCount}`;
-      queryParams.push(batch);
+      studentsQuery = studentsQuery.eq('batches.name', batch);
     }
 
     if (section) {
-      paramCount++;
-      whereClause += ` AND sec.name = $${paramCount}`;
-      queryParams.push(section);
+      studentsQuery = studentsQuery.eq('sections.name', section);
     }
 
     if (status) {
-      paramCount++;
-      whereClause += ` AND s.status = $${paramCount}`;
-      queryParams.push(status);
+      studentsQuery = studentsQuery.eq('status', status);
     }
 
-    // Get total count
-    const countQuery = `
-      SELECT COUNT(*) as total
-      FROM students s
-      LEFT JOIN batches b ON s.batch_id = b.id
-      LEFT JOIN sections sec ON s.section_id = sec.id
-      ${whereClause}
-    `;
-    const countResult = await query(countQuery, queryParams);
-    const totalStudents = parseInt(countResult.rows[0].total);
+    // Get total count for pagination
+    const countQuery = supabase
+      .from('students')
+      .select('*', { count: 'exact', head: true })
+      .neq('status', 'Dropped');
 
-    // Get students with pagination
-    paramCount++;
-    const limitParam = paramCount;
-    paramCount++;
-    const offsetParam = paramCount;
-    
-    const studentsQuery = `
-      SELECT 
-        s.id,
-        s.registration_no,
-        s.name,
-        s.course,
-        s.gender,
-        s.phone,
-        s.overall_score,
-        s.grade,
-        s.status,
-        s.current_term,
-        s.created_at,
-        b.name as batch_name,
-        b.year as batch_year,
-        sec.name as section_name,
-        h.name as house_name,
-        h.color as house_color
-      FROM students s
-      LEFT JOIN batches b ON s.batch_id = b.id
-      LEFT JOIN sections sec ON s.section_id = sec.id
-      LEFT JOIN houses h ON s.house_id = h.id
-      ${whereClause}
-      ORDER BY s.created_at DESC
-      LIMIT $${limitParam} OFFSET $${offsetParam}
-    `;
-    
-    queryParams.push(limit, offset);
-    const studentsResult = await query(studentsQuery, queryParams);
+    // Apply same filters to count query
+    let finalCountQuery = countQuery;
+    if (search) {
+      finalCountQuery = finalCountQuery.or(`name.ilike.%${search}%,registration_no.ilike.%${search}%`);
+    }
+    if (status) {
+      finalCountQuery = finalCountQuery.eq('status', status);
+    }
 
-    const totalPages = Math.ceil(totalStudents / limit);
+    // Execute count query
+    const { count: totalStudents } = await finalCountQuery;
+
+    // Execute main query with pagination
+    const result = await query(
+      studentsQuery
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+    );
+
+    const totalPages = Math.ceil((totalStudents || 0) / limit);
+
+    // Transform data to match expected format
+    const transformedData = result.rows.map(student => ({
+      ...student,
+      batch_name: student.batches?.name || null,
+      batch_year: student.batches?.year || null,
+      section_name: student.sections?.name || null,
+      house_name: student.houses?.name || null,
+      house_color: student.houses?.color || null
+    }));
 
     res.status(200).json({
       success: true,
       message: 'Students retrieved successfully',
-      data: studentsResult.rows,
+      data: transformedData,
       pagination: {
         currentPage: page,
         totalPages,
-        totalStudents,
+        totalStudents: totalStudents || 0,
         studentsPerPage: limit,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1
@@ -304,8 +303,269 @@ const createStudent = async (req, res) => {
   }
 };
 
+// Get current user's student profile
+const getCurrentStudent = async (req, res) => {
+  try {
+    if (req.user.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Only students can access this endpoint.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const studentResult = await query(
+      supabase
+        .from('students')
+        .select(`
+          id,
+          registration_no,
+          name,
+          course,
+          gender,
+          phone,
+          preferences,
+          overall_score,
+          grade,
+          status,
+          current_term,
+          created_at,
+          updated_at,
+          batches:batch_id(name, year),
+          sections:section_id(name),
+          houses:house_id(name, color)
+        `)
+        .eq('user_id', req.user.userId)
+        .limit(1)
+    );
+
+    if (!studentResult.rows || studentResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student profile not found',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const student = studentResult.rows[0];
+
+    // Transform data to match expected format
+    const transformedData = {
+      ...student,
+      batch_name: student.batches?.name || null,
+      batch_year: student.batches?.year || null,
+      section_name: student.sections?.name || null,
+      house_name: student.houses?.name || null,
+      house_color: student.houses?.color || null
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'Current student profile retrieved successfully',
+      data: transformedData,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching current student:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve current student profile',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+// Create student record for existing user (temporary helper)
+const createStudentForExistingUser = async (req, res) => {
+  try {
+    const {
+      username,
+      registration_no,
+      name,
+      email,
+      batch_id,
+      section_id,
+      house_id,
+      gender,
+      date_of_birth,
+      phone,
+      address,
+      emergency_contact_name,
+      emergency_contact_phone
+    } = req.body;
+
+    // Validation
+    if (!username || !registration_no || !name) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: username, registration_no, name',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Create supporting data using Supabase
+    console.log('Creating supporting data...');
+    
+    // Check if batch exists, create if not
+    let batchResult = await query(
+      supabase
+        .from('batches')
+        .select('id')
+        .eq('name', 'Batch 2024')
+        .limit(1)
+    );
+
+    let batchId;
+    if (batchResult.rows.length === 0) {
+      const newBatch = await supabase
+        .from('batches')
+        .insert({
+          name: 'Batch 2024',
+          year: 2024,
+          start_date: '2024-01-01',
+          end_date: '2024-12-31',
+          is_active: true
+        })
+        .select()
+        .single();
+      
+      if (newBatch.error) throw newBatch.error;
+      batchId = newBatch.data.id;
+    } else {
+      batchId = batchResult.rows[0].id;
+    }
+
+    // Check if section exists, create if not
+    let sectionResult = await query(
+      supabase
+        .from('sections')
+        .select('id')
+        .eq('name', 'Section A')
+        .eq('batch_id', batchId)
+        .limit(1)
+    );
+
+    let sectionId;
+    if (sectionResult.rows.length === 0) {
+      const newSection = await supabase
+        .from('sections')
+        .insert({
+          name: 'Section A',
+          batch_id: batchId,
+          capacity: 50,
+          is_active: true
+        })
+        .select()
+        .single();
+      
+      if (newSection.error) throw newSection.error;
+      sectionId = newSection.data.id;
+    } else {
+      sectionId = sectionResult.rows[0].id;
+    }
+
+    // Check if house exists, create if not
+    let houseResult = await query(
+      supabase
+        .from('houses')
+        .select('id')
+        .eq('name', 'Red House')
+        .limit(1)
+    );
+
+    let houseId;
+    if (houseResult.rows.length === 0) {
+      const newHouse = await supabase
+        .from('houses')
+        .insert({
+          name: 'Red House',
+          description: 'Red house for students',
+          color: '#EF4444',
+          is_active: true
+        })
+        .select()
+        .single();
+      
+      if (newHouse.error) throw newHouse.error;
+      houseId = newHouse.data.id;
+    } else {
+      houseId = houseResult.rows[0].id;
+    }
+
+    // Get user ID
+    const userResult = await query(
+      supabase
+        .from('users')
+        .select('id')
+        .eq('username', username)
+        .limit(1)
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `User with username '${username}' not found`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const userId = userResult.rows[0].id;
+    console.log('Found user ID:', userId);
+
+    // Create student record
+    const studentData = {
+      user_id: userId,
+      registration_no,
+      name,
+      course: 'General Course', // Required field
+      batch_id: batchId,
+      section_id: sectionId,
+      house_id: houseId,
+      gender: gender || 'Male',
+      phone: phone || '+1234567890',
+      preferences: {
+        address: address || '123 Test Street',
+        emergency_contact_name: emergency_contact_name || 'Emergency Contact',
+        emergency_contact_phone: emergency_contact_phone || '+1234567891',
+        date_of_birth: date_of_birth || '2000-01-01'
+      },
+      status: 'Active',
+      current_term: 'Term1'
+    };
+
+    const studentResult = await supabase
+      .from('students')
+      .upsert(studentData, { onConflict: 'user_id' })
+      .select()
+      .single();
+
+    if (studentResult.error) {
+      throw studentResult.error;
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Student record created successfully for existing user',
+      data: studentResult.data,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error creating student record:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create student record',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
 module.exports = {
   getAllStudents,
   getStudentById,
-  createStudent
+  createStudent,
+  getCurrentStudent,
+  createStudentForExistingUser
 };

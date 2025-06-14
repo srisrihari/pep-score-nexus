@@ -32,6 +32,7 @@ import InputScores from "./pages/admin/InputScores";
 import Reports from "./pages/admin/Reports";
 import DataImport from "./pages/admin/DataImport";
 import ManageTeachers from "./pages/admin/ManageTeachers";
+import ManageUsers from "./pages/admin/ManageUsers";
 
 const queryClient = new QueryClient();
 
@@ -183,6 +184,13 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="admin">
           <Layout>
             <ManageTeachers />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/users" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <ManageUsers />
           </Layout>
         </ProtectedRoute>
       } />

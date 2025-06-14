@@ -1,13 +1,24 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "sonner";
+import { authService } from "@/lib/auth";
 
 type UserRole = "student" | "admin" | "teacher" | null;
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: 'student' | 'teacher' | 'admin';
+  status: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
   userRole: UserRole;
   userId: string | null;
+  user: User | null;
+  token: string | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -26,53 +37,70 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Mock user credentials
-const MOCK_CREDENTIALS = {
-  student: { username: "student", password: "password", userId: "2024-Ajith" },
-  admin: { username: "admin", password: "password", userId: "admin-001" },
-  teacher: { username: "teacher", password: "password", userId: "teacher-001", specialization: "wellness" }
-};
-
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
+  // Check for existing session on load
+  React.useEffect(() => {
+    const savedToken = authService.getToken();
+    const savedUser = authService.getUser();
+    
+    if (savedToken && savedUser) {
+      setIsAuthenticated(true);
+      setUserRole(savedUser.role);
+      setUserId(savedUser.id);
+      setUser(savedUser);
+      setToken(savedToken);
+    }
+  }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    // Mock authentication logic
-    if (username === MOCK_CREDENTIALS.student.username && password === MOCK_CREDENTIALS.student.password) {
-      setIsAuthenticated(true);
-      setUserRole("student");
-      setUserId(MOCK_CREDENTIALS.student.userId);
-      toast.success("Logged in as Student");
-      return true;
-    } else if (username === MOCK_CREDENTIALS.admin.username && password === MOCK_CREDENTIALS.admin.password) {
-      setIsAuthenticated(true);
-      setUserRole("admin");
-      setUserId(MOCK_CREDENTIALS.admin.userId);
-      toast.success("Logged in as Admin");
-      return true;
-    } else if (username === MOCK_CREDENTIALS.teacher.username && password === MOCK_CREDENTIALS.teacher.password) {
-      setIsAuthenticated(true);
-      setUserRole("teacher");
-      setUserId(MOCK_CREDENTIALS.teacher.userId);
-      toast.success("Logged in as Teacher");
-      return true;
-    } else {
-      toast.error("Invalid credentials");
+    try {
+      const response = await authService.login(username, password);
+      
+      if (response.success) {
+        const { user: userData, token: authToken } = response.data;
+        
+        // Store in localStorage
+        authService.setToken(authToken);
+        authService.setUser(userData);
+        
+        // Update state
+        setIsAuthenticated(true);
+        setUserRole(userData.role);
+        setUserId(userData.id);
+        setUser(userData);
+        setToken(authToken);
+        
+        toast.success(`Logged in as ${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)}`);
+        return true;
+      } else {
+        toast.error(response.message || "Invalid credentials");
+        return false;
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
       return false;
     }
   };
 
   const logout = () => {
+    authService.logout();
     setIsAuthenticated(false);
     setUserRole(null);
     setUserId(null);
+    setUser(null);
+    setToken(null);
     toast.info("Logged out successfully");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userRole, userId, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userRole, userId, user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,11 +6,14 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const { testConnection } = require('./config/database');
+const { testConnection } = require('./config/supabase');
 
 // Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
 const quadrantRoutes = require('./routes/quadrants');
 const studentRoutes = require('./routes/students');
+const scoreRoutes = require('./routes/scores');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,10 +23,16 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: [
+    'http://localhost:8080',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.CORS_ORIGIN
+  ].filter(Boolean),
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
 
 // Rate limiting
@@ -76,8 +85,11 @@ const apiPrefix = process.env.API_PREFIX || '/api';
 const apiVersion = process.env.API_VERSION || 'v1';
 const baseRoute = `${apiPrefix}/${apiVersion}`;
 
+app.use(`${baseRoute}/auth`, authRoutes);
+app.use(`${baseRoute}/users`, userRoutes);
 app.use(`${baseRoute}/quadrants`, quadrantRoutes);
 app.use(`${baseRoute}/students`, studentRoutes);
+app.use(`${baseRoute}/scores`, scoreRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -87,8 +99,10 @@ app.get('/', (req, res) => {
     documentation: `${req.protocol}://${req.get('host')}/docs`,
     health: `${req.protocol}://${req.get('host')}/health`,
     endpoints: {
+      auth: `${req.protocol}://${req.get('host')}${baseRoute}/auth`,
       quadrants: `${req.protocol}://${req.get('host')}${baseRoute}/quadrants`,
-      students: `${req.protocol}://${req.get('host')}${baseRoute}/students`
+      students: `${req.protocol}://${req.get('host')}${baseRoute}/students`,
+      scores: `${req.protocol}://${req.get('host')}${baseRoute}/scores`
     }
   });
 });
@@ -99,6 +113,9 @@ app.use('*', (req, res) => {
     error: 'Endpoint not found',
     message: `The requested endpoint ${req.method} ${req.originalUrl} was not found on this server.`,
     availableEndpoints: [
+      `POST ${baseRoute}/auth/register`,
+      `POST ${baseRoute}/auth/login`,
+      `GET ${baseRoute}/auth/profile`,
       `GET ${baseRoute}/quadrants`,
       `GET ${baseRoute}/students`,
       'GET /health'

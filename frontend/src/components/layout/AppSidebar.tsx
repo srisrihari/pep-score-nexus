@@ -53,6 +53,7 @@ export function AppSidebar() {
     { title: "Dashboard", path: "/admin", icon: Home },
     { title: "Manage Students", path: "/admin/students", icon: Users },
     { title: "Manage Teachers", path: "/admin/teachers", icon: PenTool },
+    { title: "Manage Users", path: "/admin/users", icon: User },
     { title: "Input Scores", path: "/admin/scores", icon: ClipboardEdit },
     { title: "Reports", path: "/admin/reports", icon: FileBarChart },
     { title: "Data Import", path: "/admin/import", icon: FileSpreadsheet },

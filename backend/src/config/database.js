@@ -1,17 +1,22 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Database configuration
+// Database configuration for Supabase
 const dbConfig = {
   user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'pep_score_nexus',
-  password: process.env.DB_PASSWORD || 'newpassword',
+  host: process.env.DB_HOST || 'db.hxxjdvecnhvqkgkscnmv.supabase.co',
+  database: process.env.DB_NAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'Sri*9594',
   port: process.env.DB_PORT || 5432,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: {
+    rejectUnauthorized: false // Required for Supabase
+  },
+  // Force IPv4 for Supabase connection
+  keepAlive: true,
+  family: 4, // Force IPv4
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+  connectionTimeoutMillis: 10000, // Increased timeout for Supabase connection
 };
 
 // Create connection pool
@@ -19,7 +24,7 @@ const pool = new Pool(dbConfig);
 
 // Test database connection
 pool.on('connect', () => {
-  console.log('✅ Connected to PostgreSQL database');
+  console.log('✅ Connected to Supabase PostgreSQL database');
 });
 
 pool.on('error', (err) => {

@@ -1,23 +1,25 @@
-const { query } = require('../config/database');
+const { supabase, query } = require('../config/supabase');
 
 // Get all quadrants
 const getAllQuadrants = async (req, res) => {
   try {
-    const result = await query(`
-      SELECT 
-        id,
-        name,
-        description,
-        weightage,
-        minimum_attendance,
-        business_rules,
-        is_active,
-        display_order,
-        created_at
-      FROM quadrants 
-      WHERE is_active = true 
-      ORDER BY display_order ASC
-    `);
+    const result = await query(
+      supabase
+        .from('quadrants')
+        .select(`
+          id,
+          name,
+          description,
+          weightage,
+          minimum_attendance,
+          business_rules,
+          is_active,
+          display_order,
+          created_at
+        `)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+    );
 
     res.status(200).json({
       success: true,

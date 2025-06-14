@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,8 +12,25 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, userRole } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && userRole) {
+      switch (userRole) {
+        case 'admin':
+          navigate("/admin");
+          break;
+        case 'teacher':
+          navigate("/teacher");
+          break;
+        case 'student':
+          navigate("/student");
+          break;
+      }
+    }
+  }, [isAuthenticated, userRole, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,15 +44,8 @@ const Login: React.FC = () => {
 
     try {
       const success = await login(username, password);
-      if (success) {
-        if (username === "admin") {
-          navigate("/admin");
-        } else if (username === "teacher") {
-          navigate("/teacher");
-        } else {
-          navigate("/student");
-        }
-      }
+      // Redirection will be handled by the useEffect hook
+      // once the auth context is updated with the user role
     } finally {
       setIsLoading(false);
     }
@@ -93,18 +103,18 @@ const Login: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 mt-2">
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Student</p>
-                <p>Username: student</p>
-                <p>Password: password</p>
+                <p>Username: john_student</p>
+                <p>Password: newpassword123</p>
               </div>
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Teacher</p>
-                <p>Username: teacher</p>
-                <p>Password: password</p>
+                <p>Username: mary_teacher</p>
+                <p>Password: teacher123</p>
               </div>
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Admin</p>
                 <p>Username: admin</p>
-                <p>Password: password</p>
+                <p>Password: admin123</p>
               </div>
             </div>
           </div>

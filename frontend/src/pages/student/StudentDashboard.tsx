@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,15 +10,124 @@ import ScoreRing from "@/components/common/ScoreRing";
 import QuadrantCard from "@/components/common/QuadrantCard";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
 import AreasForImprovement from "@/components/student/AreasForImprovement";
-import { studentData, leaderboardData, timeSeriesData, termComparisonData, attendanceData } from "@/data/mockData";
+import { Student, Leaderboard } from "@/data/mockData";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import StatusBadge from "@/components/common/StatusBadge";
 import { Link } from "react-router-dom";
 import { InfoIcon } from "lucide-react";
+import { studentAPI, scoreAPI, quadrantAPI } from "@/lib/api";
+import { 
+  transformStudentData, 
+  generateMockLeaderboard, 
+  generateMockTimeSeriesData, 
+  generateMockTermComparisonData, 
+  generateMockAttendanceData 
+} from "@/lib/dataTransform";
 // Import all necessary types
 
 const StudentDashboard: React.FC = () => {
-  const [selectedTermId, setSelectedTermId] = useState<string>(studentData.currentTerm);
+  const [studentData, setStudentData] = useState<Student | null>(null);
+  const [leaderboardData, setLeaderboardData] = useState<Leaderboard | null>(null);
+  const [timeSeriesData, setTimeSeriesData] = useState<any>(null);
+  const [termComparisonData, setTermComparisonData] = useState<any[]>([]);
+  const [attendanceData, setAttendanceData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTermId, setSelectedTermId] = useState<string>("");
+
+  // Load data from API
+  useEffect(() => {
+    const loadStudentData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch all required data
+        const [studentResponse, quadrantsResponse] = await Promise.all([
+          studentAPI.getCurrentStudent(),
+          quadrantAPI.getAllQuadrants()
+        ]);
+
+        // Get score summary for the student (if available)
+        let scoreSummaryResponse = null;
+        try {
+          scoreSummaryResponse = await scoreAPI.getStudentScoreSummary(
+            studentResponse.data.id
+          );
+        } catch (scoreError) {
+          console.warn('Score summary not available, using mock data:', scoreError);
+          // Continue without score data - will use mock data
+        }
+
+        // Transform API data to UI format
+        const transformedStudent = transformStudentData(
+          studentResponse,
+          scoreSummaryResponse,
+          quadrantsResponse.data
+        );
+
+        // Generate mock data for charts and leaderboards
+        const mockLeaderboard = generateMockLeaderboard(transformedStudent.totalScore);
+        const mockTimeSeries = generateMockTimeSeriesData(transformedStudent.totalScore);
+        const mockTermComparison = generateMockTermComparisonData(transformedStudent.totalScore);
+        const mockAttendance = generateMockAttendanceData(scoreSummaryResponse?.summary?.quadrant_scores || []);
+
+        // Set all state
+        setStudentData(transformedStudent);
+        setLeaderboardData(mockLeaderboard);
+        setTimeSeriesData(mockTimeSeries);
+        setTermComparisonData(mockTermComparison);
+        setAttendanceData(mockAttendance);
+        setSelectedTermId(transformedStudent.currentTerm);
+
+      } catch (err) {
+        console.error('Failed to load student data:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load data';
+        
+        // If student profile not found, show a specific message
+        if (errorMessage.includes('Student profile not found')) {
+          setError('Student profile not found. Please contact your administrator to set up your student profile.');
+        } else {
+          setError(errorMessage);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStudentData();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !studentData || !leaderboardData) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Failed to load dashboard data</p>
+          <p className="text-muted-foreground text-sm">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline" 
+            className="mt-4"
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Find the selected term data
   const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
@@ -83,7 +192,7 @@ const StudentDashboard: React.FC = () => {
           <CardContent className="h-[230px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={timeSeriesData.overall}
+                data={timeSeriesData?.overall || []}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -113,21 +222,21 @@ const StudentDashboard: React.FC = () => {
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium">Overall Attendance</span>
-                  <span className="text-sm font-medium">{attendanceData.overall}%</span>
+                  <span className="text-sm font-medium">{attendanceData?.overall || 0}%</span>
                 </div>
-                <Progress value={attendanceData.overall} className="h-2" />
+                <Progress value={attendanceData?.overall || 0} className="h-2" />
               </div>
               <div>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium">Wellness Attendance</span>
-                  <span className="text-sm font-medium">{attendanceData.wellness}%</span>
+                  <span className="text-sm font-medium">{attendanceData?.wellness || 0}%</span>
                 </div>
-                <Progress value={attendanceData.wellness} className="h-2" />
+                <Progress value={attendanceData?.wellness || 0} className="h-2" />
               </div>
               <div className="flex items-center mt-4">
                 <span className="mr-2">Eligibility Status:</span>
-                <Badge variant={attendanceData.eligibility === "Eligible" ? "outline" : "destructive"}>
-                  {attendanceData.eligibility}
+                <Badge variant={attendanceData?.eligibility === "Eligible" ? "outline" : "destructive"}>
+                  {attendanceData?.eligibility || "Unknown"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
@@ -197,8 +306,8 @@ const StudentDashboard: React.FC = () => {
               <QuadrantCard
                 key={quadrant.id}
                 quadrant={quadrant}
-                batchAvg={leaderboardData.quadrants[quadrant.id].batchAvg}
-                batchBest={leaderboardData.quadrants[quadrant.id].batchBest}
+                batchAvg={leaderboardData?.quadrants[quadrant.id]?.batchAvg || 0}
+                batchBest={leaderboardData?.quadrants[quadrant.id]?.batchBest || 0}
                 gradientClass={
                   index === 0
                     ? "card-gradient-primary"
