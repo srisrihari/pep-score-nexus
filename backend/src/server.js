@@ -14,6 +14,7 @@ const userRoutes = require('./routes/users');
 const quadrantRoutes = require('./routes/quadrants');
 const studentRoutes = require('./routes/students');
 const scoreRoutes = require('./routes/scores');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -90,6 +91,7 @@ app.use(`${baseRoute}/users`, userRoutes);
 app.use(`${baseRoute}/quadrants`, quadrantRoutes);
 app.use(`${baseRoute}/students`, studentRoutes);
 app.use(`${baseRoute}/scores`, scoreRoutes);
+app.use(`${baseRoute}/admin`, adminRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
