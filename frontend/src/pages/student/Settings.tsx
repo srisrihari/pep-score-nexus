@@ -1,30 +1,105 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { studentData } from "@/data/mockData";
+import { studentAPI } from "@/lib/api";
 
 const Settings: React.FC = () => {
-  const [email, setEmail] = useState("student@university.edu");
-  const [phone, setPhone] = useState("+1 234-567-8900");
+  const [studentData, setStudentData] = useState<any>(null);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [notifyScores, setNotifyScores] = useState(true);
   const [notifyUpdates, setNotifyUpdates] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  // Load student profile data
+  useEffect(() => {
+    const loadStudentProfile = async () => {
+      try {
+        const currentStudentResponse = await studentAPI.getCurrentStudent();
+        const studentId = currentStudentResponse.data.id;
+
+        const profileResponse = await studentAPI.getStudentProfile(studentId);
+        const profile = profileResponse.data;
+
+        setStudentData(profile);
+        setEmail(profile.email || "");
+        setPhone(profile.phone || "");
+
+        // Load preferences if available
+        if (profile.preferences) {
+          setNotifyScores(profile.preferences.notifyScores ?? true);
+          setNotifyUpdates(profile.preferences.notifyUpdates ?? false);
+        }
+      } catch (error) {
+        console.error('Failed to load student profile:', error);
+        toast.error('Failed to load profile data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStudentProfile();
+  }, []);
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!studentData) {
+      toast.error("Student data not available");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await studentAPI.updateStudentProfile(studentData.id, {
+        email,
+        phone,
+        preferences: {
+          notifyScores,
+          notifyUpdates
+        }
+      });
+
       toast.success("Profile updated successfully");
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error("Failed to update profile. Please try again.");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!studentData) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Failed to load student data</p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -45,22 +120,22 @@ const Settings: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" value={studentData.name} disabled />
+                  <Input id="name" value={studentData.name || ""} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="registration">Registration No.</Label>
-                  <Input id="registration" value={studentData.registrationNo} disabled />
+                  <Input id="registration" value={studentData.registrationNo || ""} disabled />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="batch">Batch</Label>
-                  <Input id="batch" value={studentData.batch} disabled />
+                  <Input id="batch" value={studentData.batch || ""} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="course">Course</Label>
-                  <Input id="course" value={studentData.course} disabled />
+                  <Input id="course" value={studentData.course || ""} disabled />
                 </div>
               </div>
 

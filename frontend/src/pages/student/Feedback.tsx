@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,31 +7,62 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { MessageSquare } from "lucide-react";
+import { studentAPI } from "@/lib/api";
 
 const Feedback: React.FC = () => {
   const [subject, setSubject] = useState("");
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [studentId, setStudentId] = useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Get current student ID
+  useEffect(() => {
+    const getCurrentStudent = async () => {
+      try {
+        const response = await studentAPI.getCurrentStudent();
+        setStudentId(response.data.id);
+      } catch (error) {
+        console.error('Failed to get current student:', error);
+        toast.error('Failed to load student information');
+      }
+    };
+
+    getCurrentStudent();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!subject || !category || !message) {
       toast.error("Please fill out all fields");
       return;
     }
-    
+
+    if (!studentId) {
+      toast.error("Student information not available");
+      return;
+    }
+
     setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      await studentAPI.submitFeedback(studentId, {
+        subject,
+        category,
+        message
+      });
+
       toast.success("Feedback submitted successfully");
       setSubject("");
       setCategory("");
       setMessage("");
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      toast.error("Failed to submit feedback. Please try again.");
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (

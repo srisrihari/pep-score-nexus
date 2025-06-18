@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,18 +7,86 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, TrendingDown, AlertTriangle, Target, CheckCircle2, Calendar, Clock, BookOpen, Award } from 'lucide-react';
-import { studentData } from '@/data/mockData';
+import { studentAPI } from '@/lib/api';
+import { transformStudentPerformanceData } from '@/lib/dataTransform';
+import { Student } from '@/data/mockData';
 
 const ImprovementPlan: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedTermId, setSelectedTermId] = useState<string>(studentData.currentTerm);
+  const [studentData, setStudentData] = useState<Student | null>(null);
+  const [improvementPlan, setImprovementPlan] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTermId, setSelectedTermId] = useState<string>("");
   const [selectedQuadrant, setSelectedQuadrant] = useState<string>('all');
+
+  // Load data from API
+  useEffect(() => {
+    const loadImprovementPlan = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get current student first
+        const currentStudentResponse = await studentAPI.getCurrentStudent();
+        const studentId = currentStudentResponse.data.id;
+
+        // Fetch performance data and improvement plan
+        const [performanceResponse, improvementPlanResponse] = await Promise.all([
+          studentAPI.getStudentPerformance(studentId, undefined, true),
+          studentAPI.getImprovementPlan(studentId).catch(() => null)
+        ]);
+
+        // Transform data
+        const transformedStudent = transformStudentPerformanceData(performanceResponse);
+
+        setStudentData(transformedStudent);
+        setImprovementPlan(improvementPlanResponse?.data);
+        setSelectedTermId(transformedStudent.currentTerm);
+
+      } catch (err) {
+        console.error('Failed to load improvement plan:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadImprovementPlan();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading improvement plan...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !studentData) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Failed to load improvement plan</p>
+          <p className="text-muted-foreground text-sm">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   // Get the current term data
   const currentTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
-  
-  // Find components that need improvement across all quadrants
-  const improvementAreas: {
+
+  // Use API improvement plan data if available, otherwise generate from performance data
+  let improvementAreas: {
     quadrantId: string;
     quadrantName: string;
     componentId: string;
@@ -28,60 +96,76 @@ const ImprovementPlan: React.FC = () => {
     status?: string;
     priority: 'high' | 'medium' | 'low';
   }[] = [];
-  
-  // Helper function to determine priority
-  const determinePriority = (component: any, quadrant: any): 'high' | 'medium' | 'low' => {
-    if (component.status === 'Deteriorate') return 'high';
-    if (component.score / component.maxScore < 0.6) return 'high';
-    if (component.score / component.maxScore < 0.7) return 'medium';
-    return 'low';
-  };
-  
-  // Collect improvement areas from all quadrants
-  currentTerm.quadrants.forEach(quadrant => {
-    // Skip if filtering by quadrant and this isn't the selected one
-    if (selectedQuadrant !== 'all' && quadrant.id !== selectedQuadrant) return;
-    
-    // Check if the quadrant has eligibility issues
-    if (quadrant.eligibility === 'Not Eligible') {
-      improvementAreas.push({
-        quadrantId: quadrant.id,
-        quadrantName: quadrant.name,
-        componentId: 'attendance',
-        componentName: 'Attendance',
-        score: quadrant.attendance || 0,
-        maxScore: 100,
-        status: 'Attendance Shortage',
-        priority: 'high'
-      });
-    }
-    
-    // Check individual components
-    quadrant.components.forEach(component => {
-      if (
-        component.status === 'Progress' || 
-        component.status === 'Deteriorate' || 
-        (component.score / component.maxScore < 0.7)
-      ) {
+
+  if (improvementPlan?.improvementAreas) {
+    // Use API improvement plan data
+    improvementAreas = improvementPlan.improvementAreas
+      .filter((area: any) => selectedQuadrant === 'all' || area.quadrantId === selectedQuadrant)
+      .map((area: any) => ({
+        quadrantId: area.quadrantId,
+        quadrantName: area.quadrantName,
+        componentId: area.quadrantId,
+        componentName: area.quadrantName,
+        score: area.currentScore,
+        maxScore: 100, // Assuming 100 as max for quadrant scores
+        status: area.currentScore < area.targetScore ? 'Progress' : 'Good',
+        priority: area.priority as 'high' | 'medium' | 'low'
+      }));
+  } else {
+    // Fallback: Generate improvement areas from performance data
+    const determinePriority = (component: any, quadrant: any): 'high' | 'medium' | 'low' => {
+      if (component.status === 'Deteriorate') return 'high';
+      if (component.score / component.maxScore < 0.6) return 'high';
+      if (component.score / component.maxScore < 0.7) return 'medium';
+      return 'low';
+    };
+
+    // Collect improvement areas from all quadrants
+    currentTerm.quadrants.forEach(quadrant => {
+      // Skip if filtering by quadrant and this isn't the selected one
+      if (selectedQuadrant !== 'all' && quadrant.id !== selectedQuadrant) return;
+
+      // Check if the quadrant has eligibility issues
+      if (quadrant.eligibility === 'Not Eligible') {
         improvementAreas.push({
           quadrantId: quadrant.id,
           quadrantName: quadrant.name,
-          componentId: component.id,
-          componentName: component.name,
-          score: component.score,
-          maxScore: component.maxScore,
-          status: component.status,
-          priority: determinePriority(component, quadrant)
+          componentId: 'attendance',
+          componentName: 'Attendance',
+          score: quadrant.attendance || 0,
+          maxScore: 100,
+          status: 'Attendance Shortage',
+          priority: 'high'
         });
       }
+
+      // Check individual components
+      quadrant.components.forEach(component => {
+        if (
+          component.status === 'Progress' ||
+          component.status === 'Deteriorate' ||
+          (component.score / component.maxScore < 0.7)
+        ) {
+          improvementAreas.push({
+            quadrantId: quadrant.id,
+            quadrantName: quadrant.name,
+            componentId: component.id,
+            componentName: component.name,
+            score: component.score,
+            maxScore: component.maxScore,
+            status: component.status,
+            priority: determinePriority(component, quadrant)
+          });
+        }
+      });
     });
-  });
-  
-  // Sort by priority (high to low)
-  improvementAreas.sort((a, b) => {
-    const priorityOrder = { high: 0, medium: 1, low: 2 };
-    return priorityOrder[a.priority] - priorityOrder[b.priority];
-  });
+
+    // Sort by priority (high to low)
+    improvementAreas.sort((a, b) => {
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
+  }
   
   // Generate improvement recommendations with detailed steps
   const getDetailedRecommendations = (area: typeof improvementAreas[0]): {

@@ -15,13 +15,15 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import StatusBadge from "@/components/common/StatusBadge";
 import { Link } from "react-router-dom";
 import { InfoIcon } from "lucide-react";
-import { studentAPI, scoreAPI, quadrantAPI } from "@/lib/api";
-import { 
-  transformStudentData, 
-  generateMockLeaderboard, 
-  generateMockTimeSeriesData, 
-  generateMockTermComparisonData, 
-  generateMockAttendanceData 
+import { studentAPI } from "@/lib/api";
+import {
+  transformStudentPerformanceData,
+  transformLeaderboardData,
+  transformAttendanceData,
+  generateMockLeaderboard,
+  generateMockTimeSeriesData,
+  generateMockTermComparisonData,
+  generateMockAttendanceData
 } from "@/lib/dataTransform";
 // Import all necessary types
 
@@ -42,48 +44,78 @@ const StudentDashboard: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch all required data
-        const [studentResponse, quadrantsResponse] = await Promise.all([
-          studentAPI.getCurrentStudent(),
-          quadrantAPI.getAllQuadrants()
+        // First get current student to get their ID
+        const currentStudentResponse = await studentAPI.getCurrentStudent();
+        const studentId = currentStudentResponse.data.id;
+
+        // Fetch all required data using the new comprehensive APIs
+        const [
+          performanceResponse,
+          leaderboardResponse,
+          attendanceResponse
+        ] = await Promise.all([
+          studentAPI.getStudentPerformance(studentId, undefined, true).catch((error) => {
+            console.error('Performance API failed:', error);
+            return null;
+          }),
+          studentAPI.getStudentLeaderboard(studentId).catch(() => null), // Optional
+          studentAPI.getStudentAttendance(studentId).catch(() => null) // Optional
         ]);
 
-        // Get score summary for the student (if available)
-        let scoreSummaryResponse = null;
-        try {
-          scoreSummaryResponse = await scoreAPI.getStudentScoreSummary(
-            studentResponse.data.id
-          );
-        } catch (scoreError) {
-          console.warn('Score summary not available, using mock data:', scoreError);
-          // Continue without score data - will use mock data
+        // Check if we have the minimum required data
+        if (!performanceResponse) {
+          throw new Error('Unable to load student performance data. The API may be unavailable.');
         }
 
         // Transform API data to UI format
-        const transformedStudent = transformStudentData(
-          studentResponse,
-          scoreSummaryResponse,
-          quadrantsResponse.data
-        );
+        const transformedStudent = transformStudentPerformanceData(performanceResponse);
 
-        // Generate mock data for charts and leaderboards
-        const mockLeaderboard = generateMockLeaderboard(transformedStudent.totalScore);
-        const mockTimeSeries = generateMockTimeSeriesData(transformedStudent.totalScore);
-        const mockTermComparison = generateMockTermComparisonData(transformedStudent.totalScore);
-        const mockAttendance = generateMockAttendanceData(scoreSummaryResponse?.summary?.quadrant_scores || []);
+        // Use real leaderboard data if available, otherwise generate mock
+        const leaderboard = leaderboardResponse
+          ? transformLeaderboardData(leaderboardResponse)
+          : generateMockLeaderboard(transformedStudent.totalScore);
+
+        // Use real attendance data if available, otherwise generate mock
+        const attendance = attendanceResponse
+          ? transformAttendanceData(attendanceResponse)
+          : generateMockAttendanceData([]);
+
+        // Data loaded successfully
+
+        // Generate time series and term comparison from performance history
+        const timeSeries = transformedStudent.terms.length > 1
+          ? {
+              overall: transformedStudent.terms.map(term => ({
+                term: term.termName,
+                score: term.totalScore
+              }))
+            }
+          : generateMockTimeSeriesData(transformedStudent.totalScore);
+
+        const termComparison = transformedStudent.terms.length > 1
+          ? transformedStudent.terms.map(term => ({
+              termName: term.termName,
+              overall: term.totalScore
+            }))
+          : generateMockTermComparisonData(transformedStudent.totalScore);
+
+        // Validate data before setting state
+        if (!transformedStudent || !transformedStudent.terms || transformedStudent.terms.length === 0) {
+          throw new Error('Invalid student data structure');
+        }
 
         // Set all state
         setStudentData(transformedStudent);
-        setLeaderboardData(mockLeaderboard);
-        setTimeSeriesData(mockTimeSeries);
-        setTermComparisonData(mockTermComparison);
-        setAttendanceData(mockAttendance);
+        setLeaderboardData(leaderboard);
+        setTimeSeriesData(timeSeries);
+        setTermComparisonData(termComparison);
+        setAttendanceData(attendance);
         setSelectedTermId(transformedStudent.currentTerm);
 
       } catch (err) {
         console.error('Failed to load student data:', err);
         const errorMessage = err instanceof Error ? err.message : 'Failed to load data';
-        
+
         // If student profile not found, show a specific message
         if (errorMessage.includes('Student profile not found')) {
           setError('Student profile not found. Please contact your administrator to set up your student profile.');
@@ -132,13 +164,29 @@ const StudentDashboard: React.FC = () => {
   // Find the selected term data
   const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
   const { quadrants, totalScore, overallStatus, grade } = selectedTerm;
-  const { overall: overallLeaderboard } = leaderboardData;
+  const overallLeaderboard = leaderboardData?.overall || { batchAvg: 0, batchBest: 0, topStudents: [], userRank: 0 };
 
   const summaryMetrics = [
-    { label: "Previous Term Score", value: studentData.terms.length > 1 ? studentData.terms[studentData.terms.length - 2].totalScore : "-", maxValue: 100 },
-    { label: "Best Term Score", value: Math.max(...studentData.terms.map(term => term.totalScore)), maxValue: 100 },
-    { label: "Batch Avg Score", value: overallLeaderboard.batchAvg, maxValue: 100 },
-    { label: "Batch Best Score", value: overallLeaderboard.batchBest, maxValue: 100 },
+    {
+      label: "Previous Term Score",
+      value: studentData.terms.length > 1 ? studentData.terms[studentData.terms.length - 2].totalScore : "-",
+      maxValue: 100
+    },
+    {
+      label: "Best Term Score",
+      value: studentData.terms.length > 0 ? Math.max(...studentData.terms.map(term => term.totalScore)) : 0,
+      maxValue: 100
+    },
+    {
+      label: "Batch Avg Score",
+      value: typeof overallLeaderboard.batchAvg === 'number' ? overallLeaderboard.batchAvg : 0,
+      maxValue: 100
+    },
+    {
+      label: "Batch Best Score",
+      value: typeof overallLeaderboard.batchBest === 'number' ? overallLeaderboard.batchBest : 0,
+      maxValue: 100
+    },
   ];
 
   return (
@@ -235,8 +283,12 @@ const StudentDashboard: React.FC = () => {
               </div>
               <div className="flex items-center mt-4">
                 <span className="mr-2">Eligibility Status:</span>
-                <Badge variant={attendanceData?.eligibility === "Eligible" ? "outline" : "destructive"}>
-                  {attendanceData?.eligibility || "Unknown"}
+                <Badge variant={
+                  (typeof attendanceData?.eligibility === 'string' && attendanceData.eligibility === "Eligible")
+                    ? "outline"
+                    : "destructive"
+                }>
+                  {typeof attendanceData?.eligibility === 'string' ? attendanceData.eligibility : "Unknown"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">

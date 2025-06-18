@@ -18,12 +18,15 @@ import Feedback from "./pages/student/Feedback";
 import Settings from "./pages/student/Settings";
 import EligibilityPage from "./pages/student/EligibilityPage";
 import ImprovementPlan from "./pages/student/ImprovementPlan";
+import InterventionsPage from "./pages/student/InterventionsPage";
+import InterventionDetailsPage from "./pages/student/InterventionDetailsPage";
 
 // Teacher pages
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherStudents from "./pages/teacher/TeacherStudents";
 import InterventionScoring from "./pages/teacher/InterventionScoring";
 import TeacherFeedback from "./pages/teacher/TeacherFeedback";
+import TeacherInterventions from "./pages/teacher/TeacherInterventions";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -33,6 +36,7 @@ import Reports from "./pages/admin/Reports";
 import DataImport from "./pages/admin/DataImport";
 import ManageTeachers from "./pages/admin/ManageTeachers";
 import ManageUsers from "./pages/admin/ManageUsers";
+import ManageInterventions from "./pages/admin/ManageInterventions";
 
 const queryClient = new QueryClient();
 
@@ -106,6 +110,20 @@ const AppRoutes = () => {
           </Layout>
         </ProtectedRoute>
       } />
+      <Route path="/student/interventions" element={
+        <ProtectedRoute requiredRole="student">
+          <Layout>
+            <InterventionsPage />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/student/interventions/:id" element={
+        <ProtectedRoute requiredRole="student">
+          <Layout>
+            <InterventionDetailsPage />
+          </Layout>
+        </ProtectedRoute>
+      } />
 
       {/* Teacher Routes */}
       <Route path="/teacher" element={
@@ -140,6 +158,13 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="teacher">
           <Layout>
             <Settings />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/interventions" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <TeacherInterventions />
           </Layout>
         </ProtectedRoute>
       } />
@@ -191,6 +216,13 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="admin">
           <Layout>
             <ManageUsers />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/interventions" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <ManageInterventions />
           </Layout>
         </ProtectedRoute>
       } />

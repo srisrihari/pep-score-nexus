@@ -13,15 +13,16 @@ const getDashboardOverview = async (req, res) => {
     ] = await Promise.all([
       query(supabase.from('students').select('*', { count: 'exact' })),
       query(supabase.from('teachers').select('*', { count: 'exact' })),
-      query(supabase.from('interventions').select('*', { count: 'exact' }).eq('status', 'active')),
+      query(supabase.from('interventions').select('*', { count: 'exact' }).eq('status', 'Active')),
       query(supabase.from('scores').select('*').order('created_at', { ascending: false }).limit(5))
     ]);
 
-    // Get performance metrics
+    // Get performance metrics - get quadrants and calculate scores separately
     const performanceMetrics = await query(
       supabase.from('quadrants')
-        .select('name, avg_score')
-        .order('avg_score', { ascending: false })
+        .select('id, name, weightage, display_order')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
     );
 
     res.status(200).json({
@@ -403,10 +404,22 @@ const getAllTeachers = async (req, res) => {
 // Add new teacher
 const addTeacher = async (req, res) => {
   try {
-    const teacherData = req.body;
-    
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      qualification,
+      specialization,
+      department,
+      employeeId,
+      phone,
+      experience,
+      assignedQuadrants = []
+    } = req.body;
+
     // Validate teacher data
-    const validationError = validateTeacherData(teacherData);
+    const validationError = validateTeacherData(req.body);
     if (validationError) {
       return res.status(400).json({
         success: false,
@@ -415,17 +428,45 @@ const addTeacher = async (req, res) => {
       });
     }
 
-    // Start a transaction
-    const { data, error } = await supabase.rpc('create_teacher', {
-      teacher_data: teacherData
-    });
+    // Create user first
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .insert({
+        username: email.split('@')[0],
+        email,
+        password_hash: password, // In production, this should be hashed
+        role: 'teacher',
+        status: 'active'
+      })
+      .select()
+      .single();
 
-    if (error) throw error;
+    if (userError) throw userError;
+
+    // Create teacher record
+    const { data: teacherData, error: teacherError } = await supabase
+      .from('teachers')
+      .insert({
+        user_id: userData.id,
+        employee_id: employeeId,
+        name: `${firstName} ${lastName}`,
+        specialization,
+        department,
+        assigned_quadrants: assignedQuadrants,
+        is_active: true
+      })
+      .select(`
+        *,
+        user:users(email, username)
+      `)
+      .single();
+
+    if (teacherError) throw teacherError;
 
     res.status(201).json({
       success: true,
       message: 'Teacher created successfully',
-      data
+      data: teacherData
     });
   } catch (error) {
     console.error('❌ Add teacher error:', error);

@@ -103,18 +103,18 @@ const Login: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 mt-2">
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Student</p>
-                <p>Username: john_student</p>
-                <p>Password: newpassword123</p>
+                <p>Username: student1</p>
+                <p>Password: password123</p>
               </div>
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Teacher</p>
-                <p>Username: mary_teacher</p>
-                <p>Password: teacher123</p>
+                <p>Username: teacher1</p>
+                <p>Password: password123</p>
               </div>
               <div className="bg-muted p-2 rounded-md">
                 <p className="font-medium">Admin</p>
-                <p>Username: admin</p>
-                <p>Password: admin123</p>
+                <p>Username: admin1</p>
+                <p>Password: password123</p>
               </div>
             </div>
           </div>

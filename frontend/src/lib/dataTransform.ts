@@ -18,44 +18,113 @@ const calculateStatus = (score: number, threshold: number): StatusType => {
   return 'Deteriorate';
 };
 
-// Transform API student data to UI format
+// Transform API student performance data to UI format
+export const transformStudentPerformanceData = (
+  apiPerformance: any
+): Student => {
+  // Handle different API response structures
+  const data = apiPerformance.data || apiPerformance;
+  const { student, currentTerm, termHistory, batchStats } = data;
+
+  // Validate required data
+  if (!student || !currentTerm) {
+    throw new Error('Invalid API response: missing student or currentTerm data');
+  }
+
+  // Transform current term data with safety checks
+  const currentTermData: TermData = {
+    termId: currentTerm.termId || 'current',
+    termName: currentTerm.termName || 'Current Term',
+    quadrants: Array.isArray(currentTerm.quadrants) ? currentTerm.quadrants.map((q: any) => ({
+      id: q.id || 'unknown',
+      name: q.name || 'Unknown Quadrant',
+      weightage: typeof q.weightage === 'number' ? q.weightage : 0,
+      obtained: typeof q.obtained === 'number' ? q.obtained : 0,
+      status: q.status as StatusType || 'IC',
+      attendance: typeof q.attendance === 'number' ? q.attendance : 0,
+      eligibility: (q.eligibility === 'Eligible' || q.eligibility === 'Not Eligible') ? q.eligibility : 'Not Eligible',
+      rank: typeof q.rank === 'number' ? q.rank : 0,
+      components: Array.isArray(q.components) ? q.components.map((c: any) => ({
+        id: c.id || 'unknown',
+        name: c.name || 'Unknown Component',
+        score: typeof c.score === 'number' ? c.score : 0,
+        maxScore: typeof c.maxScore === 'number' ? c.maxScore : 100,
+        status: c.status as StatusType || 'IC',
+        category: (c.category === 'SHL' || c.category === 'Professional') ? c.category : undefined
+      })) : []
+    })) : [],
+    tests: [], // Will be populated if needed
+    totalScore: typeof currentTerm.totalScore === 'number' ? currentTerm.totalScore : 0,
+    grade: currentTerm.grade as Grade || 'IC',
+    overallStatus: currentTerm.overallStatus as StatusType || 'IC'
+  };
+
+  // Transform term history if available
+  const allTerms = Array.isArray(termHistory) ?
+    [currentTermData, ...termHistory.map((term: any) => ({
+      termId: term.termId || 'unknown',
+      termName: term.termName || 'Unknown Term',
+      quadrants: Array.isArray(term.quadrants) ? term.quadrants : [],
+      tests: Array.isArray(term.tests) ? term.tests : [],
+      totalScore: typeof term.totalScore === 'number' ? term.totalScore : 0,
+      grade: term.grade as Grade || 'IC',
+      overallStatus: term.overallStatus as StatusType || 'IC'
+    }))] :
+    [currentTermData];
+
+  return {
+    id: student.id || 'unknown',
+    name: student.name || 'Unknown Student',
+    registrationNo: student.registrationNo || 'Unknown',
+    course: student.course || 'Unknown Course',
+    batch: student.batch || 'Unknown Batch',
+    section: student.section || 'Unknown Section',
+    houseName: student.houseName || 'Unknown House',
+    gender: (student.gender === 'Male' || student.gender === 'Female' || student.gender === 'Other') ? student.gender : 'Male',
+    currentTerm: student.currentTerm || currentTermData.termId,
+    terms: allTerms,
+    totalScore: currentTermData.totalScore,
+    grade: currentTermData.grade,
+    overallStatus: currentTermData.overallStatus,
+    quadrants: currentTermData.quadrants,
+    tests: []
+  };
+};
+
+// Legacy transform function for backward compatibility
 export const transformStudentData = (
   apiStudent: any,
   apiScoreSummary: any,
   apiQuadrants: any[]
 ): Student => {
   const student = apiStudent.data;
-  const summary = apiScoreSummary?.data?.summary || {};
-  
-  // Get the actual overall score from API - use calculated percentage or stored score
-  const actualOverallScore = summary.overall_percentage || apiScoreSummary?.data?.student?.current_overall_score || 0;
-  const actualGrade = summary.calculated_grade || apiScoreSummary?.data?.student?.current_grade || 'IC';
-  
+  const summary = apiScoreSummary?.summary || {};
+
+  // Get the actual overall score from API
+  const actualOverallScore = summary.total_score || summary.weighted_score || 0;
+  const actualGrade = summary.overall_grade || 'IC';
+
   // Transform quadrant scores to UI format
-  const quadrants: QuadrantData[] = summary.quadrants && summary.quadrants.length > 0 ? 
-    summary.quadrants.map((qs: any) => {
-      const quadrant = apiQuadrants.find(q => q.id === qs.quadrant_id);
-      
-      return {
-        id: qs.quadrant_id,
-        name: qs.quadrant_name,
-        weightage: qs.weightage,
-        obtained: Math.round((qs.average_percentage || 0) * qs.weightage / 100),
-        status: calculateStatus(qs.average_percentage || 0, 75) as StatusType,
-        attendance: 85, // Mock attendance for now - will be replaced with real data later
-        eligibility: 'Eligible' as const,
-        rank: 1, // Mock rank for now
-        components: [] // Will be populated from detailed scores if needed
-      };
-    }) :
-    // When no scores exist, show quadrants with 0 scores (not mock data)
+  const quadrants: QuadrantData[] = summary.quadrant_scores && summary.quadrant_scores.length > 0 ?
+    summary.quadrant_scores.map((qs: any) => ({
+      id: qs.quadrant_id,
+      name: qs.quadrant_name,
+      weightage: qs.weight_percentage,
+      obtained: qs.weighted_score,
+      status: qs.status as StatusType,
+      attendance: qs.attendance_percentage,
+      eligibility: qs.is_attendance_met ? 'Eligible' : 'Not Eligible' as const,
+      rank: 1, // Mock rank for now
+      components: [] // Will be populated from detailed scores if needed
+    })) :
+    // When no scores exist, show quadrants with 0 scores
     apiQuadrants.map((q) => ({
       id: q.id,
       name: q.name,
       weightage: q.weightage,
-      obtained: 0, // Show actual 0 instead of mock scores
-      status: 'IC' as StatusType, // Incomplete status when no scores
-      attendance: 0, // No attendance data
+      obtained: 0,
+      status: 'IC' as StatusType,
+      attendance: 0,
       eligibility: 'Not Eligible' as const,
       rank: 0,
       components: []
@@ -66,10 +135,10 @@ export const transformStudentData = (
     termId: summary.term?.id || student.current_term || 'term-1',
     termName: summary.term?.name || 'Current Term',
     quadrants,
-    tests: [], // Mock tests for now
-    totalScore: actualOverallScore, // Use actual score, no fallback
+    tests: [],
+    totalScore: actualOverallScore,
     grade: actualGrade as Grade,
-    overallStatus: calculateStatus(actualOverallScore, 75) as StatusType
+    overallStatus: summary.overall_status as StatusType || calculateStatus(actualOverallScore, 75) as StatusType
   };
 
   return {
@@ -82,12 +151,12 @@ export const transformStudentData = (
     houseName: student.house_name || student.houses?.name || 'Unknown House',
     gender: student.gender || 'Male',
     currentTerm: summary.term?.id || student.current_term || 'term-1',
-    terms: [termData], // Single term for now
-    totalScore: actualOverallScore, // Use actual score, no fallback
+    terms: [termData],
+    totalScore: actualOverallScore,
     grade: actualGrade as Grade,
-    overallStatus: calculateStatus(actualOverallScore, 75) as StatusType,
+    overallStatus: termData.overallStatus,
     quadrants,
-    tests: [] // Mock tests
+    tests: []
   };
 };
 
@@ -103,7 +172,20 @@ export const transformScoresToComponents = (apiScores: any[]): Component[] => {
   }));
 };
 
-// Generate mock leaderboard data (since we don't have this API yet)
+// Transform API leaderboard data to UI format
+export const transformLeaderboardData = (apiLeaderboard: any): Leaderboard => {
+  return {
+    overall: {
+      topStudents: apiLeaderboard.data.overall.topStudents,
+      userRank: apiLeaderboard.data.overall.userRank,
+      batchAvg: apiLeaderboard.data.overall.batchAvg,
+      batchBest: apiLeaderboard.data.overall.batchBest
+    },
+    quadrants: apiLeaderboard.data.quadrants
+  };
+};
+
+// Fallback: Generate mock leaderboard data when API is not available
 export const generateMockLeaderboard = (studentScore: number): Leaderboard => {
   const generateTopStudents = (baseScore: number) => [
     { id: '1', name: 'Student A', score: Math.min(100, Math.max(0, baseScore + 5)) },
@@ -118,32 +200,32 @@ export const generateMockLeaderboard = (studentScore: number): Leaderboard => {
       batchAvg: Math.max(0, studentScore > 0 ? studentScore - 10 : 0),
       batchBest: Math.min(100, Math.max(0, studentScore + 5))
     },
-          quadrants: {
-        persona: {
-          topStudents: generateTopStudents(studentScore),
-          userRank: studentScore > 0 ? 3 : 0,
-          batchAvg: Math.max(0, studentScore > 0 ? studentScore - 8 : 0),
-          batchBest: Math.min(100, Math.max(0, studentScore + 3))
-        },
-        wellness: {
-          topStudents: generateTopStudents(studentScore),
-          userRank: studentScore > 0 ? 5 : 0,
-          batchAvg: Math.max(0, studentScore > 0 ? studentScore - 12 : 0),
-          batchBest: Math.min(100, Math.max(0, studentScore + 7))
-        },
-        behavior: {
-          topStudents: generateTopStudents(studentScore),
-          userRank: studentScore > 0 ? 2 : 0,
-          batchAvg: Math.max(0, studentScore > 0 ? studentScore - 5 : 0),
-          batchBest: Math.min(100, Math.max(0, studentScore + 2))
-        },
-        discipline: {
-          topStudents: generateTopStudents(studentScore),
-          userRank: studentScore > 0 ? 1 : 0,
-          batchAvg: Math.max(0, studentScore > 0 ? studentScore - 3 : 0),
-          batchBest: Math.min(100, Math.max(0, studentScore + 1))
-        }
+    quadrants: {
+      persona: {
+        topStudents: generateTopStudents(studentScore),
+        userRank: studentScore > 0 ? 3 : 0,
+        batchAvg: Math.max(0, studentScore > 0 ? studentScore - 8 : 0),
+        batchBest: Math.min(100, Math.max(0, studentScore + 3))
+      },
+      wellness: {
+        topStudents: generateTopStudents(studentScore),
+        userRank: studentScore > 0 ? 5 : 0,
+        batchAvg: Math.max(0, studentScore > 0 ? studentScore - 12 : 0),
+        batchBest: Math.min(100, Math.max(0, studentScore + 7))
+      },
+      behavior: {
+        topStudents: generateTopStudents(studentScore),
+        userRank: studentScore > 0 ? 2 : 0,
+        batchAvg: Math.max(0, studentScore > 0 ? studentScore - 5 : 0),
+        batchBest: Math.min(100, Math.max(0, studentScore + 2))
+      },
+      discipline: {
+        topStudents: generateTopStudents(studentScore),
+        userRank: studentScore > 0 ? 1 : 0,
+        batchAvg: Math.max(0, studentScore > 0 ? studentScore - 3 : 0),
+        batchBest: Math.min(100, Math.max(0, studentScore + 1))
       }
+    }
   };
 };
 
@@ -170,21 +252,34 @@ export const generateMockTermComparisonData = (currentScore: number) => {
   ];
 };
 
-// Generate mock attendance data
+// Transform API attendance data to UI format
+export const transformAttendanceData = (apiAttendance: any) => {
+  const data = apiAttendance.data || apiAttendance;
+
+  return {
+    overall: typeof data.overall === 'number' ? data.overall : 0,
+    wellness: typeof data.wellness === 'number' ? data.wellness : 0,
+    eligibility: typeof data.eligibility === 'string' ? data.eligibility : 'Unknown',
+    history: Array.isArray(data.history) ? data.history : [],
+    quadrantAttendance: Array.isArray(data.quadrantAttendance) ? data.quadrantAttendance : []
+  };
+};
+
+// Fallback: Generate mock attendance data when API is not available
 export const generateMockAttendanceData = (quadrantScores: any[]) => {
-  const personaQuadrant = quadrantScores.find(q => q.quadrant_name.toLowerCase().includes('persona'));
-  const wellnessQuadrant = quadrantScores.find(q => q.quadrant_name.toLowerCase().includes('wellness'));
-  
+  const personaQuadrant = quadrantScores.find(q => q.quadrant_name?.toLowerCase().includes('persona'));
+  const wellnessQuadrant = quadrantScores.find(q => q.quadrant_name?.toLowerCase().includes('wellness'));
+
   const overallAttendance = Math.round(
-    (personaQuadrant?.attendance_percentage || 85) * 0.6 + 
+    (personaQuadrant?.attendance_percentage || 85) * 0.6 +
     (wellnessQuadrant?.attendance_percentage || 80) * 0.4
   );
-  
+
   const isEligible = (personaQuadrant?.is_attendance_met && wellnessQuadrant?.is_attendance_met) || true;
-  
+
   return {
     overall: overallAttendance,
     wellness: wellnessQuadrant?.attendance_percentage || 80,
     eligibility: isEligible ? 'Eligible' : 'Not Eligible'
   };
-}; 
+};

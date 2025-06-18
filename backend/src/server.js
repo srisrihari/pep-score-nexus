@@ -15,6 +15,7 @@ const quadrantRoutes = require('./routes/quadrants');
 const studentRoutes = require('./routes/students');
 const scoreRoutes = require('./routes/scores');
 const adminRoutes = require('./routes/admin');
+const interventionRoutes = require('./routes/interventions');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -92,6 +93,7 @@ app.use(`${baseRoute}/quadrants`, quadrantRoutes);
 app.use(`${baseRoute}/students`, studentRoutes);
 app.use(`${baseRoute}/scores`, scoreRoutes);
 app.use(`${baseRoute}/admin`, adminRoutes);
+app.use(`${baseRoute}/interventions`, interventionRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -104,7 +106,10 @@ app.get('/', (req, res) => {
       auth: `${req.protocol}://${req.get('host')}${baseRoute}/auth`,
       quadrants: `${req.protocol}://${req.get('host')}${baseRoute}/quadrants`,
       students: `${req.protocol}://${req.get('host')}${baseRoute}/students`,
-      scores: `${req.protocol}://${req.get('host')}${baseRoute}/scores`
+      scores: `${req.protocol}://${req.get('host')}${baseRoute}/scores`,
+      interventions: `${req.protocol}://${req.get('host')}${baseRoute}/interventions`,
+      admin: `${req.protocol}://${req.get('host')}${baseRoute}/admin`,
+      users: `${req.protocol}://${req.get('host')}${baseRoute}/users`
     }
   });
 });

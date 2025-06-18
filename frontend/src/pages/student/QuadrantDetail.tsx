@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// Progress is used in the StudentDashboard but not here
 import StatusBadge from "@/components/common/StatusBadge";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
-import { studentData, leaderboardData, timeSeriesData } from "@/data/mockData";
 import BehaviorRatingScale from "@/components/student/BehaviorRatingScale";
+import { studentAPI } from "@/lib/api";
+import { transformStudentPerformanceData, transformLeaderboardData } from "@/lib/dataTransform";
+import { Student, QuadrantData, Leaderboard } from "@/data/mockData";
 import {
   LineChart,
   Line,
@@ -25,8 +26,53 @@ import { ArrowLeft, AlertCircle, TrendingDown, CheckCircle2, BookOpen, Target } 
 const QuadrantDetail: React.FC = () => {
   const { quadrantId } = useParams<{ quadrantId: string }>();
   const navigate = useNavigate();
-  const [selectedTermId, setSelectedTermId] = useState<string>(studentData.currentTerm);
+  const [studentData, setStudentData] = useState<Student | null>(null);
+  const [leaderboardData, setLeaderboardData] = useState<Leaderboard | null>(null);
+  const [quadrantDetails, setQuadrantDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedTermId, setSelectedTermId] = useState<string>("");
   const [activeQuadrant, setActiveQuadrant] = useState<string>(quadrantId || "persona");
+
+  // Load data from API
+  useEffect(() => {
+    const loadQuadrantData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Get current student first
+        const currentStudentResponse = await studentAPI.getCurrentStudent();
+        const studentId = currentStudentResponse.data.id;
+
+        // Fetch performance data and quadrant details
+        const [performanceResponse, leaderboardResponse, quadrantDetailsResponse] = await Promise.all([
+          studentAPI.getStudentPerformance(studentId, undefined, true),
+          studentAPI.getStudentLeaderboard(studentId).catch(() => null),
+          studentAPI.getQuadrantDetails(studentId, activeQuadrant).catch(() => null)
+        ]);
+
+        // Transform data
+        const transformedStudent = transformStudentPerformanceData(performanceResponse);
+        const leaderboard = leaderboardResponse
+          ? transformLeaderboardData(leaderboardResponse)
+          : null;
+
+        setStudentData(transformedStudent);
+        setLeaderboardData(leaderboard);
+        setQuadrantDetails(quadrantDetailsResponse?.data);
+        setSelectedTermId(transformedStudent.currentTerm);
+
+      } catch (err) {
+        console.error('Failed to load quadrant data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQuadrantData();
+  }, [activeQuadrant]);
 
   // Update active quadrant when URL param changes
   useEffect(() => {
@@ -43,11 +89,46 @@ const QuadrantDetail: React.FC = () => {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading quadrant details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !studentData) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-destructive mb-4">Failed to load quadrant data</p>
+          <p className="text-muted-foreground text-sm">{error}</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="mt-4">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // Find the selected term data
   const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
   const quadrant = selectedTerm.quadrants.find((q) => q.id === activeQuadrant);
-  const leaderboard = leaderboardData.quadrants[activeQuadrant || ""];
-  const chartData = timeSeriesData[activeQuadrant as keyof typeof timeSeriesData] || [];
+  const leaderboard = leaderboardData?.quadrants[activeQuadrant || ""];
+
+  // Generate chart data from term history
+  const chartData = studentData.terms.map(term => {
+    const termQuadrant = term.quadrants.find(q => q.id === activeQuadrant);
+    return {
+      term: term.termName,
+      score: termQuadrant?.obtained || 0
+    };
+  });
 
   if (!quadrant || !leaderboard) {
     return (

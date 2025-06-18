@@ -27,7 +27,8 @@ import {
   FileSpreadsheet,
   GraduationCap,
   PenTool,
-  CheckSquare
+  CheckSquare,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -38,6 +39,7 @@ export function AppSidebar() {
 
   const studentMenuItems = [
     { title: "Dashboard", path: "/student", icon: Home },
+    { title: "Interventions", path: "/student/interventions", icon: BookOpen },
     { title: "Feedback", path: "/student/feedback", icon: MessageSquare },
     { title: "Settings", path: "/student/settings", icon: Settings },
   ];
@@ -45,6 +47,7 @@ export function AppSidebar() {
   const teacherMenuItems = [
     { title: "Dashboard", path: "/teacher", icon: Home },
     { title: "My Students", path: "/teacher/students", icon: GraduationCap },
+    { title: "Interventions", path: "/teacher/interventions", icon: BookOpen },
     { title: "Feedback", path: "/teacher/feedback", icon: MessageSquare },
     { title: "Settings", path: "/teacher/settings", icon: Settings },
   ];
@@ -54,6 +57,7 @@ export function AppSidebar() {
     { title: "Manage Students", path: "/admin/students", icon: Users },
     { title: "Manage Teachers", path: "/admin/teachers", icon: PenTool },
     { title: "Manage Users", path: "/admin/users", icon: User },
+    { title: "Interventions", path: "/admin/interventions", icon: BookOpen },
     { title: "Input Scores", path: "/admin/scores", icon: ClipboardEdit },
     { title: "Reports", path: "/admin/reports", icon: FileBarChart },
     { title: "Data Import", path: "/admin/import", icon: FileSpreadsheet },
