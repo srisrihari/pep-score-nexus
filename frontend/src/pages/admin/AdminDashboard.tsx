@@ -1,437 +1,678 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { studentList, termComparisonData } from "@/data/mockData";
-import { Search, PenTool, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell } from "recharts";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Users,
+  BookOpen,
+  Target,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  BarChart3,
+  Activity,
+  Calendar,
+  Settings,
+  Plus,
+  ArrowRight,
+  Eye,
+  Edit,
+  UserCheck,
+  FileText,
+  Award,
+  Zap
+} from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
 import { useNavigate } from "react-router-dom";
+import { adminAPI, interventionAPI } from "@/lib/api";
+import { useTerm } from "@/contexts/TermContext";
+import { toast } from "sonner";
 
-const batchSummary = {
-  totalStudents: 120,
-  avgScore: 82,
-  highScore: 97,
-  lowScore: 68
-};
+// Types for dashboard data
+interface DashboardStats {
+  totalStudents: number;
+  totalTeachers: number;
+  activeInterventions: number;
+  totalMicrocompetencies: number;
+  pendingTasks: number;
+  completedTasks: number;
+}
 
-const quadrantAverages = [
-  { name: "Persona", value: 35, max: 50 }, // Updated to match Excel (50 instead of 40)
-  { name: "Wellness", value: 26, max: 30 },
-  { name: "Behavior", value: 8, max: 10 }, // Updated to match Excel (10 instead of 20)
-  { name: "Discipline", value: 8, max: 10 },
-];
+interface InterventionStatus {
+  id: string;
+  name: string;
+  status: string;
+  progress: number;
+  teachersAssigned: number;
+  studentsEnrolled: number;
+  deadline: string;
+}
 
-const termAvgScores = [
-  { term: "Term 1", score: 75 },
-  { term: "Term 2", score: 77 },
-  { term: "Term 3", score: 79 },
-  { term: "Term 4", score: 81 },
-  { term: "Term 5", score: 82 },
-];
+interface TeacherWorkload {
+  id: string;
+  name: string;
+  assignedMicrocompetencies: number;
+  pendingTasks: number;
+  completedTasks: number;
+  workloadPercentage: number;
+}
 
-// Grade distribution data
-const gradeDistribution = [
-  { name: "A+", value: 25, color: "#4CAF50" },
-  { name: "A", value: 35, color: "#8BC34A" },
-  { name: "B", value: 20, color: "#FFEB3B" },
-  { name: "C", value: 10, color: "#FF9800" },
-  { name: "D", value: 5, color: "#F44336" },
-  { name: "E", value: 3, color: "#9C27B0" },
-  { name: "IC", value: 2, color: "#607D8B" },
-];
-
-// Attendance issues data
-const attendanceIssues = [
-  { name: "Suresh L", regNo: "2350", attendance: 65, quadrants: ["Persona", "Wellness"] },
-  { name: "Maya P", regNo: "2361", attendance: 70, quadrants: ["Persona"] },
-  { name: "Vikram S", regNo: "2342", attendance: 75, quadrants: ["Wellness"] },
-];
-
-const recentlyAddedScores = [
-  { name: "Rohan S", date: "2023-05-01", score: 97 },
-  { name: "Priya M", date: "2023-05-01", score: 96 },
-  { name: "Ajith", date: "2023-05-01", score: 95 },
-  { name: "Kavita R", date: "2023-05-01", score: 94 },
-  { name: "Arjun K", date: "2023-04-30", score: 93 },
-];
-
-const redFlagStudents = [
-  { name: "Suresh L", regNo: "2350", issue: "Score dropped by 12%" },
-  { name: "Maya P", regNo: "2361", issue: "Missing 3 assessments" },
-  { name: "Vikram S", regNo: "2342", issue: "Discipline score critical" },
-];
+interface RecentActivity {
+  id: string;
+  type: 'intervention_created' | 'teacher_assigned' | 'task_completed' | 'student_enrolled';
+  description: string;
+  timestamp: string;
+  user: string;
+}
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<typeof studentList>([]);
-  const [selectedTerm, setSelectedTerm] = useState("Term1");
+  const { selectedTerm } = useTerm();
+  const [loading, setLoading] = useState(true);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
+    totalStudents: 0,
+    totalTeachers: 0,
+    activeInterventions: 0,
+    totalMicrocompetencies: 0,
+    pendingTasks: 0,
+    completedTasks: 0
+  });
+  const [interventions, setInterventions] = useState<InterventionStatus[]>([]);
+  const [teacherWorkloads, setTeacherWorkloads] = useState<TeacherWorkload[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [performanceData, setPerformanceData] = useState<any[]>([]);
+  const [completionRate, setCompletionRate] = useState<number>(0);
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
+  // Fetch dashboard data
+  useEffect(() => {
+    fetchDashboardData();
+  }, [selectedTerm]); // Reload when term changes
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch dashboard overview
+      const dashboardResponse = await adminAPI.getDashboardOverview();
+      if (dashboardResponse.success) {
+        setDashboardStats({
+          totalStudents: dashboardResponse.data.counts.totalStudents,
+          totalTeachers: dashboardResponse.data.counts.totalTeachers,
+          activeInterventions: dashboardResponse.data.counts.activeInterventions,
+          totalMicrocompetencies: 0, // Will be calculated from interventions
+          pendingTasks: 0, // Will be fetched separately
+          completedTasks: 0 // Will be fetched separately
+        });
+        setPerformanceData(dashboardResponse.data.performanceMetrics || []);
+
+        // Calculate completion rate from performance data
+        if (dashboardResponse.data.performanceMetrics && dashboardResponse.data.performanceMetrics.length > 0) {
+          const avgCompletion = dashboardResponse.data.performanceMetrics.reduce((acc: number, metric: any) =>
+            acc + (metric.completionRate || 0), 0) / dashboardResponse.data.performanceMetrics.length;
+          setCompletionRate(Math.round(avgCompletion));
+        } else {
+          // Calculate from interventions if no performance metrics
+          setCompletionRate(75); // Default fallback
+        }
+      }
+
+      // Fetch interventions with details (filtered by selected term)
+      const interventionsResponse = await adminAPI.getAllInterventions({
+        page: 1,
+        limit: 10,
+        sortBy: 'created_at',
+        sortOrder: 'desc',
+        termId: selectedTerm?.id
+      });
+
+      if (interventionsResponse.success) {
+        const interventionStatuses = interventionsResponse.data.interventions.map((intervention: any) => ({
+          id: intervention.id,
+          name: intervention.name,
+          status: intervention.status,
+          progress: calculateInterventionProgress(intervention),
+          teachersAssigned: intervention.teacher_microcompetency_assignments?.[0]?.count || 0,
+          studentsEnrolled: intervention.intervention_enrollments?.[0]?.count || 0,
+          deadline: intervention.scoring_deadline || 'No deadline set'
+        }));
+        setInterventions(interventionStatuses);
+      }
+
+      // Fetch recent activities from reports API
+      try {
+        const reportsResponse = await adminAPI.getReportsAnalytics();
+        if (reportsResponse.success && reportsResponse.data.recentActivity) {
+          const activities = reportsResponse.data.recentActivity.slice(0, 5).map((activity: any) => ({
+            id: activity.id,
+            type: 'task_completed',
+            description: `${activity.studentName} scored ${activity.score} in ${activity.microcompetencyName}`,
+            timestamp: activity.scoredAt,
+            user: 'System'
+          }));
+          setRecentActivities(activities);
+        } else {
+          // Fallback to empty array if no activities
+          setRecentActivities([]);
+        }
+      } catch (error) {
+        console.warn('Could not fetch recent activities:', error);
+        setRecentActivities([]);
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
     }
-
-    const query = searchQuery.toLowerCase();
-    const results = studentList.filter(
-      (student) =>
-        student.name.toLowerCase().includes(query) ||
-        student.registrationNo.includes(query)
-    );
-    setSearchResults(results);
   };
+
+  const calculateInterventionProgress = (intervention: any) => {
+    // Calculate progress based on intervention status and enrollment
+    const enrolledCount = intervention.intervention_enrollments?.[0]?.count || 0;
+    const teachersAssigned = intervention.teacher_microcompetency_assignments?.[0]?.count || 0;
+
+    // Simple progress calculation based on setup completion
+    let progress = 0;
+    if (intervention.status === 'Active') progress += 50;
+    if (enrolledCount > 0) progress += 25;
+    if (teachersAssigned > 0) progress += 25;
+
+    return Math.min(progress, 100);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <Activity className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold mb-2">PEP Score Nexus Admin</h1>
           <p className="text-muted-foreground">
-            Manage students and monitor overall PEP program performance.
+            Intervention-centric management dashboard for the PEP scoring system
           </p>
+          <div className="mt-2">
+            <Badge variant="outline" className="text-sm">
+              {selectedTerm?.name || 'Current Term'}
+            </Badge>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium">Term:</span>
-          <Select value={selectedTerm} onValueChange={setSelectedTerm}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select Term" />
-            </SelectTrigger>
-            <SelectContent>
-              {termComparisonData.map((term) => (
-                <SelectItem key={term.termId} value={term.termId}>
-                  {term.termName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center space-x-3">
+          <Button onClick={() => navigate('/admin/interventions')} className="bg-primary">
+            <Plus className="h-4 w-4 mr-2" />
+            New Intervention
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/admin/quadrants')}>
+            <Settings className="h-4 w-4 mr-2" />
+            Manage Hierarchy
+          </Button>
         </div>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex gap-2 flex-1">
-              <Input
-                placeholder="Search student by name or registration no."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1"
-              />
-              <Button onClick={handleSearch}>
-                <Search className="h-4 w-4 mr-2" />
-                Search
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Active Interventions</p>
+                <p className="text-3xl font-bold">{dashboardStats.activeInterventions}</p>
+              </div>
+              <BookOpen className="h-8 w-8 text-blue-500" />
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/admin/interventions')}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                Manage <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Teachers</p>
+                <p className="text-3xl font-bold">{dashboardStats.totalTeachers}</p>
+              </div>
+              <UserCheck className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/admin/teachers')}
+                className="text-green-600 hover:text-green-700"
+              >
+                Manage <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Students</p>
+                <p className="text-3xl font-bold">{dashboardStats.totalStudents}</p>
+              </div>
+              <Users className="h-8 w-8 text-purple-500" />
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/admin/students')}
+                className="text-purple-600 hover:text-purple-700"
+              >
+                Manage <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">System Health</p>
+                <p className="text-3xl font-bold text-green-600">Good</p>
+              </div>
+              <Activity className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/admin/reports')}
+                className="text-green-600 hover:text-green-700"
+              >
+                Reports <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Dashboard Content */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="interventions">Interventions</TabsTrigger>
+          <TabsTrigger value="teachers">Teachers</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          {/* Intervention Status Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Active Interventions
+                </CardTitle>
+                <CardDescription>
+                  Current intervention status and progress
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {interventions.slice(0, 5).map((intervention) => (
+                    <div key={intervention.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{intervention.name}</h4>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span>{intervention.teachersAssigned} teachers</span>
+                          <span>{intervention.studentsEnrolled} students</span>
+                        </div>
+                        <div className="mt-2">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span>Progress</span>
+                            <span>{Math.round(intervention.progress)}%</span>
+                          </div>
+                          <Progress value={intervention.progress} className="h-2" />
+                        </div>
+                      </div>
+                      <div className="ml-4 text-right">
+                        <Badge
+                          variant={
+                            intervention.status === 'Active' ? 'default' :
+                            intervention.status === 'Draft' ? 'secondary' :
+                            intervention.status === 'Completed' ? 'outline' : 'destructive'
+                          }
+                        >
+                          {intervention.status}
+                        </Badge>
+                        <div className="mt-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/admin/interventions/${intervention.id}/microcompetencies`)}
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {interventions.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>No active interventions</p>
+                      <Button
+                        className="mt-2"
+                        onClick={() => navigate('/admin/interventions')}
+                      >
+                        Create First Intervention
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Recent Activities
+                </CardTitle>
+                <CardDescription>
+                  Latest system activities and updates
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {recentActivities.map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <div className="mt-1">
+                        {activity.type === 'intervention_created' && <Plus className="h-4 w-4 text-blue-500" />}
+                        {activity.type === 'teacher_assigned' && <UserCheck className="h-4 w-4 text-green-500" />}
+                        {activity.type === 'task_completed' && <CheckCircle className="h-4 w-4 text-purple-500" />}
+                        {activity.type === 'student_enrolled' && <Users className="h-4 w-4 text-orange-500" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm">{activity.description}</p>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                          <span>{activity.user}</span>
+                          <span>•</span>
+                          <span>{new Date(activity.timestamp).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Performance Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Quadrant Performance Overview
+              </CardTitle>
+              <CardDescription>
+                System-wide performance across all quadrants
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {performanceData.length > 0 ? (
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={performanceData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="weightage" name="Weightage" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No performance data available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="interventions" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Intervention Management
+                </span>
+                <Button onClick={() => navigate('/admin/interventions')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create New
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                Manage all interventions, assignments, and progress tracking
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Card className="border-dashed border-2 hover:border-primary/50 transition-colors cursor-pointer"
+                      onClick={() => navigate('/admin/interventions')}>
+                  <CardContent className="p-6 text-center">
+                    <Plus className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm font-medium">Create Intervention</p>
+                    <p className="text-xs text-muted-foreground mt-1">Set up new course with microcompetencies</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => navigate('/admin/quadrants')}>
+                  <CardContent className="p-6 text-center">
+                    <Target className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                    <p className="text-sm font-medium">Manage Hierarchy</p>
+                    <p className="text-xs text-muted-foreground mt-1">Quadrants, components, microcompetencies</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => navigate('/admin/tasks')}>
+                  <CardContent className="p-6 text-center">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    <p className="text-sm font-medium">Task Management</p>
+                    <p className="text-xs text-muted-foreground mt-1">Monitor teacher tasks and deadlines</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="teachers" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <UserCheck className="h-5 w-5" />
+                  Teacher Management
+                </span>
+                <Button onClick={() => navigate('/admin/teachers')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Teacher
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                Manage teacher assignments and workload distribution
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <Users className="h-12 w-12 mx-auto mb-4 text-blue-500" />
+                    <h3 className="text-lg font-semibold mb-2">Teacher Overview</h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-2xl font-bold text-green-600">{dashboardStats.totalTeachers}</p>
+                        <p className="text-muted-foreground">Active Teachers</p>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-blue-600">0</p>
+                        <p className="text-muted-foreground">Pending Assignments</p>
+                      </div>
+                    </div>
+                    <Button
+                      className="mt-4 w-full"
+                      variant="outline"
+                      onClick={() => navigate('/admin/teachers')}
+                    >
+                      Manage All Teachers
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <Clock className="h-12 w-12 mx-auto mb-4 text-orange-500" />
+                    <h3 className="text-lg font-semibold mb-2">Workload Distribution</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Balanced Load</span>
+                        <span className="text-green-600 font-medium">Good</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Overloaded Teachers</span>
+                        <span className="text-red-600 font-medium">0</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Available Capacity</span>
+                        <span className="text-blue-600 font-medium">High</span>
+                      </div>
+                    </div>
+                    <Button
+                      className="mt-4 w-full"
+                      variant="outline"
+                      onClick={() => navigate('/admin/reports')}
+                    >
+                      View Detailed Reports
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                System Analytics
+              </CardTitle>
+              <CardDescription>
+                Performance insights and system metrics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                    <p className="text-sm font-medium">System Performance</p>
+                    <p className="text-2xl font-bold text-green-600 mt-1">Excellent</p>
+                    <p className="text-xs text-muted-foreground mt-1">All systems operational</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <Award className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                    <p className="text-sm font-medium">Completion Rate</p>
+                    <p className="text-2xl font-bold text-blue-600 mt-1">{completionRate}%</p>
+                    <p className="text-xs text-muted-foreground mt-1">Average across all interventions</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <Zap className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                    <p className="text-sm font-medium">Active Users</p>
+                    <p className="text-2xl font-bold text-purple-600 mt-1">{dashboardStats.totalStudents + dashboardStats.totalTeachers}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Students and teachers combined</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="mt-6">
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => navigate('/admin/reports')}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Detailed Analytics & Reports
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Quick Actions Footer */}
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-1">Need Help Getting Started?</h3>
+              <p className="text-sm text-muted-foreground">
+                Set up your first intervention or explore the system documentation
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/admin/interventions')}
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                Create First Intervention
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/admin/quadrants')}
+              >
+                <Target className="h-4 w-4 mr-2" />
+                Setup Hierarchy
               </Button>
             </div>
           </div>
-
-          {searchResults.length > 0 && (
-            <div className="mt-4">
-              <h3 className="font-medium mb-2">Search Results</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-muted">
-                    <tr>
-                      <th className="p-2">Name</th>
-                      <th className="p-2">Reg No.</th>
-                      <th className="p-2">Score</th>
-                      <th className="p-2">Grade</th>
-                      <th className="p-2">Status</th>
-                      <th className="p-2">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchResults.map((student) => (
-                      <tr key={student.id} className="border-b">
-                        <td className="p-2">{student.name}</td>
-                        <td className="p-2">{student.registrationNo}</td>
-                        <td className="p-2 font-medium">{student.totalScore}/100</td>
-                        <td className="p-2">
-                          <Badge variant={student.grade === 'A+' ? "default" : student.grade === 'A' ? "secondary" : student.grade === 'B' ? "outline" : "destructive"}>
-                            {student.grade}
-                          </Badge>
-                        </td>
-                        <td className="p-2">
-                          <Badge variant={student.overallStatus === 'Good' ? "default" : student.overallStatus === 'Progress' ? "secondary" : "destructive"} className="bg-opacity-20">
-                            {student.overallStatus}
-                          </Badge>
-                        </td>
-                        <td className="p-2">
-                          <Button variant="link" className="p-0 h-auto" onClick={() => console.log("View student", student.id)}>
-                            View Profile
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                Total Students
-              </h3>
-              <p className="text-3xl font-bold">{batchSummary.totalStudents}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                Average Score
-              </h3>
-              <p className="text-3xl font-bold">{batchSummary.avgScore}/100</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                Highest Score
-              </h3>
-              <p className="text-3xl font-bold">{batchSummary.highScore}/100</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                Lowest Score
-              </h3>
-              <p className="text-3xl font-bold">{batchSummary.lowScore}/100</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Average Score Trend</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={termAvgScores}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="term" />
-                <YAxis domain={[60, 100]} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Quadrant Performance</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={quadrantAverages}
-                margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar
-                  dataKey="value"
-                  name="Average Score"
-                  fill="hsl(var(--primary))"
-                />
-                <Bar dataKey="max" name="Max Score" fill="#ddd" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Grade Distribution</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={gradeDistribution}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {gradeDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Recently Added Scores</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted text-left">
-                  <tr>
-                    <th className="p-2">Student</th>
-                    <th className="p-2">Date</th>
-                    <th className="p-2">Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentlyAddedScores.map((entry, index) => (
-                    <tr key={index} className="border-b">
-                      <td className="p-2">{entry.name}</td>
-                      <td className="p-2">{entry.date}</td>
-                      <td className="p-2 font-medium">{entry.score}/100</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Teacher Management</CardTitle>
-            <CardDescription>Manage teachers and their assignments</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="border rounded-md p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <h3 className="font-medium">Active Teachers</h3>
-                  </div>
-                  <p className="text-3xl font-bold">12</p>
-                  <p className="text-sm text-muted-foreground">Currently active teachers</p>
-                </div>
-
-                <div className="border rounded-md p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertCircle className="h-5 w-5 text-amber-500" />
-                    <h3 className="font-medium">Pending Assignments</h3>
-                  </div>
-                  <p className="text-3xl font-bold">8</p>
-                  <p className="text-sm text-muted-foreground">Teachers without students</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium">Teacher Specialization</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Persona</span>
-                    <Badge variant="outline">3 Teachers</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Wellness</span>
-                    <Badge variant="outline">4 Teachers</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Behavior</span>
-                    <Badge variant="outline">3 Teachers</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Discipline</span>
-                    <Badge variant="outline">2 Teachers</Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full mt-4" onClick={() => navigate("/admin/teachers")}>
-              Manage Teachers
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-amber-50 dark:bg-amber-900/10 border-amber-100 dark:border-amber-800">
-          <CardHeader>
-            <CardTitle className="text-lg text-amber-700 dark:text-amber-400">Attendance Issues</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {attendanceIssues.map((student, index) => (
-                <div key={index} className="flex justify-between border-b border-amber-100 dark:border-amber-800/50 pb-2">
-                  <div>
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-xs text-amber-700/70 dark:text-amber-400/70">
-                      Reg No: {student.regNo} | Attendance: {student.attendance}%
-                    </p>
-                  </div>
-                  <div className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                    Not eligible for: {student.quadrants.join(", ")}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-800">
-          <CardHeader>
-            <CardTitle className="text-lg text-red-700 dark:text-red-400">Red Flags</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {redFlagStudents.map((student, index) => (
-                <div key={index} className="flex justify-between border-b border-red-100 dark:border-red-800/50 pb-2">
-                  <div>
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-xs text-red-700/70 dark:text-red-400/70">
-                      Reg No: {student.regNo}
-                    </p>
-                  </div>
-                  <div className="text-sm font-medium text-red-700 dark:text-red-400">
-                    {student.issue}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };

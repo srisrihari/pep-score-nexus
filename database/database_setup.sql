@@ -20,7 +20,7 @@ CREATE TYPE intervention_status AS ENUM ('Draft', 'Active', 'Completed', 'Archiv
 CREATE TYPE teacher_role AS ENUM ('Lead', 'Assistant');
 CREATE TYPE intervention_enrollment_status AS ENUM ('Enrolled', 'Pending', 'Dropped', 'Completed');
 CREATE TYPE enrollment_type AS ENUM ('Mandatory', 'Optional');
-CREATE TYPE submission_type AS ENUM ('Document', 'Presentation', 'Video', 'Link', 'Text');
+CREATE TYPE submission_type AS ENUM ('Document', 'Presentation', 'Video', 'Link', 'Text', 'Direct_Assessment');
 CREATE TYPE task_status AS ENUM ('Draft', 'Active', 'Completed', 'Archived');
 CREATE TYPE submission_status AS ENUM ('Submitted', 'Graded', 'Returned', 'Late');
 CREATE TYPE feedback_category AS ENUM ('General', 'Academic', 'Technical', 'Wellness', 'Behavior');
@@ -246,6 +246,7 @@ CREATE TABLE sub_categories (
     display_order INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_subcategory_weightage CHECK (weightage > 0 AND weightage <= 100)
 );
@@ -266,6 +267,7 @@ CREATE TABLE components (
     display_order INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_component_scores CHECK (max_score > 0 AND minimum_score >= 0 AND minimum_score <= max_score),
     CONSTRAINT chk_component_weightage CHECK (weightage > 0 AND weightage <= 100)
@@ -274,6 +276,28 @@ CREATE TABLE components (
 CREATE INDEX idx_components_subcategory ON components(sub_category_id);
 CREATE INDEX idx_components_category ON components(category);
 CREATE INDEX idx_components_order ON components(display_order);
+
+-- microcompetencies table
+-- Each component is divided into microcompetencies with specific weightages
+CREATE TABLE microcompetencies (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    component_id UUID NOT NULL REFERENCES components(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    weightage DECIMAL(5,2) NOT NULL, -- Weightage within the component (should sum to 100)
+    max_score DECIMAL(5,2) NOT NULL DEFAULT 10.00,
+    display_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_microcompetency_weightage CHECK (weightage > 0 AND weightage <= 100),
+    CONSTRAINT chk_microcompetency_max_score CHECK (max_score > 0)
+);
+
+CREATE INDEX idx_microcompetencies_component ON microcompetencies(component_id);
+CREATE INDEX idx_microcompetencies_active ON microcompetencies(is_active);
+CREATE INDEX idx_microcompetencies_order ON microcompetencies(display_order);
 
 -- 6. Scoring and Assessment Tables
 
@@ -427,6 +451,45 @@ CREATE TABLE intervention_teachers (
 CREATE INDEX idx_intervention_teachers_intervention ON intervention_teachers(intervention_id);
 CREATE INDEX idx_intervention_teachers_teacher ON intervention_teachers(teacher_id);
 
+-- intervention_microcompetencies table
+-- Links interventions to specific microcompetencies with their weightages
+CREATE TABLE intervention_microcompetencies (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    intervention_id UUID NOT NULL REFERENCES interventions(id) ON DELETE CASCADE,
+    microcompetency_id UUID NOT NULL REFERENCES microcompetencies(id) ON DELETE CASCADE,
+    weightage DECIMAL(5,2) NOT NULL, -- Weightage of this microcompetency in the intervention
+    max_score DECIMAL(5,2) NOT NULL DEFAULT 10.00,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uk_intervention_microcompetency UNIQUE (intervention_id, microcompetency_id),
+    CONSTRAINT chk_intervention_micro_weightage CHECK (weightage > 0 AND weightage <= 100),
+    CONSTRAINT chk_intervention_micro_max_score CHECK (max_score > 0)
+);
+
+CREATE INDEX idx_intervention_microcompetencies_intervention ON intervention_microcompetencies(intervention_id);
+CREATE INDEX idx_intervention_microcompetencies_microcompetency ON intervention_microcompetencies(microcompetency_id);
+
+-- teacher_microcompetency_assignments table
+-- Assigns teachers to specific microcompetencies within interventions
+CREATE TABLE teacher_microcompetency_assignments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    intervention_id UUID NOT NULL REFERENCES interventions(id) ON DELETE CASCADE,
+    teacher_id UUID NOT NULL REFERENCES teachers(id) ON DELETE CASCADE,
+    microcompetency_id UUID NOT NULL REFERENCES microcompetencies(id) ON DELETE CASCADE,
+    can_score BOOLEAN DEFAULT true,
+    can_create_tasks BOOLEAN DEFAULT true,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assigned_by UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    is_active BOOLEAN DEFAULT true,
+
+    CONSTRAINT uk_teacher_intervention_microcompetency UNIQUE (intervention_id, teacher_id, microcompetency_id)
+);
+
+CREATE INDEX idx_teacher_microcompetency_assignments_intervention ON teacher_microcompetency_assignments(intervention_id);
+CREATE INDEX idx_teacher_microcompetency_assignments_teacher ON teacher_microcompetency_assignments(teacher_id);
+CREATE INDEX idx_teacher_microcompetency_assignments_microcompetency ON teacher_microcompetency_assignments(microcompetency_id);
+
 -- intervention_enrollments table
 CREATE TABLE intervention_enrollments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -446,24 +509,24 @@ CREATE TABLE intervention_enrollments (
 CREATE INDEX idx_intervention_enrollments_intervention ON intervention_enrollments(intervention_id);
 CREATE INDEX idx_intervention_enrollments_student ON intervention_enrollments(student_id);
 
--- tasks table
+-- Enhanced tasks table (microcompetency-centric)
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     intervention_id UUID NOT NULL REFERENCES interventions(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    quadrant_id VARCHAR(50) NOT NULL REFERENCES quadrants(id) ON DELETE RESTRICT,
-    component_id UUID NOT NULL REFERENCES components(id) ON DELETE RESTRICT,
     max_score DECIMAL(5,2) NOT NULL DEFAULT 10.00,
     due_date TIMESTAMP NOT NULL,
     instructions TEXT,
     rubric JSONB DEFAULT '[]',
     attachments JSONB DEFAULT '[]',
     submission_type submission_type DEFAULT 'Document',
+    requires_submission BOOLEAN DEFAULT true,
     allow_late_submission BOOLEAN DEFAULT true,
     late_penalty DECIMAL(5,2) DEFAULT 0.00,
     status task_status DEFAULT 'Draft',
-    created_by UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    created_by UUID REFERENCES users(id) ON DELETE RESTRICT,
+    created_by_teacher_id UUID REFERENCES teachers(id) ON DELETE RESTRICT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -471,10 +534,28 @@ CREATE TABLE tasks (
     CONSTRAINT chk_task_late_penalty CHECK (late_penalty >= 0 AND late_penalty <= 100)
 );
 
+-- Task-Microcompetency mapping with weightages
+CREATE TABLE task_microcompetencies (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    microcompetency_id UUID NOT NULL REFERENCES microcompetencies(id) ON DELETE CASCADE,
+    weightage DECIMAL(5,2) NOT NULL DEFAULT 100.00,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_weightage CHECK (weightage > 0 AND weightage <= 100),
+    UNIQUE(task_id, microcompetency_id)
+);
+
 CREATE INDEX idx_tasks_intervention ON tasks(intervention_id);
-CREATE INDEX idx_tasks_quadrant ON tasks(quadrant_id);
 CREATE INDEX idx_tasks_due_date ON tasks(due_date);
 CREATE INDEX idx_tasks_status ON tasks(status);
+CREATE INDEX idx_tasks_created_by ON tasks(created_by);
+CREATE INDEX idx_tasks_created_by_teacher ON tasks(created_by_teacher_id);
+
+-- Task-Microcompetency indexes
+CREATE INDEX idx_task_microcompetencies_task ON task_microcompetencies(task_id);
+CREATE INDEX idx_task_microcompetencies_microcompetency ON task_microcompetencies(microcompetency_id);
+CREATE INDEX idx_task_microcompetencies_weightage ON task_microcompetencies(weightage);
 
 -- task_submissions table
 CREATE TABLE task_submissions (
@@ -499,6 +580,27 @@ CREATE TABLE task_submissions (
 CREATE INDEX idx_task_submissions_task ON task_submissions(task_id);
 CREATE INDEX idx_task_submissions_student ON task_submissions(student_id);
 CREATE INDEX idx_task_submissions_status ON task_submissions(status);
+
+-- Direct Assessments Table (for tasks that don't require submissions)
+CREATE TABLE direct_assessments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    score DECIMAL(5,2) NOT NULL,
+    feedback TEXT,
+    private_notes TEXT,
+    assessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assessed_by UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uk_direct_assessment UNIQUE (task_id, student_id),
+    CONSTRAINT chk_direct_assessment_score CHECK (score >= 0)
+);
+
+CREATE INDEX idx_direct_assessments_task ON direct_assessments(task_id);
+CREATE INDEX idx_direct_assessments_student ON direct_assessments(student_id);
+CREATE INDEX idx_direct_assessments_assessed_by ON direct_assessments(assessed_by);
 
 -- 8. Communication and System Tables
 
@@ -682,6 +784,37 @@ CREATE INDEX idx_shl_integrations_shl_user ON shl_integrations(shl_user_id);
 CREATE INDEX idx_shl_integrations_sync ON shl_integrations(last_sync_at);
 CREATE INDEX idx_shl_integrations_status ON shl_integrations(sync_status);
 
+-- microcompetency_scores table for tracking individual microcompetency scores
+CREATE TABLE microcompetency_scores (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    microcompetency_id UUID NOT NULL REFERENCES microcompetencies(id) ON DELETE CASCADE,
+    intervention_id UUID NOT NULL REFERENCES interventions(id) ON DELETE CASCADE,
+    obtained_score DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    max_score DECIMAL(5,2) NOT NULL DEFAULT 10.00,
+    percentage DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    scored_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    scored_by UUID REFERENCES teachers(id) ON DELETE SET NULL,
+    status score_status DEFAULT 'Draft',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_microcompetency_obtained_score CHECK (obtained_score >= 0),
+    CONSTRAINT chk_microcompetency_max_score CHECK (max_score > 0),
+    CONSTRAINT chk_microcompetency_percentage CHECK (percentage >= 0 AND percentage <= 100),
+    CONSTRAINT chk_microcompetency_obtained_max CHECK (obtained_score <= max_score),
+    UNIQUE(student_id, microcompetency_id, intervention_id)
+);
+
+CREATE INDEX idx_microcompetency_scores_student ON microcompetency_scores(student_id);
+CREATE INDEX idx_microcompetency_scores_microcompetency ON microcompetency_scores(microcompetency_id);
+CREATE INDEX idx_microcompetency_scores_intervention ON microcompetency_scores(intervention_id);
+CREATE INDEX idx_microcompetency_scores_scored_by ON microcompetency_scores(scored_by);
+CREATE INDEX idx_microcompetency_scores_status ON microcompetency_scores(status);
+CREATE INDEX idx_microcompetency_scores_scored_at ON microcompetency_scores(scored_at);
+CREATE INDEX idx_microcompetency_scores_percentage ON microcompetency_scores(percentage DESC);
+
 -- Database Functions and Triggers
 
 -- Update timestamp function
@@ -701,6 +834,9 @@ CREATE TRIGGER update_scores_updated_at BEFORE UPDATE ON scores FOR EACH ROW EXE
 CREATE TRIGGER update_interventions_updated_at BEFORE UPDATE ON interventions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_shl_integrations_updated_at BEFORE UPDATE ON shl_integrations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_microcompetency_scores_updated_at BEFORE UPDATE ON microcompetency_scores FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_sub_categories_updated_at BEFORE UPDATE ON sub_categories FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_components_updated_at BEFORE UPDATE ON components FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Calculate grade function
 CREATE OR REPLACE FUNCTION calculate_grade(score DECIMAL)
@@ -717,6 +853,118 @@ BEGIN
     END CASE;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Function to calculate microcompetency score from task score
+CREATE OR REPLACE FUNCTION calculate_microcompetency_score_from_task(
+    p_task_score DECIMAL,
+    p_task_max_score DECIMAL,
+    p_microcompetency_weightage DECIMAL,
+    p_microcompetency_max_score DECIMAL
+) RETURNS DECIMAL AS $$
+BEGIN
+    -- Calculate weighted score for microcompetency
+    -- Formula: (task_score / task_max_score) * (weightage / 100) * microcompetency_max_score
+    RETURN (p_task_score / p_task_max_score) * (p_microcompetency_weightage / 100.0) * p_microcompetency_max_score;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to validate task microcompetency weightages
+CREATE OR REPLACE FUNCTION validate_task_weightages(p_task_id UUID)
+RETURNS BOOLEAN AS $$
+DECLARE
+    total_weightage DECIMAL;
+BEGIN
+    SELECT SUM(weightage) INTO total_weightage
+    FROM task_microcompetencies
+    WHERE task_id = p_task_id;
+
+    RETURN COALESCE(total_weightage, 0) = 100.00;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Helpful Views for Microcompetency-Centric Task System
+
+-- View: Task summary with microcompetencies
+CREATE OR REPLACE VIEW task_microcompetency_summary AS
+SELECT
+    t.id as task_id,
+    t.name as task_name,
+    t.max_score,
+    t.due_date,
+    t.status,
+    i.name as intervention_name,
+    COUNT(tm.microcompetency_id) as microcompetency_count,
+    SUM(tm.weightage) as total_weightage,
+    ARRAY_AGG(m.name ORDER BY tm.weightage DESC) as microcompetency_names,
+    ARRAY_AGG(tm.weightage ORDER BY tm.weightage DESC) as weightages,
+    ARRAY_AGG(
+        q.name || ' > ' || sc.name || ' > ' || c.name
+        ORDER BY tm.weightage DESC
+    ) as competency_paths
+FROM tasks t
+JOIN interventions i ON t.intervention_id = i.id
+LEFT JOIN task_microcompetencies tm ON t.id = tm.task_id
+LEFT JOIN microcompetencies m ON tm.microcompetency_id = m.id
+LEFT JOIN components c ON m.component_id = c.id
+LEFT JOIN sub_categories sc ON c.sub_category_id = sc.id
+LEFT JOIN quadrants q ON sc.quadrant_id = q.id
+GROUP BY t.id, t.name, t.max_score, t.due_date, t.status, i.name;
+
+-- View: Teacher task permissions
+CREATE OR REPLACE VIEW teacher_task_permissions AS
+SELECT DISTINCT
+    t.id as teacher_id,
+    u.name as teacher_name,
+    i.id as intervention_id,
+    i.name as intervention_name,
+    COUNT(tma.microcompetency_id) as assigned_microcompetencies,
+    COUNT(CASE WHEN tma.can_create_tasks THEN 1 END) as can_create_tasks_count,
+    COUNT(CASE WHEN tma.can_score THEN 1 END) as can_score_count,
+    BOOL_OR(tma.can_create_tasks) as can_create_any_tasks,
+    BOOL_OR(tma.can_score) as can_score_any_tasks
+FROM teachers t
+JOIN users u ON t.user_id = u.id
+JOIN teacher_microcompetency_assignments tma ON t.id = tma.teacher_id
+JOIN interventions i ON tma.intervention_id = i.id
+WHERE tma.is_active = true AND t.is_active = true
+GROUP BY t.id, u.name, i.id, i.name;
+
+-- View: Student microcompetency progress
+CREATE OR REPLACE VIEW student_microcompetency_progress AS
+SELECT
+    s.id as student_id,
+    s.name as student_name,
+    s.registration_no,
+    i.id as intervention_id,
+    i.name as intervention_name,
+    m.id as microcompetency_id,
+    m.name as microcompetency_name,
+    q.name as quadrant_name,
+    sc.name as sub_category_name,
+    c.name as component_name,
+    COALESCE(ms.obtained_score, 0) as current_score,
+    m.max_score,
+    COALESCE(ms.percentage, 0) as percentage,
+    ms.status as score_status,
+    ms.scored_at,
+    COUNT(DISTINCT tm.task_id) as related_tasks
+FROM students s
+CROSS JOIN interventions i
+CROSS JOIN microcompetencies m
+JOIN components c ON m.component_id = c.id
+JOIN sub_categories sc ON c.sub_category_id = sc.id
+JOIN quadrants q ON sc.quadrant_id = q.id
+LEFT JOIN microcompetency_scores ms ON s.id = ms.student_id
+    AND m.id = ms.microcompetency_id
+    AND i.id = ms.intervention_id
+LEFT JOIN task_microcompetencies tm ON m.id = tm.microcompetency_id
+LEFT JOIN tasks t ON tm.task_id = t.id AND t.intervention_id = i.id
+WHERE s.is_active = true
+    AND m.is_active = true
+    AND i.status IN ('Active', 'Completed')
+GROUP BY s.id, s.name, s.registration_no, i.id, i.name, m.id, m.name,
+         q.name, sc.name, c.name, ms.obtained_score, m.max_score,
+         ms.percentage, ms.status, ms.scored_at;
 
 -- Initial Data Setup
 
@@ -758,6 +1006,157 @@ INSERT INTO sub_categories (quadrant_id, name, description, weightage, display_o
 ('discipline', 'Code of Conduct', 'Policy compliance, ethical behavior, professional standards', 40.00, 2),
 ('discipline', 'Academic Discipline', 'Assignment completion, deadlines, quality of work', 20.00, 3);
 
+-- Insert sample components for each sub-category
+-- Persona Components
+INSERT INTO components (sub_category_id, name, description, weightage, max_score, category, display_order)
+SELECT
+    sc.id,
+    'Critical Thinking',
+    'Analytical and problem-solving skills',
+    25.00,
+    10.00,
+    'SHL',
+    1
+FROM sub_categories sc WHERE sc.name = 'SHL Competencies';
+
+INSERT INTO components (sub_category_id, name, description, weightage, max_score, category, display_order)
+SELECT
+    sc.id,
+    'Communication Skills',
+    'Verbal and written communication abilities',
+    25.00,
+    10.00,
+    'SHL',
+    2
+FROM sub_categories sc WHERE sc.name = 'SHL Competencies';
+
+INSERT INTO components (sub_category_id, name, description, weightage, max_score, category, display_order)
+SELECT
+    sc.id,
+    'Leadership',
+    'Leadership and team management skills',
+    25.00,
+    10.00,
+    'SHL',
+    3
+FROM sub_categories sc WHERE sc.name = 'SHL Competencies';
+
+INSERT INTO components (sub_category_id, name, description, weightage, max_score, category, display_order)
+SELECT
+    sc.id,
+    'Teamwork',
+    'Collaboration and team working abilities',
+    25.00,
+    10.00,
+    'SHL',
+    4
+FROM sub_categories sc WHERE sc.name = 'SHL Competencies';
+
+-- Professional Readiness Components
+INSERT INTO components (sub_category_id, name, description, weightage, max_score, category, display_order)
+SELECT
+    sc.id,
+    'Business Etiquette',
+    'Professional behavior and etiquette',
+    50.00,
+    10.00,
+    'Professional',
+    1
+FROM sub_categories sc WHERE sc.name = 'Professional Readiness';
+
+INSERT INTO components (sub_category_id, name, description, weightage, max_score, category, display_order)
+SELECT
+    sc.id,
+    'Work Ethics',
+    'Professional work ethics and values',
+    50.00,
+    10.00,
+    'Professional',
+    2
+FROM sub_categories sc WHERE sc.name = 'Professional Readiness';
+
+-- Insert sample microcompetencies for Critical Thinking component
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Problem Analysis',
+    'Ability to break down complex problems',
+    25.00,
+    10.00,
+    1
+FROM components c WHERE c.name = 'Critical Thinking';
+
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Solution Development',
+    'Creating effective solutions to problems',
+    25.00,
+    10.00,
+    2
+FROM components c WHERE c.name = 'Critical Thinking';
+
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Decision Making',
+    'Making informed and timely decisions',
+    25.00,
+    10.00,
+    3
+FROM components c WHERE c.name = 'Critical Thinking';
+
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Logical Reasoning',
+    'Using logic and reasoning in analysis',
+    25.00,
+    10.00,
+    4
+FROM components c WHERE c.name = 'Critical Thinking';
+
+-- Insert sample microcompetencies for Communication Skills component
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Verbal Communication',
+    'Effective spoken communication skills',
+    30.00,
+    10.00,
+    1
+FROM components c WHERE c.name = 'Communication Skills';
+
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Written Communication',
+    'Clear and effective writing skills',
+    30.00,
+    10.00,
+    2
+FROM components c WHERE c.name = 'Communication Skills';
+
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Presentation Skills',
+    'Ability to present ideas effectively',
+    25.00,
+    10.00,
+    3
+FROM components c WHERE c.name = 'Communication Skills';
+
+INSERT INTO microcompetencies (component_id, name, description, weightage, max_score, display_order)
+SELECT
+    c.id,
+    'Active Listening',
+    'Listening and understanding others',
+    15.00,
+    10.00,
+    4
+FROM components c WHERE c.name = 'Communication Skills';
+
 -- Create a default term
 INSERT INTO terms (name, description, start_date, end_date, is_active, is_current, academic_year) VALUES
 ('Term 1 / Level 0', 'First term of the academic year', '2024-01-01', '2024-06-30', true, true, '2024');
@@ -774,5 +1173,44 @@ CREATE INDEX idx_student_terms_term_score ON student_terms(term_id, total_score 
 CREATE INDEX idx_intervention_enrollments_intervention_status ON intervention_enrollments(intervention_id, enrollment_status);
 CREATE INDEX idx_tasks_intervention_status_due ON tasks(intervention_id, status, due_date);
 
+-- Microcompetency-centric task system performance indexes
+CREATE INDEX idx_task_microcompetencies_task_weightage ON task_microcompetencies(task_id, weightage DESC);
+CREATE INDEX idx_microcompetency_scores_student_intervention ON microcompetency_scores(student_id, intervention_id);
+CREATE INDEX idx_microcompetency_scores_microcompetency_percentage ON microcompetency_scores(microcompetency_id, percentage DESC);
+CREATE INDEX idx_teacher_microcompetency_assignments_teacher_intervention ON teacher_microcompetency_assignments(teacher_id, intervention_id);
+CREATE INDEX idx_teacher_microcompetency_assignments_permissions ON teacher_microcompetency_assignments(teacher_id, can_create_tasks, can_score);
+CREATE INDEX idx_tasks_created_by_teacher_status ON tasks(created_by_teacher_id, status);
+CREATE INDEX idx_task_submissions_task_status ON task_submissions(task_id, status);
+CREATE INDEX idx_microcompetencies_component_active ON microcompetencies(component_id, is_active);
+
 -- Database setup completed successfully!
-SELECT 'PEP Score Nexus Database Setup Completed Successfully!' as status;
+--
+-- MICROCOMPETENCY-CENTRIC TASK SYSTEM FEATURES:
+-- ✅ Tasks are created for specific microcompetencies with weightage distribution
+-- ✅ Teachers can only create tasks for their assigned microcompetencies
+-- ✅ Automatic microcompetency score updates when tasks are graded
+-- ✅ Comprehensive views for reporting and progress tracking
+-- ✅ Performance-optimized indexes for fast queries
+-- ✅ Data integrity constraints and validation functions
+--
+-- USAGE EXAMPLES:
+--
+-- 1. Check task weightage validation:
+--    SELECT validate_task_weightages('task-uuid-here');
+--
+-- 2. View task summary with microcompetencies:
+--    SELECT * FROM task_microcompetency_summary WHERE task_name LIKE '%Essay%';
+--
+-- 3. Check teacher permissions:
+--    SELECT * FROM teacher_task_permissions WHERE teacher_name = 'John Doe';
+--
+-- 4. Monitor student progress:
+--    SELECT * FROM student_microcompetency_progress
+--    WHERE student_name = 'Jane Smith' AND intervention_name = 'Sripathi Intervention';
+--
+-- 5. Calculate microcompetency score from task:
+--    SELECT calculate_microcompetency_score_from_task(18.5, 20.0, 60.0, 10.0);
+--    -- Returns: 5.55 (18.5/20 * 60/100 * 10)
+--
+SELECT 'PEP Score Nexus Database Setup Completed Successfully!' as status,
+       'Microcompetency-Centric Task System Ready!' as task_system_status;

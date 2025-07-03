@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,80 +10,252 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
-import { Download, FileBarChart } from "lucide-react";
+import { Download, FileBarChart, TrendingUp, Users, BookOpen, Award, RefreshCw } from "lucide-react";
+import { adminAPI } from "@/lib/api";
+import { useTerm } from "@/contexts/TermContext";
 
-const quadrantDistribution = [
-  { name: "Persona", value: 50 }, // Updated to match Excel (50 instead of 40)
-  { name: "Wellness", value: 30 },
-  { name: "Behavior", value: 10 }, // Updated to match Excel (10 instead of 20)
-  { name: "Discipline", value: 10 },
-];
-
-const scoreDistribution = [
-  { range: "A+", count: 25, label: "Excellent (>80)" },
-  { range: "A", count: 35, label: "Good (66-79)" },
-  { range: "B", count: 20, label: "Average (50-65)" },
-  { range: "C/D", count: 15, label: "Marginal (34-49)" },
-  { range: "E", count: 3, label: "Poor (<34)" },
-  { range: "IC", count: 2, label: "Incomplete" },
-];
-
-// Attendance distribution data
-const attendanceDistribution = [
-  { range: "90-100%", count: 45, status: "Excellent" },
-  { range: "80-89%", count: 35, status: "Good" },
-  { range: "70-79%", count: 15, status: "At Risk" },
-  { range: "Below 70%", count: 5, status: "Critical" },
-];
-
-const termProgress = [
-  { term: "Term 1", avgScore: 75 },
-  { term: "Term 2", avgScore: 79 },
-  { term: "Term 3", avgScore: 82 },
-  { term: "Term 4", avgScore: 84 },
-  { term: "Term 5", avgScore: 86 },
-];
-
-const quadrantPerformance = [
-  { name: "Persona", actual: 42, target: 50 }, // Updated to match Excel (50 instead of 40)
-  { name: "Wellness", actual: 26, target: 30 },
-  { name: "Behavior", actual: 8, target: 10 }, // Updated to match Excel (10 instead of 20)
-  { name: "Discipline", actual: 8, target: 10 },
-];
-
-// Eligibility status data
-const eligibilityStatus = [
-  { status: "Eligible", count: 95 },
-  { status: "Not Eligible", count: 5 },
-];
+// Types for reports data
+interface ReportsData {
+  overview: {
+    totalInterventions: number;
+    activeInterventions: number;
+    totalStudents: number;
+    totalTeachers: number;
+    totalScores: number;
+  };
+  interventionStats: Array<{
+    id: string;
+    name: string;
+    status: string;
+    enrollmentCount: number;
+    teacherCount: number;
+    startDate: string;
+    endDate: string;
+  }>;
+  studentPerformance: {
+    gradeDistribution: Record<string, number>;
+    scoreDistribution: Record<string, number>;
+    averageScore: number;
+  };
+  teacherPerformance: Array<{
+    id: string;
+    name: string;
+    employee_id: string;
+    specialization: string;
+    assignmentCount: number;
+    interventions: string[];
+  }>;
+  recentActivity: Array<{
+    id: string;
+    studentName: string;
+    registrationNo: string;
+    microcompetencyName: string;
+    interventionName: string;
+    score: string;
+    percentage: number;
+    scoredAt: string;
+  }>;
+}
 
 const COLORS = ['#7e3af2', '#0694a2', '#6875f5', '#8c6dfd'];
 
 const Reports: React.FC = () => {
+  const { selectedTerm } = useTerm();
   const [batchFilter, setBatchFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("2023-2024");
-  const [reportType, setReportType] = useState("overview");
   const [termFilter, setTermFilter] = useState("all");
+  const [reportType, setReportType] = useState("overview");
+  const [reportsData, setReportsData] = useState<ReportsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleDownload = (format: "pdf" | "excel") => {
-    toast.success(`Downloading report in ${format.toUpperCase()} format`);
+  // Mock data for charts
+  const termProgress = [
+    { term: "Term 1", avgScore: 75 },
+    { term: "Term 2", avgScore: 78 },
+    { term: "Term 3", avgScore: 82 },
+    { term: "Term 4", avgScore: 85 },
+    { term: "Term 5", avgScore: 88 }
+  ];
+
+  const attendanceDistribution = [
+    { range: "90-100%", count: 45 },
+    { range: "80-89%", count: 32 },
+    { range: "70-79%", count: 18 },
+    { range: "60-69%", count: 8 },
+    { range: "Below 60%", count: 3 }
+  ];
+
+  const eligibilityStatus = [
+    { status: "Eligible", count: 89 },
+    { status: "Not Eligible", count: 17 }
+  ];
+
+  const quadrantDistribution = [
+    { quadrant: "Cognitive", count: 25 },
+    { quadrant: "Affective", count: 22 },
+    { quadrant: "Conative", count: 18 },
+    { quadrant: "Physical", count: 20 }
+  ];
+
+  const quadrantPerformance = [
+    { quadrant: "Cognitive", avgScore: 78, maxScore: 95 },
+    { quadrant: "Affective", avgScore: 82, maxScore: 92 },
+    { quadrant: "Conative", avgScore: 75, maxScore: 88 },
+    { quadrant: "Physical", avgScore: 85, maxScore: 98 }
+  ];
+
+  useEffect(() => {
+    fetchReportsData();
+  }, []);
+
+  const fetchReportsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await adminAPI.getReportsAnalytics();
+      setReportsData(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch reports data');
+      toast.error('Failed to load reports data');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleDownload = async (format: "pdf" | "excel" | "csv" | "json" = "csv") => {
+    try {
+      if (format === "pdf" || format === "excel") {
+        toast.success(`Downloading report in ${format.toUpperCase()} format`);
+        return;
+      }
+
+      const exportFormat = format === "json" ? "json" : "csv";
+      await adminAPI.exportReports({ format: exportFormat, reportType });
+      toast.success(`Report exported successfully as ${exportFormat.toUpperCase()}!`);
+    } catch (err) {
+      toast.error('Failed to export report');
+    }
+  };
+
+  // Convert data for charts
+  const getScoreDistributionData = () => {
+    if (!reportsData?.studentPerformance.scoreDistribution) return [];
+    return Object.entries(reportsData.studentPerformance.scoreDistribution).map(([range, count]) => ({
+      range,
+      count,
+      label: range
+    }));
+  };
+
+  const getGradeDistributionData = () => {
+    if (!reportsData?.studentPerformance.gradeDistribution) return [];
+    return Object.entries(reportsData.studentPerformance.gradeDistribution).map(([grade, count]) => ({
+      grade,
+      count,
+      label: grade
+    }));
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+            <p className="text-gray-600">Loading reports data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <div className="text-center">
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={fetchReportsData} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const renderReportContent = () => {
     switch (reportType) {
       case "overview":
         return (
           <>
+            {/* Overview Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <BookOpen className="h-8 w-8 text-blue-600" />
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Interventions</p>
+                      <p className="text-2xl font-bold">{reportsData?.overview.totalInterventions || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <TrendingUp className="h-8 w-8 text-green-600" />
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Active Interventions</p>
+                      <p className="text-2xl font-bold">{reportsData?.overview.activeInterventions || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <Users className="h-8 w-8 text-purple-600" />
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Students</p>
+                      <p className="text-2xl font-bold">{reportsData?.overview.totalStudents || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <Award className="h-8 w-8 text-orange-600" />
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Scores</p>
+                      <p className="text-2xl font-bold">{reportsData?.overview.totalScores || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>PEP Score Distribution</CardTitle>
+                  <CardTitle>Score Distribution</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={scoreDistribution}>
+                    <BarChart data={getScoreDistributionData()}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="range" />
                       <YAxis />
@@ -244,11 +416,32 @@ const Reports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold mb-1">Reports</h1>
-        <p className="text-muted-foreground">
-          Generate and view performance reports for the PEP program.
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold mb-1">Reports & Analytics</h1>
+          <p className="text-muted-foreground">
+            Generate and view comprehensive performance reports for the PEP program.
+          </p>
+          <div className="mt-2">
+            <Badge variant="outline" className="text-sm">
+              {selectedTerm?.name || 'Current Term'}
+            </Badge>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => handleDownload('csv')} variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          <Button onClick={() => handleDownload('json')} variant="outline" size="sm">
+            <FileBarChart className="h-4 w-4 mr-2" />
+            Export JSON
+          </Button>
+          <Button onClick={fetchReportsData} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       <Card>

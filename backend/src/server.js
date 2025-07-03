@@ -12,10 +12,19 @@ const { testConnection } = require('./config/supabase');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const quadrantRoutes = require('./routes/quadrants');
+const subCategoryRoutes = require('./routes/subCategories');
+const componentRoutes = require('./routes/components');
 const studentRoutes = require('./routes/students');
 const scoreRoutes = require('./routes/scores');
 const adminRoutes = require('./routes/admin');
 const interventionRoutes = require('./routes/interventions');
+const microcompetencyRoutes = require('./routes/microcompetencies');
+const teacherMicrocompetencyRoutes = require('./routes/teacherMicrocompetencies');
+const teacherRoutes = require('./routes/teachers');
+const studentInterventionRoutes = require('./routes/studentInterventions');
+const scoreCalculationRoutes = require('./routes/scoreCalculation');
+const uploadRoutes = require('./routes/uploads');
+const termRoutes = require('./routes/terms');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,8 +36,11 @@ app.use(helmet());
 app.use(cors({
   origin: [
     'http://localhost:8080',
+    'http://localhost:8081',
+    'http://localhost:8082',
     'http://localhost:5173',
     'http://localhost:3000',
+    'http://10.80.60.105:8082',
     process.env.CORS_ORIGIN
   ].filter(Boolean),
   credentials: true,
@@ -40,7 +52,7 @@ app.use(cors({
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // Increased for development
   message: {
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: Math.ceil((parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000) / 1000)
@@ -82,6 +94,15 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Version endpoint for .well-known requests
+app.get('/.well-known/version', (req, res) => {
+  res.json({
+    version: '1.0.0',
+    name: 'PEP Score Nexus API',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API routes
 const apiPrefix = process.env.API_PREFIX || '/api';
 const apiVersion = process.env.API_VERSION || 'v1';
@@ -90,10 +111,19 @@ const baseRoute = `${apiPrefix}/${apiVersion}`;
 app.use(`${baseRoute}/auth`, authRoutes);
 app.use(`${baseRoute}/users`, userRoutes);
 app.use(`${baseRoute}/quadrants`, quadrantRoutes);
+app.use(`${baseRoute}/sub-categories`, subCategoryRoutes);
+app.use(`${baseRoute}/components`, componentRoutes);
 app.use(`${baseRoute}/students`, studentRoutes);
 app.use(`${baseRoute}/scores`, scoreRoutes);
 app.use(`${baseRoute}/admin`, adminRoutes);
 app.use(`${baseRoute}/interventions`, interventionRoutes);
+app.use(`${baseRoute}/microcompetencies`, microcompetencyRoutes);
+app.use(`${baseRoute}/teacher-microcompetencies`, teacherMicrocompetencyRoutes);
+app.use(`${baseRoute}/teachers`, teacherRoutes);
+app.use(`${baseRoute}/student-interventions`, studentInterventionRoutes);
+app.use(`${baseRoute}/score-calculation`, scoreCalculationRoutes);
+app.use(`${baseRoute}/uploads`, uploadRoutes);
+app.use(`${baseRoute}/terms`, termRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

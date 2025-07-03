@@ -10,6 +10,7 @@ import StatusBadge from "@/components/common/StatusBadge";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
 import BehaviorRatingScale from "@/components/student/BehaviorRatingScale";
 import { studentAPI } from "@/lib/api";
+import { useTerm } from "@/contexts/TermContext";
 import { transformStudentPerformanceData, transformLeaderboardData } from "@/lib/dataTransform";
 import { Student, QuadrantData, Leaderboard } from "@/data/mockData";
 import {
@@ -26,12 +27,12 @@ import { ArrowLeft, AlertCircle, TrendingDown, CheckCircle2, BookOpen, Target } 
 const QuadrantDetail: React.FC = () => {
   const { quadrantId } = useParams<{ quadrantId: string }>();
   const navigate = useNavigate();
+  const { selectedTerm } = useTerm();
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [leaderboardData, setLeaderboardData] = useState<Leaderboard | null>(null);
   const [quadrantDetails, setQuadrantDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTermId, setSelectedTermId] = useState<string>("");
   const [activeQuadrant, setActiveQuadrant] = useState<string>(quadrantId || "persona");
 
   // Load data from API
@@ -45,11 +46,11 @@ const QuadrantDetail: React.FC = () => {
         const currentStudentResponse = await studentAPI.getCurrentStudent();
         const studentId = currentStudentResponse.data.id;
 
-        // Fetch performance data and quadrant details
+        // Fetch performance data and quadrant details (using selected term)
         const [performanceResponse, leaderboardResponse, quadrantDetailsResponse] = await Promise.all([
-          studentAPI.getStudentPerformance(studentId, undefined, true),
-          studentAPI.getStudentLeaderboard(studentId).catch(() => null),
-          studentAPI.getQuadrantDetails(studentId, activeQuadrant).catch(() => null)
+          studentAPI.getStudentPerformance(studentId, selectedTerm?.id, true),
+          studentAPI.getStudentLeaderboard(studentId, selectedTerm?.id).catch(() => null),
+          studentAPI.getQuadrantDetails(studentId, activeQuadrant, selectedTerm?.id).catch(() => null)
         ]);
 
         // Transform data
@@ -61,7 +62,6 @@ const QuadrantDetail: React.FC = () => {
         setStudentData(transformedStudent);
         setLeaderboardData(leaderboard);
         setQuadrantDetails(quadrantDetailsResponse?.data);
-        setSelectedTermId(transformedStudent.currentTerm);
 
       } catch (err) {
         console.error('Failed to load quadrant data:', err);
@@ -72,7 +72,7 @@ const QuadrantDetail: React.FC = () => {
     };
 
     loadQuadrantData();
-  }, [activeQuadrant]);
+  }, [activeQuadrant, selectedTerm]); // Reload when term or quadrant changes
 
   // Update active quadrant when URL param changes
   useEffect(() => {
@@ -116,24 +116,29 @@ const QuadrantDetail: React.FC = () => {
     );
   }
 
-  // Find the selected term data
-  const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
-  const quadrant = selectedTerm.quadrants.find((q) => q.id === activeQuadrant);
-  const leaderboard = leaderboardData?.quadrants[activeQuadrant || ""];
+  // Find the current term data (use the first term as current)
+  const currentTermData = studentData.terms?.[0] || studentData.terms?.find(term => term.termId === studentData.currentTerm);
+  const quadrant = currentTermData?.quadrants.find((q) => q.id === activeQuadrant);
+  const leaderboard = leaderboardData?.quadrants?.[activeQuadrant || ""];
+
+
 
   // Generate chart data from term history
-  const chartData = studentData.terms.map(term => {
+  const chartData = studentData.terms?.map(term => {
     const termQuadrant = term.quadrants.find(q => q.id === activeQuadrant);
     return {
       term: term.termName,
       score: termQuadrant?.obtained || 0
     };
-  });
+  }) || [];
 
-  if (!quadrant || !leaderboard) {
+  if (!quadrant) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold mb-4">Quadrant not found</h1>
+        <p className="text-muted-foreground mb-4">
+          The requested quadrant "{activeQuadrant}" could not be found or you don't have access to it.
+        </p>
         <Button onClick={() => navigate("/student")}>Back to Dashboard</Button>
       </div>
     );
@@ -174,26 +179,16 @@ const QuadrantDetail: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium">Term:</span>
-          <Select value={selectedTermId} onValueChange={setSelectedTermId}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select Term" />
-            </SelectTrigger>
-            <SelectContent>
-              {studentData.terms.map((term) => (
-                <SelectItem key={term.termId} value={term.termId}>
-                  {term.termName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Badge variant="outline" className="text-sm">
+            {selectedTerm?.name || 'Current Term'}
+          </Badge>
         </div>
       </div>
 
       <div className="mt-4">
         <Tabs value={activeQuadrant} onValueChange={handleQuadrantChange} className="w-full">
           <TabsList className="grid grid-cols-4 w-full">
-            {selectedTerm.quadrants.map((q) => (
+            {currentTermData?.quadrants.map((q) => (
               <TabsTrigger key={q.id} value={q.id} className="flex items-center justify-center">
                 <div className="flex items-center">
                   <span className="mr-1">{q.name}</span>
@@ -215,7 +210,7 @@ const QuadrantDetail: React.FC = () => {
             <div className="text-center">
               <h2 className="text-xl font-bold mb-1">Your Score</h2>
               <div className="text-4xl font-bold mb-4">
-                {quadrant.obtained}/{quadrant.weightage}
+              {quadrant.obtained.toFixed(1)}/{quadrant.weightage}
               </div>
               <div className="inline-flex">
                 <StatusBadge
@@ -237,23 +232,30 @@ const QuadrantDetail: React.FC = () => {
               )}
             </div>
 
+            {/* Batch comparison section */}
             <div className="mt-4 pt-4 border-t border-white/20">
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-xs text-white/70">Batch Average</p>
-                  <p className="font-bold">{leaderboard.batchAvg}/{quadrant.weightage}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-white/70">Batch Best</p>
-                  <p className="font-bold">{leaderboard.batchBest}/{quadrant.weightage}</p>
-                </div>
-                {quadrant.rank && (
-                  <div className="col-span-2 mt-2">
-                    <p className="text-xs text-white/70">Your Rank</p>
-                    <p className="font-bold">#{quadrant.rank} in batch</p>
+              {leaderboard ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-white/70">Batch Average</p>
+                    <p className="font-bold">{leaderboard.batchAvg || 0}/{quadrant.weightage}</p>
                   </div>
-                )}
-              </div>
+                  <div>
+                    <p className="text-xs text-white/70">Batch Best</p>
+                    <p className="font-bold">{leaderboard.batchBest || 0}/{quadrant.weightage}</p>
+                  </div>
+                  {quadrant.rank && (
+                    <div className="col-span-2 mt-2">
+                      <p className="text-xs text-white/70">Your Rank</p>
+                      <p className="font-bold">#{quadrant.rank} in batch</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-2">
+                  <p className="text-xs text-white/70">Batch comparison data not available</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -286,82 +288,113 @@ const QuadrantDetail: React.FC = () => {
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold mt-8">Component Breakdown</h2>
+        <h2 className="text-xl font-semibold mt-8">Breakdown by Sub-Categories</h2>
 
-        {activeQuadrant === "persona" && (
-          <>
-            <h3 className="text-lg font-medium mt-4 mb-2">SHL Competencies (80%)</h3>
+        {/* NEW: Dynamic sub-category structure */}
+        {quadrant.sub_categories && quadrant.sub_categories.length > 0 ? (
+          <div className="space-y-8 mt-6">
+            {quadrant.sub_categories.map((subCategory) => (
+              <div key={subCategory.id} className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">{subCategory.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">
+                      {subCategory.weightage}% of {quadrant.name}
+                    </Badge>
+                    <Badge variant="outline">
+                      {subCategory.obtained.toFixed(1)}/{subCategory.maxScore.toFixed(1)}
+                    </Badge>
+                  </div>
+                </div>
+                
+                {subCategory.description && (
+                  <p className="text-sm text-muted-foreground">{subCategory.description}</p>
+                )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {quadrant.components
-                .filter(component => component.category === "SHL")
-                .map((component) => (
+                  {subCategory.components.map((component) => (
                   <Card key={component.id}>
                     <CardContent className="pt-6">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{component.name}</h3>
+                          <div>
+                            <h4 className="font-medium">{component.name}</h4>
+                            {component.description && (
+                              <p className="text-xs text-muted-foreground mt-1">{component.description}</p>
+                            )}
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
                         {component.status && (
                           <StatusBadge status={component.status} />
                         )}
+                            {component.category && (
+                              <Badge variant="outline" className="text-xs">
+                                {component.category}
+                              </Badge>
+                            )}
+                          </div>
                       </div>
-                      <div className="mt-2">
+                        <div className="mt-3">
                         <div className="flex justify-between text-sm mb-1">
                           <span>Score</span>
+                            <div className="flex items-center gap-2">
                           <span className="font-bold">
-                            {component.score}/{component.maxScore}
+                                {component.score.toFixed(1)}/{component.maxScore.toFixed(1)}
                           </span>
+                              {component.weightage && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {component.weightage}%
+                                </Badge>
+                              )}
+                            </div>
                         </div>
                         <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full"
                             style={{
-                              width: `${(component.score / component.maxScore) * 100}%`,
+                                width: `${component.maxScore > 0 ? (component.score / component.maxScore) * 100 : 0}%`,
                             }}
                           />
+                          </div>
+                          <div className="text-right text-xs text-muted-foreground mt-1">
+                            {component.maxScore > 0 ? Math.round((component.score / component.maxScore) * 100) : 0}%
+                          </div>
+                        </div>
+
+                        {/* Show microcompetencies if available */}
+                        {component.microcompetencies && component.microcompetencies.length > 0 && (
+                          <div className="mt-4 pt-3 border-t">
+                            <h5 className="text-xs font-medium mb-2">Microcompetencies</h5>
+                            <div className="space-y-1">
+                              {component.microcompetencies.map((micro) => (
+                                <div key={micro.id} className="flex justify-between items-center text-xs">
+                                  <span className="truncate">{micro.name}</span>
+                                  <div className="flex items-center gap-1">
+                                    {micro.score !== undefined ? (
+                                      <span className="font-medium">
+                                        {micro.score.toFixed(1)}/{micro.maxScore}
+                                      </span>
+                                    ) : (
+                                      <span className="text-muted-foreground">Not scored</span>
+                                    )}
+                                    <Badge variant="outline" className="text-xs py-0">
+                                      {micro.weightage}%
+                                    </Badge>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
                 ))}
             </div>
-
-            <h3 className="text-lg font-medium mt-6 mb-2">Professional Readiness (20%)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {quadrant.components
-                .filter(component => component.category === "Professional")
-                .map((component) => (
-                  <Card key={component.id}>
-                    <CardContent className="pt-6">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">{component.name}</h3>
-                        {component.status && (
-                          <StatusBadge status={component.status} />
+                          </div>
                         )}
-                      </div>
-                      <div className="mt-2">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Score</span>
-                          <span className="font-bold">
-                            {component.score}/{component.maxScore}
-                          </span>
-                        </div>
-                        <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-primary rounded-full"
-                            style={{
-                              width: `${(component.score / component.maxScore) * 100}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
                     </CardContent>
                   </Card>
                 ))}
             </div>
-          </>
-        )}
-
-        {activeQuadrant !== "persona" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* LEGACY: Fall back to flat components structure */
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             {quadrant.components.map((component) => (
               <Card key={component.id}>
                 <CardContent className="pt-6">
@@ -401,11 +434,22 @@ const QuadrantDetail: React.FC = () => {
       )}
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <LeaderboardCard
-          leaders={leaderboard.topStudents}
-          userRank={leaderboard.userRank}
-          maxScore={quadrant.weightage}
-        />
+        {leaderboard ? (
+          <LeaderboardCard
+            leaders={leaderboard.topStudents}
+            userRank={leaderboard.userRank}
+            maxScore={quadrant.weightage}
+          />
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Leaderboard</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Leaderboard data is not available at the moment.</p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader className="pb-2">

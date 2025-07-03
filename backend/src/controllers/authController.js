@@ -4,7 +4,9 @@ const { supabase, query } = require('../config/supabase');
 
 // JWT secret from environment variables
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-super-secret-refresh-key-change-this-in-production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 // Helper function to generate JWT token
 const generateToken = (userId, role) => {
@@ -12,6 +14,15 @@ const generateToken = (userId, role) => {
     { userId, role },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN }
+  );
+};
+
+// Helper function to generate refresh token
+const generateRefreshToken = (userId, role) => {
+  return jwt.sign(
+    { userId, role, type: 'refresh' },
+    JWT_REFRESH_SECRET,
+    { expiresIn: JWT_REFRESH_EXPIRES_IN }
   );
 };
 
@@ -111,8 +122,9 @@ const register = async (req, res) => {
       );
     }
 
-    // Generate JWT token
+    // Generate JWT tokens
     const token = generateToken(newUser.id, newUser.role);
+    const refreshToken = generateRefreshToken(newUser.id, newUser.role);
 
     res.status(201).json({
       success: true,
@@ -126,7 +138,8 @@ const register = async (req, res) => {
           status: newUser.status,
           created_at: newUser.created_at
         },
-        token
+        token,
+        refreshToken
       },
       timestamp: new Date().toISOString()
     });
@@ -193,8 +206,9 @@ const login = async (req, res) => {
         .eq('id', user.id)
     );
 
-    // Generate JWT token
+    // Generate JWT tokens
     const token = generateToken(user.id, user.role);
+    const refreshToken = generateRefreshToken(user.id, user.role);
 
     // Get role-specific profile data
     let profileData = null;
@@ -251,7 +265,8 @@ const login = async (req, res) => {
           last_login: user.last_login
         },
         profile: profileData,
-        token
+        token,
+        refreshToken
       },
       timestamp: new Date().toISOString()
     });
@@ -357,6 +372,90 @@ const getProfile = async (req, res) => {
   }
 };
 
+// Refresh token
+const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Refresh token is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Verify refresh token
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid refresh token',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Check if it's a refresh token
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token type',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Verify user still exists and is active
+    const userResult = await query(
+      supabase
+        .from('users')
+        .select('id, username, email, role, status')
+        .eq('id', decoded.userId)
+        .eq('status', 'active')
+        .limit(1)
+    );
+
+    if (!userResult.rows || userResult.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found or inactive',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // Generate new tokens
+    const newToken = generateToken(user.id, user.role);
+    const newRefreshToken = generateRefreshToken(user.id, user.role);
+
+    res.status(200).json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        token: newToken,
+        refreshToken: newRefreshToken,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        }
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to refresh token',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
 // Logout user (optional - mainly for token invalidation in future)
 const logout = async (req, res) => {
   try {
@@ -382,5 +481,6 @@ module.exports = {
   register,
   login,
   getProfile,
+  refreshToken,
   logout
-}; 
+};

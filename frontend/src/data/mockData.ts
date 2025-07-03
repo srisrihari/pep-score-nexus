@@ -3,23 +3,51 @@
 export type Grade = 'A+' | 'A' | 'B' | 'C' | 'D' | 'E' | 'IC';
 
 // Status types for components and quadrants
-export type StatusType = 'Good' | 'Progress' | 'Deteriorate' | 'Cleared' | 'Not Cleared' | 'Attendance Shortage';
+export type StatusType = 'Good' | 'Progress' | 'Deteriorate' | 'Cleared' | 'Not Cleared' | 'Attendance Shortage' | 'IC' | 'Not Scored';
+
+export interface Microcompetency {
+  id: string;
+  name: string;
+  description: string;
+  score?: number;
+  maxScore: number;
+  weightage: number;
+  feedback?: string;
+  status?: StatusType;
+  scoredAt?: string | null;
+  scoredBy?: string | null;
+}
 
 export interface Component {
   id: string;
   name: string;
+  description?: string;
   score: number;
   maxScore: number;
+  weightage?: number;
   status?: StatusType;
-  category?: 'SHL' | 'Professional'; // For Persona components categorization
+  category?: 'SHL' | 'Professional' | 'Academic' | 'Physical' | 'Mental' | 'Social' | 'Conduct'; // Extended categories
+  microcompetencies?: Microcompetency[];
+}
+
+export interface SubCategory {
+  id: string;
+  name: string;
+  description?: string;
+  weightage: number;
+  obtained: number;
+  maxScore: number;
+  components: Component[];
 }
 
 export interface QuadrantData {
   id: string;
   name: string;
+  description?: string;
   weightage: number;
   obtained: number;
-  components: Component[];
+  components: Component[]; // Legacy flat structure
+  sub_categories?: SubCategory[]; // NEW: Hierarchical structure
   status: StatusType;
   attendance?: number; // Attendance percentage
   eligibility?: 'Eligible' | 'Not Eligible'; // Eligibility status
@@ -128,8 +156,32 @@ export const studentData: Student = {
           rank: 1,
           components: [
             // SHL Competencies (80%)
-            { id: "anc", name: "Analysis & Critical Thinking (A&C)", score: 4, maxScore: 5, category: "SHL" },
-            { id: "c", name: "Communication (C)", score: 4, maxScore: 5, category: "SHL" },
+            {
+              id: "anc",
+              name: "Analysis & Critical Thinking (A&C)",
+              score: 4,
+              maxScore: 5,
+              category: "SHL",
+              microcompetencies: [
+                { id: "anc-1", name: "Problem Analysis", description: "Ability to break down complex problems", score: 8, maxScore: 10, weightage: 25, feedback: "Good analytical skills demonstrated", status: "Good" },
+                { id: "anc-2", name: "Solution Development", description: "Creating effective solutions to problems", score: 7, maxScore: 10, weightage: 25, feedback: "Room for improvement in creative solutions", status: "Progress" },
+                { id: "anc-3", name: "Decision Making", description: "Making informed and timely decisions", score: 9, maxScore: 10, weightage: 25, feedback: "Excellent decision-making abilities", status: "Good" },
+                { id: "anc-4", name: "Logical Reasoning", description: "Using logic and reasoning in analysis", score: 8, maxScore: 10, weightage: 25, feedback: "Strong logical thinking", status: "Good" }
+              ]
+            },
+            {
+              id: "c",
+              name: "Communication (C)",
+              score: 4,
+              maxScore: 5,
+              category: "SHL",
+              microcompetencies: [
+                { id: "c-1", name: "Verbal Communication", description: "Effective spoken communication skills", score: 8, maxScore: 10, weightage: 30, feedback: "Clear and articulate speaker", status: "Good" },
+                { id: "c-2", name: "Written Communication", description: "Clear and effective writing skills", score: 7, maxScore: 10, weightage: 30, feedback: "Good writing, minor grammar issues", status: "Progress" },
+                { id: "c-3", name: "Presentation Skills", description: "Ability to present ideas effectively", score: 9, maxScore: 10, weightage: 25, feedback: "Excellent presentation delivery", status: "Good" },
+                { id: "c-4", name: "Active Listening", description: "Listening and understanding others", score: 8, maxScore: 10, weightage: 15, feedback: "Good listening skills", status: "Good" }
+              ]
+            },
             { id: "e", name: "Empathy (E)", score: 5, maxScore: 5, category: "SHL" },
             { id: "l", name: "Leadership (L)", score: 5, maxScore: 5, category: "SHL" },
             { id: "n", name: "Negotiation (N)", score: 4, maxScore: 5, category: "SHL" },
@@ -153,7 +205,18 @@ export const studentData: Student = {
           eligibility: "Eligible",
           rank: 7,
           components: [
-            { id: "push-ups", name: "Push Ups", score: 4, maxScore: 5, status: "Good" },
+            {
+              id: "push-ups",
+              name: "Push Ups",
+              score: 4,
+              maxScore: 5,
+              status: "Good",
+              microcompetencies: [
+                { id: "pu-1", name: "Upper Body Strength", description: "Strength in chest, shoulders, and arms", score: 8, maxScore: 10, weightage: 50, feedback: "Good strength development", status: "Good" },
+                { id: "pu-2", name: "Endurance", description: "Ability to maintain performance over time", score: 7, maxScore: 10, weightage: 30, feedback: "Needs improvement in endurance", status: "Progress" },
+                { id: "pu-3", name: "Form & Technique", description: "Proper push-up form and technique", score: 9, maxScore: 10, weightage: 20, feedback: "Excellent form", status: "Good" }
+              ]
+            },
             { id: "sit-ups", name: "Sit Ups", score: 4, maxScore: 5, status: "Good" },
             { id: "sit-reach", name: "Sit & Reach", score: 3, maxScore: 5, status: "Progress" },
             { id: "beep-test", name: "Beep Test", score: 4, maxScore: 5, status: "Good" },
@@ -168,7 +231,17 @@ export const studentData: Student = {
           obtained: 9,
           status: "Cleared",
           components: [
-            { id: "prepares-class", name: "Prepares for Class", score: 3, maxScore: 5 },
+            {
+              id: "prepares-class",
+              name: "Prepares for Class",
+              score: 3,
+              maxScore: 5,
+              microcompetencies: [
+                { id: "pc-1", name: "Pre-reading", description: "Completes assigned readings before class", score: 6, maxScore: 10, weightage: 40, feedback: "Inconsistent with pre-reading", status: "Progress" },
+                { id: "pc-2", name: "Note Taking", description: "Takes comprehensive notes during class", score: 8, maxScore: 10, weightage: 30, feedback: "Good note-taking habits", status: "Good" },
+                { id: "pc-3", name: "Question Preparation", description: "Comes prepared with thoughtful questions", score: 5, maxScore: 10, weightage: 30, feedback: "Needs to prepare more questions", status: "Progress" }
+              ]
+            },
             { id: "participation", name: "Participates in Class Discussions", score: 3, maxScore: 5 },
             { id: "manners", name: "Demonstrates Good Manners", score: 3, maxScore: 5 },
             { id: "punctuality", name: "Arrives on Time and is Properly Groomed", score: 3, maxScore: 5 },

@@ -26,6 +26,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTerm } from "@/contexts/TermContext";
 
 // Types
 interface User {
@@ -56,12 +57,13 @@ interface UserStats {
 
 const ManageUsers: React.FC = () => {
   const { token } = useAuth();
+  const { selectedTerm } = useTerm();
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -83,8 +85,8 @@ const ManageUsers: React.FC = () => {
       queryParams.append('page', currentPage.toString());
       queryParams.append('limit', '10');
       if (searchQuery) queryParams.append('search', searchQuery);
-      if (roleFilter) queryParams.append('role', roleFilter);
-      if (statusFilter) queryParams.append('status', statusFilter);
+      if (roleFilter && roleFilter !== 'all') queryParams.append('role', roleFilter);
+      if (statusFilter && statusFilter !== 'all') queryParams.append('status', statusFilter);
 
              const response = await fetch(`http://localhost:3001/api/v1/users?${queryParams}`, {
          headers: {
@@ -194,6 +196,11 @@ const ManageUsers: React.FC = () => {
           <p className="text-muted-foreground">
             Manage user accounts, roles, and permissions across the system.
           </p>
+          <div className="mt-2">
+            <Badge variant="outline" className="text-sm">
+              {selectedTerm?.name || 'Current Term'}
+            </Badge>
+          </div>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="outline" onClick={loadUsers}>
@@ -296,7 +303,7 @@ const ManageUsers: React.FC = () => {
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Roles</SelectItem>
+                  <SelectItem value="all">All Roles</SelectItem>
                   <SelectItem value="student">Student</SelectItem>
                   <SelectItem value="teacher">Teacher</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
@@ -307,7 +314,7 @@ const ManageUsers: React.FC = () => {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                   <SelectItem value="suspended">Suspended</SelectItem>

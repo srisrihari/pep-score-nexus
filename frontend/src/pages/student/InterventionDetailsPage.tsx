@@ -27,15 +27,18 @@ import {
   Award,
   TrendingUp,
 } from 'lucide-react';
-import { interventionAPI } from '@/lib/api';
-import { InterventionDetails, InterventionTask } from '@/types/intervention';
+import { studentAPI } from '@/lib/api';
+import { InterventionDetails, InterventionMicrocompetency } from '@/types/intervention';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTerm } from '@/contexts/TermContext';
 
 const InterventionDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [intervention, setIntervention] = useState<InterventionDetails | null>(null);
+  const { selectedTerm } = useTerm();
+  const [intervention, setIntervention] = useState<any>(null);
+  const [studentScore, setStudentScore] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
@@ -44,14 +47,30 @@ const InterventionDetailsPage: React.FC = () => {
     if (id) {
       fetchInterventionDetails();
     }
-  }, [id]);
+  }, [id, selectedTerm]); // Reload when term changes
 
   const fetchInterventionDetails = async () => {
     try {
       setLoading(true);
-      const response = await interventionAPI.getInterventionById(id!);
-      setIntervention(response.data);
+
+      if (!user?.id) {
+        setError('User not authenticated');
+        return;
+      }
+
+      // Get current student profile to get student ID
+      const currentStudentResponse = await studentAPI.getCurrentStudent();
+      const studentId = currentStudentResponse.data.id;
+
+      // Use student-specific endpoint that doesn't require admin privileges
+      const interventionResponse = await studentAPI.getStudentInterventionDetails(studentId, id!);
+
+      setIntervention(interventionResponse.data.intervention);
+      if (interventionResponse.data.progress) {
+        setStudentScore(interventionResponse.data.progress);
+      }
     } catch (err) {
+      console.error('Error fetching intervention details:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch intervention details');
     } finally {
       setLoading(false);
@@ -225,8 +244,8 @@ const InterventionDetailsPage: React.FC = () => {
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="teachers">Teachers</TabsTrigger>
+              <TabsTrigger value="scores">My Scores</TabsTrigger>
+              <TabsTrigger value="microcompetencies">Microcompetencies</TabsTrigger>
               <TabsTrigger value="students">Students</TabsTrigger>
             </TabsList>
 
@@ -273,86 +292,154 @@ const InterventionDetailsPage: React.FC = () => {
                 </Card>
               )}
 
-              {/* Quadrant Focus */}
+              {/* Scoring Status */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Focus Areas & Weightages
+                    Scoring Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {Object.entries(intervention.quadrant_weightages).map(([quadrant, weight]) => (
-                      <div key={quadrant} className="flex items-center justify-between">
-                        <span className="font-medium capitalize">{quadrant}</span>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Scoring Status</span>
+                      <div className="flex items-center gap-2">
+                        {intervention.is_scoring_open ? (
+                          <Badge className="bg-green-100 text-green-800 border-green-200">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Open
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-red-100 text-red-800 border-red-200">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Closed
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {intervention.scoring_deadline && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Scoring Deadline</span>
+                        <span className="font-medium">{formatDate(intervention.scoring_deadline)}</span>
+                      </div>
+                    )}
+
+                    {studentScore && studentScore.maxScore > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600">Your Overall Score</span>
                         <div className="flex items-center gap-2">
-                          <div className="w-24 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ width: `${weight}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium w-12 text-right">{weight}%</span>
+                          <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                            {((studentScore.currentScore / studentScore.maxScore) * 100).toFixed(1)}%
+                          </Badge>
+                          <span className="text-sm text-gray-600">
+                            ({studentScore.currentScore}/{studentScore.maxScore})
+                          </span>
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="tasks" className="space-y-4">
-              {intervention.tasks.length === 0 ? (
+            <TabsContent value="scores" className="space-y-4">
+              {!studentScore ? (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12">
-                    <FileText className="h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No tasks yet</h3>
+                    <Award className="h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No scores yet</h3>
                     <p className="text-gray-600 text-center">
-                      Tasks will be added by instructors as the intervention progresses.
+                      You haven't been scored for this intervention yet. Scores will appear here once teachers begin scoring.
                     </p>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="space-y-4">
-                  {intervention.tasks.map((task) => (
-                    <Card key={task.id}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle className="text-lg">{task.name}</CardTitle>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="outline" className="capitalize">
-                                {task.quadrant_id}
-                              </Badge>
-                              <Badge variant="outline" className={getTaskStatusColor(task.status)}>
-                                {task.status}
-                              </Badge>
+                <div className="space-y-6">
+                  {/* Overall Score */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Award className="h-5 w-5" />
+                        Overall Progress & Score
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {/* Score Information */}
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-2xl font-bold text-blue-600">
+                            {studentScore.maxScore > 0 ? ((studentScore.currentScore / studentScore.maxScore) * 100).toFixed(1) : '0'}%
+                          </span>
+                          <span className="text-gray-600">
+                            {studentScore.currentScore} / {studentScore.maxScore} points
+                          </span>
+                        </div>
+                        <Progress value={studentScore.maxScore > 0 ? (studentScore.currentScore / studentScore.maxScore) * 100 : 0} className="h-3" />
+                        
+                        {/* Task Progress */}
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <div className="text-center p-3 bg-gray-50 rounded-lg">
+                            <div className="text-2xl font-bold text-green-600">{studentScore.completedTasks}</div>
+                            <div className="text-sm text-gray-600">Tasks Completed</div>
+                          </div>
+                          <div className="text-center p-3 bg-gray-50 rounded-lg">
+                            <div className="text-2xl font-bold text-blue-600">{studentScore.totalTasks}</div>
+                            <div className="text-sm text-gray-600">Total Tasks</div>
+                          </div>
+                        </div>
+
+                        {/* Completion Percentage */}
+                        <div className="mt-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium">Overall Progress</span>
+                            <span className="text-sm text-gray-600">{studentScore.completionPercentage}%</span>
+                          </div>
+                          <Progress value={studentScore.completionPercentage} className="h-2" />
+                        </div>
+
+                        {/* Rank Information */}
+                        {studentScore.rank > 0 && (
+                          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                            <div className="text-sm text-blue-800">
+                              Your rank: <span className="font-bold">#{studentScore.rank}</span> out of {studentScore.totalStudents} students
                             </div>
                           </div>
-                          <div className="text-right text-sm text-gray-600">
-                            <div className="font-medium">{task.max_score} points</div>
-                            <div>Due: {formatDate(task.due_date)}</div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-700 mb-3">{task.description}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <FileText className="h-4 w-4" />
-                            {task.submission_type}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {task.allow_late_submission ? 'Late submission allowed' : 'No late submissions'}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Task Breakdown */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Task Progress</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-8">
+                        <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Task Details</h3>
+                        <p className="text-gray-600">
+                          Detailed task breakdown and scores will be available here once teachers begin scoring individual tasks.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="microcompetencies" className="space-y-4">
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Target className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Microcompetencies</h3>
+                  <p className="text-gray-600 text-center">
+                    Detailed microcompetency information will be available here.
+                  </p>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="teachers" className="space-y-4">
@@ -466,13 +553,17 @@ const InterventionDetailsPage: React.FC = () => {
                 <span className="font-medium">{formatDate(intervention.end_date)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Tasks</span>
-                <span className="font-medium">{intervention.tasks.length}</span>
+                <span className="text-gray-600">Scoring Status</span>
+                <span className="font-medium">
+                  {intervention.is_scoring_open ? 'Open' : 'Closed'}
+                </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Teachers</span>
-                <span className="font-medium">{intervention.teachers.length}</span>
-              </div>
+              {studentScore && studentScore.maxScore > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Your Score</span>
+                  <span className="font-medium">{((studentScore.currentScore / studentScore.maxScore) * 100).toFixed(1)}%</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 

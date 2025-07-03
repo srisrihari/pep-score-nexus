@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getAllStudents,
+  getStudentFilterOptions,
   getStudentById,
   createStudent,
   getCurrentStudent,
@@ -26,7 +27,8 @@ const {
   getStudentInterventionDetails,
   getStudentInterventionTasks,
   submitInterventionTask,
-  getInterventionQuadrantImpact
+  getInterventionQuadrantImpact,
+  getStudentInterventionPerformance
 } = require('../controllers/studentController');
 const { authenticateToken, requireRole } = require('../middleware/auth');
 
@@ -182,12 +184,22 @@ router.post('/:studentId/interventions/:interventionId/tasks/:taskId/submit', au
 // @query   termId, quadrant
 router.get('/:studentId/interventions/quadrant-impact', authenticateToken, getInterventionQuadrantImpact);
 
+// @route   GET /api/v1/students/:studentId/intervention-performance
+// @desc    Get comprehensive intervention performance for student
+// @access  Students (own data), Teachers, Admins
+router.get('/:studentId/intervention-performance', authenticateToken, getStudentInterventionPerformance);
+
 // Administrative Student Management
 
-// @route   GET /api/v1/students
-// @desc    Get all students with pagination and filters
+// @route   GET /api/v1/students/filter-options
+// @desc    Get available filter options for student filtering
 // @access  Teachers, Admins
-// @query   page, limit, search, batch, section, status
+router.get('/filter-options', authenticateToken, requireRole('teacher', 'admin'), getStudentFilterOptions);
+
+// @route   GET /api/v1/students
+// @desc    Get all students with enhanced pagination and filters
+// @access  Teachers, Admins
+// @query   page, limit, search, batch, section, status, course, house, batch_ids, batch_years, courses, sections, houses, exclude_enrolled
 router.get('/', authenticateToken, requireRole('teacher', 'admin'), getAllStudents);
 
 // @route   GET /api/v1/students/:id

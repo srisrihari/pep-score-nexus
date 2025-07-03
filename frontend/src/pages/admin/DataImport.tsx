@@ -2,9 +2,13 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ExcelImport from '@/components/admin/ExcelImport';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { FileSpreadsheet, Database, History } from 'lucide-react';
+import { useTerm } from '@/contexts/TermContext';
 
 const DataImport: React.FC = () => {
+  const { selectedTerm } = useTerm();
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,6 +16,11 @@ const DataImport: React.FC = () => {
         <p className="text-muted-foreground">
           Import data from Excel files and manage data synchronization.
         </p>
+        <div className="mt-2">
+          <Badge variant="outline" className="text-sm">
+            {selectedTerm?.name || 'Current Term'}
+          </Badge>
+        </div>
       </div>
 
       <Tabs defaultValue="excel">

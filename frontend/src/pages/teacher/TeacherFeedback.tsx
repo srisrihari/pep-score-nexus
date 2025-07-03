@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,138 +10,258 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { 
-  MessageSquare, 
-  Send, 
-  User, 
-  Clock, 
+import {
+  MessageSquare,
+  Send,
+  User,
+  Clock,
   Filter,
   CheckCircle,
   AlertCircle,
   Search,
   ArrowUpDown,
-  Calendar
+  Calendar,
+  Plus,
+  RefreshCw,
+  Mail
 } from "lucide-react";
+import { teacherAPI } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
-// Mock feedback data
-const feedbackData = [
-  {
-    id: 1,
-    studentId: "2024-Ajith",
-    studentName: "Ajith",
-    registrationNo: "2334",
-    date: "2023-04-15",
-    subject: "Wellness Assessment Feedback",
-    message: "Great improvement in your fitness levels. Your push-ups and sit-ups scores have significantly improved. Keep up the good work!",
-    status: "unread",
-    quadrant: "wellness"
-  },
-  {
-    id: 2,
-    studentId: "2024-Rohan",
-    studentName: "Rohan S",
-    registrationNo: "2335",
-    date: "2023-04-14",
-    subject: "Improvement Areas",
-    message: "You need to focus more on your flexibility. Your sit and reach scores are below average. I recommend daily stretching exercises.",
-    status: "read",
-    quadrant: "wellness"
-  },
-  {
-    id: 3,
-    studentId: "2024-Priya",
-    studentName: "Priya M",
-    registrationNo: "2361",
-    date: "2023-04-13",
-    subject: "Wellness Plan",
-    message: "Based on your recent assessment, I've created a personalized wellness plan for you. Please follow it consistently for better results.",
-    status: "read",
-    quadrant: "wellness"
-  },
-  {
-    id: 4,
-    studentId: "2024-Kavita",
-    studentName: "Kavita R",
-    registrationNo: "2362",
-    date: "2023-04-12",
-    subject: "Attendance Concern",
-    message: "Your attendance in wellness sessions has been inconsistent. This is affecting your performance. Please ensure regular attendance.",
-    status: "unread",
-    quadrant: "wellness"
-  },
-  {
-    id: 5,
-    studentId: "2024-Arjun",
-    studentName: "Arjun K",
-    registrationNo: "2363",
-    date: "2023-04-11",
-    subject: "Outstanding Performance",
-    message: "Congratulations on your outstanding performance in the recent fitness assessment. You've scored the highest in your batch!",
-    status: "read",
-    quadrant: "wellness"
-  }
-];
+// Types for feedback data
+interface FeedbackItem {
+  id: string;
+  student_id: string;
+  student_name: string;
+  registration_no: string;
+  subject: string;
+  message: string;
+  category: 'Academic' | 'Behavioral' | 'General';
+  priority: 'Low' | 'Medium' | 'High';
+  status: string;
+  submitted_at: string;
+  read_at?: string;
+}
+
+interface FeedbackData {
+  feedback: FeedbackItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+interface NewFeedbackForm {
+  studentId: string;
+  subject: string;
+  message: string;
+  category: 'Academic' | 'Behavioral' | 'General';
+  priority: 'Low' | 'Medium' | 'High';
+}
 
 const TeacherFeedback: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // State management
+  const [feedbackData, setFeedbackData] = useState<FeedbackData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("all");
-  const [selectedFeedback, setSelectedFeedback] = useState<typeof feedbackData[0] | null>(null);
-  const [replyText, setReplyText] = useState("");
-  const [newFeedbackSubject, setNewFeedbackSubject] = useState("");
-  const [newFeedbackMessage, setNewFeedbackMessage] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState("");
-  
-  // Filter feedback based on search query and tab
-  const filteredFeedback = feedbackData.filter(feedback => {
-    const matchesSearch = 
-      feedback.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      feedback.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesTab = 
-      selectedTab === "all" || 
-      (selectedTab === "unread" && feedback.status === "unread") ||
-      (selectedTab === "sent" && feedback.status === "read");
-    
-    return matchesSearch && matchesTab;
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
+  const [isNewFeedbackOpen, setIsNewFeedbackOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // New feedback form
+  const [newFeedback, setNewFeedback] = useState<NewFeedbackForm>({
+    studentId: "",
+    subject: "",
+    message: "",
+    category: "General",
+    priority: "Medium"
   });
-  
-  // Handle sending a reply
-  const handleSendReply = () => {
-    if (!replyText.trim()) {
-      toast.error("Please enter a reply message");
-      return;
+
+  // Fetch feedback data
+  useEffect(() => {
+    if (user?.id) {
+      fetchFeedback();
     }
-    
-    toast.success("Reply sent successfully");
-    setReplyText("");
-    // In a real app, you would update the feedback status and add the reply to the conversation
+  }, [user, currentPage, pageSize, selectedTab]);
+
+  const fetchFeedback = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await teacherAPI.getFeedback(user.id, {
+        page: currentPage,
+        limit: pageSize,
+        status: selectedTab === 'all' ? undefined : selectedTab,
+      });
+
+      setFeedbackData(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch feedback');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    setCurrentPage(1); // Reset to first page when searching
+    fetchFeedback();
   };
   
   // Handle sending new feedback
-  const handleSendNewFeedback = () => {
-    if (!selectedStudent) {
-      toast.error("Please select a student");
-      return;
+  const handleSendNewFeedback = async () => {
+    try {
+      if (!user?.id) {
+        toast.error("User not authenticated");
+        return;
+      }
+
+      if (!newFeedback.studentId) {
+        toast.error("Please select a student");
+        return;
+      }
+
+      if (!newFeedback.subject.trim()) {
+        toast.error("Please enter a subject");
+        return;
+      }
+
+      if (!newFeedback.message.trim()) {
+        toast.error("Please enter a message");
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      await teacherAPI.sendFeedback(user.id, {
+        studentId: newFeedback.studentId,
+        subject: newFeedback.subject,
+        message: newFeedback.message,
+        category: newFeedback.category,
+        priority: newFeedback.priority,
+      });
+
+      toast.success("Feedback sent successfully");
+
+      // Reset form
+      setNewFeedback({
+        studentId: "",
+        subject: "",
+        message: "",
+        category: "General",
+        priority: "Medium"
+      });
+      setIsNewFeedbackOpen(false);
+
+      // Refresh feedback list
+      fetchFeedback();
+
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send feedback');
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    if (!newFeedbackSubject.trim()) {
-      toast.error("Please enter a subject");
-      return;
-    }
-    
-    if (!newFeedbackMessage.trim()) {
-      toast.error("Please enter a message");
-      return;
-    }
-    
-    toast.success("Feedback sent successfully");
-    setNewFeedbackSubject("");
-    setNewFeedbackMessage("");
-    setSelectedStudent("");
-    // In a real app, you would add the new feedback to the list
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Feedback Management</h1>
+          <p className="text-muted-foreground">Loading your feedback...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Feedback Management</h1>
+          <p className="text-muted-foreground">Manage and send feedback to your students</p>
+        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error}
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2"
+              onClick={fetchFeedback}
+            >
+              <RefreshCw className="h-4 w-4 mr-1" />
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // No data state
+  if (!feedbackData || feedbackData.feedback.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">Feedback Management</h1>
+            <p className="text-muted-foreground">No feedback messages yet</p>
+          </div>
+          <Dialog open={isNewFeedbackOpen} onOpenChange={setIsNewFeedbackOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Send Feedback
+              </Button>
+            </DialogTrigger>
+          </Dialog>
+        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Mail className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Feedback Messages</h3>
+            <p className="text-muted-foreground text-center">
+              You haven't sent or received any feedback messages yet. Start by sending feedback to your students.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -165,7 +285,7 @@ const TeacherFeedback: React.FC = () => {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle>Messages</CardTitle>
-                    <Badge>{feedbackData.filter(f => f.status === "unread").length} Unread</Badge>
+                    <Badge>{feedbackData?.feedback.filter(f => f.status === "unread").length || 0} Unread</Badge>
                   </div>
                   <div className="relative mt-2">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -187,34 +307,37 @@ const TeacherFeedback: React.FC = () => {
                 </CardHeader>
                 <CardContent className="h-[calc(100%-130px)] overflow-auto">
                   <div className="space-y-2">
-                    {filteredFeedback.length > 0 ? (
-                      filteredFeedback.map((feedback) => (
-                        <div 
-                          key={feedback.id} 
+                    {feedbackData?.feedback && feedbackData.feedback.length > 0 ? (
+                      feedbackData.feedback.map((feedback) => (
+                        <div
+                          key={feedback.id}
                           className={`p-3 rounded-md cursor-pointer transition-colors ${
-                            selectedFeedback?.id === feedback.id 
-                              ? 'bg-primary text-primary-foreground' 
-                              : feedback.status === 'unread' 
-                                ? 'bg-muted hover:bg-muted/80' 
+                            selectedFeedback?.id === feedback.id
+                              ? 'bg-primary text-primary-foreground'
+                              : feedback.status === 'unread'
+                                ? 'bg-muted hover:bg-muted/80'
                                 : 'hover:bg-muted/50'
                           }`}
                           onClick={() => setSelectedFeedback(feedback)}
                         >
                           <div className="flex justify-between items-start">
-                            <div className="font-medium">{feedback.studentName}</div>
+                            <div className="font-medium">{feedback.student_name}</div>
                             <div className="text-xs">
-                              {new Date(feedback.date).toLocaleDateString()}
+                              {new Date(feedback.submitted_at).toLocaleDateString()}
                             </div>
                           </div>
                           <div className="text-sm truncate">{feedback.subject}</div>
                           <div className="text-xs truncate mt-1">
                             {feedback.message.substring(0, 60)}...
                           </div>
-                          {feedback.status === "unread" && (
-                            <div className="flex justify-end mt-1">
+                          <div className="flex justify-between items-center mt-1">
+                            <Badge variant={feedback.priority === 'High' ? 'destructive' : feedback.priority === 'Medium' ? 'default' : 'secondary'} className="text-xs">
+                              {feedback.priority}
+                            </Badge>
+                            {feedback.status === "unread" && (
                               <div className="w-2 h-2 rounded-full bg-primary"></div>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -298,30 +421,62 @@ const TeacherFeedback: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="student">Student</Label>
-                <Select value={selectedStudent} onValueChange={setSelectedStudent}>
-                  <SelectTrigger id="student">
-                    <SelectValue placeholder="Select a student" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {feedbackData.map(feedback => (
-                      <SelectItem key={feedback.studentId} value={feedback.studentId}>
-                        {feedback.studentName} ({feedback.registrationNo})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="student">Student</Label>
+                  <Select value={newFeedback.studentId} onValueChange={(value) => setNewFeedback(prev => ({ ...prev, studentId: value }))}>
+                    <SelectTrigger id="student">
+                      <SelectValue placeholder="Select a student" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {feedbackData?.feedback.map(feedback => (
+                        <SelectItem key={feedback.student_id} value={feedback.student_id}>
+                          {feedback.student_name} ({feedback.registration_no})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select value={newFeedback.category} onValueChange={(value: 'Academic' | 'Behavioral' | 'General') => setNewFeedback(prev => ({ ...prev, category: value }))}>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Academic">Academic</SelectItem>
+                      <SelectItem value="Behavioral">Behavioral</SelectItem>
+                      <SelectItem value="General">General</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input
-                  id="subject"
-                  placeholder="Enter subject"
-                  value={newFeedbackSubject}
-                  onChange={(e) => setNewFeedbackSubject(e.target.value)}
-                />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Subject</Label>
+                  <Input
+                    id="subject"
+                    placeholder="Enter subject"
+                    value={newFeedback.subject}
+                    onChange={(e) => setNewFeedback(prev => ({ ...prev, subject: e.target.value }))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="priority">Priority</Label>
+                  <Select value={newFeedback.priority} onValueChange={(value: 'Low' | 'Medium' | 'High') => setNewFeedback(prev => ({ ...prev, priority: value }))}>
+                    <SelectTrigger id="priority">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Low">Low</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               <div className="space-y-2">
@@ -329,37 +484,31 @@ const TeacherFeedback: React.FC = () => {
                 <Textarea
                   id="message"
                   placeholder="Type your feedback message here..."
-                  value={newFeedbackMessage}
-                  onChange={(e) => setNewFeedbackMessage(e.target.value)}
+                  value={newFeedback.message}
+                  onChange={(e) => setNewFeedback(prev => ({ ...prev, message: e.target.value }))}
                   className="min-h-[200px]"
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Related Assessment</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select related assessment (optional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="wellness-term1">Wellness Assessment - Term 1</SelectItem>
-                    <SelectItem value="wellness-term2">Wellness Assessment - Term 2</SelectItem>
-                    <SelectItem value="wellness-term3">Wellness Assessment - Term 3</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button variant="outline" onClick={() => {
-                setNewFeedbackSubject("");
-                setNewFeedbackMessage("");
-                setSelectedStudent("");
+                setNewFeedback({
+                  studentId: "",
+                  subject: "",
+                  message: "",
+                  category: "General",
+                  priority: "Medium"
+                });
               }}>
                 Clear
               </Button>
-              <Button onClick={handleSendNewFeedback}>
-                <Send className="mr-2 h-4 w-4" />
-                Send Feedback
+              <Button onClick={handleSendNewFeedback} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                {isSubmitting ? 'Sending...' : 'Send Feedback'}
               </Button>
             </CardFooter>
           </Card>

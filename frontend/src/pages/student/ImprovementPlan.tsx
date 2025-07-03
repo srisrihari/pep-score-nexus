@@ -10,9 +10,11 @@ import { ArrowLeft, TrendingDown, AlertTriangle, Target, CheckCircle2, Calendar,
 import { studentAPI } from '@/lib/api';
 import { transformStudentPerformanceData } from '@/lib/dataTransform';
 import { Student } from '@/data/mockData';
+import { useTerm } from '@/contexts/TermContext';
 
 const ImprovementPlan: React.FC = () => {
   const navigate = useNavigate();
+  const { selectedTerm } = useTerm();
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [improvementPlan, setImprovementPlan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -31,9 +33,9 @@ const ImprovementPlan: React.FC = () => {
         const currentStudentResponse = await studentAPI.getCurrentStudent();
         const studentId = currentStudentResponse.data.id;
 
-        // Fetch performance data and improvement plan
+        // Fetch performance data and improvement plan with term context
         const [performanceResponse, improvementPlanResponse] = await Promise.all([
-          studentAPI.getStudentPerformance(studentId, undefined, true),
+          studentAPI.getStudentPerformance(studentId, selectedTerm?.id, true),
           studentAPI.getImprovementPlan(studentId).catch(() => null)
         ]);
 
@@ -53,7 +55,7 @@ const ImprovementPlan: React.FC = () => {
     };
 
     loadImprovementPlan();
-  }, []);
+  }, [selectedTerm]); // Reload when term changes
 
   // Show loading state
   if (loading) {
@@ -101,11 +103,11 @@ const ImprovementPlan: React.FC = () => {
     // Use API improvement plan data
     improvementAreas = improvementPlan.improvementAreas
       .filter((area: any) => selectedQuadrant === 'all' || area.quadrantId === selectedQuadrant)
-      .map((area: any) => ({
+      .map((area: any, index: number) => ({
         quadrantId: area.quadrantId,
         quadrantName: area.quadrantName,
-        componentId: area.quadrantId,
-        componentName: area.quadrantName,
+        componentId: area.componentId || `${area.quadrantId}-component-${index}`,
+        componentName: area.componentName || area.quadrantName,
         score: area.currentScore,
         maxScore: 100, // Assuming 100 as max for quadrant scores
         status: area.currentScore < area.targetScore ? 'Progress' : 'Good',
@@ -384,8 +386,8 @@ const ImprovementPlan: React.FC = () => {
         <CardContent>
           {improvementAreas.length > 0 ? (
             <div className="space-y-6">
-              {improvementAreas.map((area) => (
-                <div key={`${area.quadrantId}-${area.componentId}`} className="border rounded-lg p-4">
+              {improvementAreas.map((area, index) => (
+                <div key={`${area.quadrantId}-${area.componentId}-${index}`} className="border rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
                       {area.priority === 'high' ? (

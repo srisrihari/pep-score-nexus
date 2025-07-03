@@ -28,10 +28,12 @@ import {
 import { interventionAPI } from '@/lib/api';
 import { TeacherInterventionAssignment } from '@/types/intervention';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTerm } from '@/contexts/TermContext';
 
 const TeacherInterventions: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { selectedTerm } = useTerm();
   const [assignments, setAssignments] = useState<TeacherInterventionAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,16 +42,36 @@ const TeacherInterventions: React.FC = () => {
     if (user?.id) {
       fetchTeacherInterventions();
     }
-  }, [user]);
+  }, [user, selectedTerm]); // Reload when term changes
 
   const fetchTeacherInterventions = async () => {
     try {
       setLoading(true);
-      // For demo purposes, using a mock teacher ID
-      // In real implementation, this would come from the authenticated user
-      const teacherId = '17b0b78f-c435-4d5f-a7c5-a560a05ea353'; // John Smith
-      const response = await interventionAPI.getTeacherInterventions(teacherId);
-      setAssignments(response.data.interventions);
+
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await interventionAPI.getTeacherInterventions(user.id);
+      let interventions = response.data.interventions || [];
+      
+      // Filter interventions by selected term if term is selected
+      if (selectedTerm?.id) {
+        // For now, filter client-side. In production, you might want to add backend filtering
+        // This assumes interventions have term_id or we can filter by date ranges
+        const termStart = new Date(selectedTerm.start_date);
+        const termEnd = new Date(selectedTerm.end_date);
+        
+        interventions = interventions.filter(intervention => {
+          const interventionStart = new Date(intervention.start_date);
+          const interventionEnd = new Date(intervention.end_date);
+          
+          // Check if intervention overlaps with selected term
+          return (interventionStart <= termEnd && interventionEnd >= termStart);
+        });
+      }
+      
+      setAssignments(interventions);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch interventions');
     } finally {
@@ -125,6 +147,11 @@ const TeacherInterventions: React.FC = () => {
           <p className="text-gray-600 mt-1">
             Manage your assigned intervention programs and student progress
           </p>
+          <div className="mt-2">
+            <Badge variant="outline" className="text-sm">
+              {selectedTerm?.name || 'Current Term'}
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -144,7 +171,7 @@ const TeacherInterventions: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {assignments.filter(a => a.interventions.status === 'Active').length}
+              {assignments.filter(a => a.status === 'Active').length}
             </div>
           </CardContent>
         </Card>
@@ -156,19 +183,19 @@ const TeacherInterventions: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {assignments.reduce((sum, a) => sum + (a.interventions.max_students || 0), 0)}
+              {assignments.reduce((sum, a) => sum + (a.assigned_microcompetencies_count || 0), 0)}
             </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Assigned Quadrants</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Microcompetencies</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Set(assignments.flatMap(a => a.assigned_quadrants)).size}
+              {assignments.reduce((sum, a) => sum + (a.assigned_microcompetencies_count || 0), 0)}
             </div>
           </CardContent>
         </Card>
@@ -204,42 +231,53 @@ const TeacherInterventions: React.FC = () => {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {assignments.map((assignment) => (
-              <Card 
-                key={assignment.id} 
+              <Card
+                key={assignment.id}
                 className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/teacher/interventions/${assignment.interventions.id}`)}
+                onClick={() => assignment.id && navigate(`/teacher/interventions/${assignment.id}/scoring`)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <CardTitle className="text-lg mb-2">{assignment.interventions.name}</CardTitle>
+                      <CardTitle className="text-lg mb-2">{assignment.name || 'Unknown Intervention'}</CardTitle>
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge className={getStatusColor(assignment.interventions.status)}>
-                          {getStatusIcon(assignment.interventions.status)}
-                          <span className="ml-1">{assignment.interventions.status}</span>
+                        <Badge className={getStatusColor(assignment.status || 'Draft')}>
+                          {getStatusIcon(assignment.status || 'Draft')}
+                          <span className="ml-1">{assignment.status || 'Draft'}</span>
                         </Badge>
-                        <Badge variant="outline">{assignment.role}</Badge>
+                        <Badge variant="outline">Teacher</Badge>
+                        {assignment.is_scoring_open ? (
+                          <Badge className="bg-green-100 text-green-800 border-green-200">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Scoring Open
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-red-100 text-red-800 border-red-200">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Scoring Closed
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400" />
                   </div>
                   <CardDescription className="line-clamp-2">
-                    {assignment.interventions.description}
+                    {assignment.interventions?.description || 'No description available'}
                   </CardDescription>
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
                   {/* Progress Bar for Active Interventions */}
-                  {assignment.interventions.status === 'Active' && (
+                  {assignment.status === 'Active' && assignment.start_date && assignment.end_date && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Progress</span>
                         <span className="font-medium">
-                          {calculateProgress(assignment.interventions.start_date, assignment.interventions.end_date)}%
+                          {calculateProgress(assignment.start_date, assignment.end_date)}%
                         </span>
                       </div>
-                      <Progress 
-                        value={calculateProgress(assignment.interventions.start_date, assignment.interventions.end_date)} 
+                      <Progress
+                        value={calculateProgress(assignment.start_date, assignment.end_date)}
                         className="h-2"
                       />
                     </div>
@@ -250,41 +288,48 @@ const TeacherInterventions: React.FC = () => {
                     <div className="flex items-center text-gray-600">
                       <Calendar className="h-4 w-4 mr-2" />
                       <span>
-                        {formatDate(assignment.interventions.start_date)} - {formatDate(assignment.interventions.end_date)}
+                        {assignment.start_date ? formatDate(assignment.start_date) : 'TBD'} - {assignment.end_date ? formatDate(assignment.end_date) : 'TBD'}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center text-gray-600">
-                      <Users className="h-4 w-4 mr-2" />
+                      <Target className="h-4 w-4 mr-2" />
                       <span>
-                        Max {assignment.interventions.max_students} students
+                        {assignment.assigned_microcompetencies_count || 0} microcompetencies assigned
                       </span>
                     </div>
                   </div>
 
-                  {/* Assigned Quadrants */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-gray-900">Your Quadrants</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {assignment.assigned_quadrants.map((quadrant) => (
-                        <Badge key={quadrant} variant="secondary" className="text-xs capitalize">
-                          {quadrant}
-                        </Badge>
-                      ))}
+                  {/* Scoring Deadline */}
+                  {assignment.scoring_deadline && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium text-gray-900">Scoring Deadline</h4>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm">
+                          {formatDate(assignment.scoring_deadline)}
+                        </span>
+                      </div>
                     </div>
+                  )}
+
+                  {/* Assigned Microcompetencies */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-gray-900">Your Microcompetencies</h4>
+                    <div className="text-sm text-gray-600">
+                      {assignment.assigned_microcompetencies_count || 0} microcompetencies assigned
+                    </div>
+                    {assignment.assigned_microcompetencies_count > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          <Target className="h-3 w-3 mr-1" />
+                          {assignment.assigned_microcompetencies_count} assigned
+                        </Badge>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Permissions */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-gray-900">Permissions</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {assignment.permissions.map((permission) => (
-                        <Badge key={permission} variant="outline" className="text-xs">
-                          {permission.replace('_', ' ')}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
+
                 </CardContent>
               </Card>
             ))}

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import StatusBadge from "@/components/common/StatusBadge";
 import { Link } from "react-router-dom";
 import { InfoIcon } from "lucide-react";
 import { studentAPI } from "@/lib/api";
+import { useTerm } from "@/contexts/TermContext";
 import {
   transformStudentPerformanceData,
   transformLeaderboardData,
@@ -28,14 +29,15 @@ import {
 // Import all necessary types
 
 const StudentDashboard: React.FC = () => {
+  const { selectedTerm, availableTerms } = useTerm();
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [leaderboardData, setLeaderboardData] = useState<Leaderboard | null>(null);
   const [timeSeriesData, setTimeSeriesData] = useState<any>(null);
   const [termComparisonData, setTermComparisonData] = useState<any[]>([]);
   const [attendanceData, setAttendanceData] = useState<any>(null);
+  const [interventionData, setInterventionData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTermId, setSelectedTermId] = useState<string>("");
 
   // Load data from API
   useEffect(() => {
@@ -48,18 +50,23 @@ const StudentDashboard: React.FC = () => {
         const currentStudentResponse = await studentAPI.getCurrentStudent();
         const studentId = currentStudentResponse.data.id;
 
+        // Use selected term ID for data fetching
+        const termId = selectedTerm?.id;
+
         // Fetch all required data using the new comprehensive APIs
         const [
           performanceResponse,
           leaderboardResponse,
-          attendanceResponse
+          attendanceResponse,
+          interventionResponse
         ] = await Promise.all([
-          studentAPI.getStudentPerformance(studentId, undefined, true).catch((error) => {
+          studentAPI.getStudentPerformance(studentId, termId, true).catch((error) => {
             console.error('Performance API failed:', error);
             return null;
           }),
           studentAPI.getStudentLeaderboard(studentId).catch(() => null), // Optional
-          studentAPI.getStudentAttendance(studentId).catch(() => null) // Optional
+          studentAPI.getStudentAttendance(studentId, termId).catch(() => null), // Optional
+          studentAPI.getStudentInterventionPerformance(studentId).catch(() => null) // Optional
         ]);
 
         // Check if we have the minimum required data
@@ -79,6 +86,9 @@ const StudentDashboard: React.FC = () => {
         const attendance = attendanceResponse
           ? transformAttendanceData(attendanceResponse)
           : generateMockAttendanceData([]);
+
+        // Process intervention data
+        const interventions = interventionResponse?.data || null;
 
         // Data loaded successfully
 
@@ -110,7 +120,7 @@ const StudentDashboard: React.FC = () => {
         setTimeSeriesData(timeSeries);
         setTermComparisonData(termComparison);
         setAttendanceData(attendance);
-        setSelectedTermId(transformedStudent.currentTerm);
+        setInterventionData(interventions);
 
       } catch (err) {
         console.error('Failed to load student data:', err);
@@ -128,7 +138,7 @@ const StudentDashboard: React.FC = () => {
     };
 
     loadStudentData();
-  }, []);
+  }, [selectedTerm]); // Reload when selected term changes
 
   // Show loading state
   if (loading) {
@@ -161,9 +171,9 @@ const StudentDashboard: React.FC = () => {
     );
   }
 
-  // Find the selected term data
-  const selectedTerm = studentData.terms.find(term => term.termId === selectedTermId) || studentData.terms[0];
-  const { quadrants, totalScore, overallStatus, grade } = selectedTerm;
+  // Use current term data (first term in the array since we're filtering by selected term)
+  const currentTermData = studentData.terms[0] || studentData.terms[0];
+  const { quadrants, totalScore, overallStatus, grade } = currentTermData;
   const overallLeaderboard = leaderboardData?.overall || { batchAvg: 0, batchBest: 0, topStudents: [], userRank: 0 };
 
   const summaryMetrics = [
@@ -199,19 +209,9 @@ const StudentDashboard: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium">Term:</span>
-          <Select value={selectedTermId} onValueChange={setSelectedTermId}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select Term" />
-            </SelectTrigger>
-            <SelectContent>
-              {studentData.terms.map((term) => (
-                <SelectItem key={term.termId} value={term.termId}>
-                  {term.termName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Badge variant="outline" className="text-sm">
+            {selectedTerm?.name || 'Current Term'}
+          </Badge>
         </div>
       </div>
 
@@ -324,6 +324,58 @@ const StudentDashboard: React.FC = () => {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        {/* Intervention Performance Section */}
+        {interventionData && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Intervention Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-blue-600">
+                      {interventionData.summary.totalInterventions}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Total Interventions</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {Math.round(interventionData.summary.averageScore)}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">Average Score</p>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Overall Progress</span>
+                    <span>{Math.round(interventionData.summary.overallProgress)}%</span>
+                  </div>
+                  <Progress value={interventionData.summary.overallProgress} className="h-2" />
+                </div>
+
+                {/* Active Interventions */}
+                {interventionData.interventions.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Active Interventions</h4>
+                    {interventionData.interventions.slice(0, 3).map((intervention: any) => (
+                      <div key={intervention.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">{intervention.name}</span>
+                        <Badge variant={intervention.status === 'Active' ? 'default' : 'secondary'}>
+                          {intervention.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -347,9 +399,10 @@ const StudentDashboard: React.FC = () => {
       </div>
 
       <Tabs defaultValue="quadrants">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+        <TabsList className="grid w-full grid-cols-3 mb-4">
           <TabsTrigger value="quadrants">Quadrant Scores</TabsTrigger>
           <TabsTrigger value="components">Component Details</TabsTrigger>
+          <TabsTrigger value="microcompetencies">Microcompetency Breakdown</TabsTrigger>
         </TabsList>
 
         <TabsContent value="quadrants" className="space-y-4">
@@ -380,11 +433,75 @@ const StudentDashboard: React.FC = () => {
               <Card key={quadrant.id}>
                 <CardHeader>
                   <CardTitle className="flex justify-between">
-                    <span>{quadrant.name} Components</span>
-                    <Badge variant="outline">{quadrant.obtained}/{quadrant.weightage}</Badge>
+                    <span>{quadrant.name} - Sub-categories & Components</span>
+                    <Badge variant="outline">{quadrant.obtained.toFixed(1)}/{quadrant.weightage}</Badge>
                   </CardTitle>
+                  <CardDescription>
+                    Hierarchical breakdown showing sub-categories and their components
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <div className="space-y-6">
+                    {/* NEW: Show sub-categories if available, otherwise fall back to flat components */}
+                    {quadrant.sub_categories && quadrant.sub_categories.length > 0 ? (
+                      quadrant.sub_categories.map((subCategory) => (
+                        <div key={subCategory.id} className="border rounded-lg p-4 bg-muted/30">
+                          <div className="flex justify-between items-center mb-3">
+                            <h4 className="font-semibold text-lg">{subCategory.name}</h4>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary">
+                                {subCategory.weightage}% of {quadrant.name}
+                              </Badge>
+                              <Badge variant="outline">
+                                {subCategory.obtained.toFixed(1)}/{subCategory.maxScore.toFixed(1)}
+                              </Badge>
+                            </div>
+                          </div>
+                          {subCategory.description && (
+                            <p className="text-sm text-muted-foreground mb-4">{subCategory.description}</p>
+                          )}
+                          
+                          {/* Components within this sub-category */}
+                          <div className="space-y-3">
+                            {subCategory.components.map((component) => (
+                              <div key={component.id} className="bg-background border rounded p-3">
+                                <div className="flex justify-between items-center mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">{component.name}</span>
+                                    {component.category && (
+                                      <Badge variant="outline" className="text-xs">
+                                        {component.category}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">
+                                      {component.score.toFixed(1)}/{component.maxScore.toFixed(1)}
+                                    </span>
+                                    {component.weightage && (
+                                      <Badge variant="secondary" className="text-xs">
+                                        {component.weightage}%
+                                      </Badge>
+                                    )}
+                                    {component.status && (
+                                      <StatusBadge status={component.status} />
+                                    )}
+                                  </div>
+                                </div>
+                                <Progress 
+                                  value={component.maxScore > 0 ? (component.score / component.maxScore) * 100 : 0} 
+                                  className="h-2" 
+                                />
+                                {component.description && (
+                                  <p className="text-xs text-muted-foreground mt-1">{component.description}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      /* LEGACY: Fall back to flat components structure */
                   <div className="space-y-4">
                     {quadrant.components.map((component) => (
                       <div key={component.id} className="flex justify-between items-center">
@@ -400,6 +517,83 @@ const StudentDashboard: React.FC = () => {
                             <StatusBadge status={component.status} />
                           </div>
                         )}
+                      </div>
+                    ))}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="microcompetencies">
+          <div className="space-y-6">
+            {quadrants.map((quadrant) => (
+              <Card key={quadrant.id}>
+                <CardHeader>
+                  <CardTitle className="flex justify-between">
+                    <span>{quadrant.name} Microcompetencies</span>
+                    <Badge variant="outline">{quadrant.obtained}/{quadrant.weightage}</Badge>
+                  </CardTitle>
+                  <CardDescription>
+                    Detailed breakdown of microcompetency scores within each component
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {quadrant.components.map((component) => (
+                      <div key={component.id} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="font-medium text-lg">{component.name}</h4>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">{component.score}/{component.maxScore}</span>
+                            {component.status && <StatusBadge status={component.status} />}
+                          </div>
+                        </div>
+
+                        {/* Microcompetencies for this component */}
+                        <div className="space-y-3">
+                          {component.microcompetencies && component.microcompetencies.length > 0 ? (
+                            component.microcompetencies.map((micro, index) => (
+                              <div key={micro.id || index} className="flex justify-between items-center py-2 px-3 bg-muted/50 rounded">
+                                <div className="flex-1">
+                                  <div className="flex justify-between mb-1">
+                                    <span className="text-sm font-medium">{micro.name}</span>
+                                    <span className="text-sm font-medium">
+                                      {micro.score !== undefined ? `${micro.score}/${micro.maxScore}` : 'Not scored'}
+                                    </span>
+                                  </div>
+                                  {micro.description && (
+                                    <p className="text-xs text-muted-foreground mb-1">{micro.description}</p>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <Progress
+                                      value={micro.score !== undefined ? (micro.score / micro.maxScore) * 100 : 0}
+                                      className="h-1.5 flex-1"
+                                    />
+                                    <span className="text-xs text-muted-foreground">
+                                      {micro.score !== undefined ? `${Math.round((micro.score / micro.maxScore) * 100)}%` : '0%'}
+                                    </span>
+                                  </div>
+                                </div>
+                                {micro.feedback && (
+                                  <div className="ml-4">
+                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                      <InfoIcon className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-4 text-muted-foreground">
+                              <p className="text-sm">No microcompetency data available for this component</p>
+                              <p className="text-xs">Scores will appear here once assessments are completed</p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>

@@ -1,78 +1,188 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { studentData, studentList } from "@/data/mockData";
-import { 
-  GraduationCap, 
-  ClipboardCheck, 
-  Clock, 
-  AlertCircle, 
-  CheckCircle, 
-  Calendar, 
-  ArrowRight,
-  Search
-} from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  GraduationCap,
+  ClipboardCheck,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  Calendar,
+  ArrowRight,
+  Search,
+  Users,
+  BookOpen,
+  Target,
+  TrendingUp,
+  FileText,
+  MessageSquare
+} from "lucide-react";
+import { teacherAPI, interventionAPI } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTerm } from "@/contexts/TermContext";
 
-// Mock data for teacher dashboard
-const teacherStudents = [
-  { id: "2024-Ajith", name: "Ajith", registrationNo: "2334", course: "PGDM", batch: "2024", section: "A", status: "pending" },
-  { id: "2024-Rohan", name: "Rohan S", registrationNo: "2335", course: "PGDM", batch: "2024", section: "A", status: "completed" },
-  { id: "2024-Priya", name: "Priya M", registrationNo: "2361", course: "PGDM", batch: "2024", section: "A", status: "pending" },
-  { id: "2024-Kavita", name: "Kavita R", registrationNo: "2362", course: "PGDM", batch: "2024", section: "B", status: "incomplete" },
-  { id: "2024-Arjun", name: "Arjun K", registrationNo: "2363", course: "PGDM", batch: "2024", section: "B", status: "completed" },
-];
-
-const recentActivity = [
-  { id: 1, studentName: "Rohan S", action: "Scored Wellness assessment", timestamp: "2 hours ago" },
-  { id: 2, studentName: "Arjun K", action: "Provided feedback on fitness plan", timestamp: "1 day ago" },
-  { id: 3, studentName: "Priya M", action: "Scheduled intervention", timestamp: "2 days ago" },
-];
+// Types for dashboard data
+interface TeacherDashboardData {
+  teacher: {
+    id: string;
+    name: string;
+    employee_id: string;
+    department: string;
+    specialization: string;
+  };
+  overview: {
+    totalStudents: number;
+    pendingAssessments: number;
+    recentFeedback: number;
+    assignedQuadrants: number;
+  };
+  recentActivities: Array<{
+    id: string;
+    type: string;
+    description: string;
+    score: string;
+    date: string;
+    notes?: string;
+  }>;
+  assignedQuadrants: Array<{
+    id: string;
+    name: string;
+    display_order: number;
+  }>;
+  currentTerm: string;
+}
 
 const TeacherDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { selectedTerm } = useTerm();
+
+  // State management
+  const [dashboardData, setDashboardData] = useState<TeacherDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTerm, setSelectedTerm] = useState("Term1");
   const [selectedStatus, setSelectedStatus] = useState("all");
 
-  // Filter students based on search query and filters
-  const filteredStudents = teacherStudents.filter(student => {
-    const matchesSearch = 
-      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.registrationNo.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = selectedStatus === "all" || student.status === selectedStatus;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Fetch dashboard data on component mount
+  useEffect(() => {
+    if (user?.id) {
+      fetchDashboardData();
+    }
+  }, [user, selectedTerm]);
 
-  const pendingCount = teacherStudents.filter(s => s.status === "pending").length;
-  const completedCount = teacherStudents.filter(s => s.status === "completed").length;
-  const incompleteCount = teacherStudents.filter(s => s.status === "incomplete").length;
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await teacherAPI.getDashboard(user.id, selectedTerm?.id);
+      setDashboardData(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // For now, we'll show recent activities instead of student performance
+  // This can be updated when student performance data is available
+  const filteredActivities = dashboardData?.recentActivities?.filter(activity => {
+    const matchesSearch = activity.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
+  }) || [];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
         return <Badge variant="secondary">Pending</Badge>;
       case "completed":
-        return <Badge variant="success">Completed</Badge>;
+        return <Badge variant="default">Completed</Badge>;
       case "incomplete":
         return <Badge variant="destructive">Incomplete</Badge>;
       default:
-        return null;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
+          <p className="text-muted-foreground">Loading your dashboard...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
+          <p className="text-muted-foreground">Manage your students and interventions</p>
+        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error}
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2"
+              onClick={fetchDashboardData}
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // No data state
+  if (!dashboardData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
+          <p className="text-muted-foreground">No dashboard data available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
         <p className="text-muted-foreground">
-          Manage your students and interventions
+          Welcome back, {dashboardData.teacher.name}
         </p>
       </div>
 
@@ -85,12 +195,12 @@ const TeacherDashboard: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{pendingCount}</div>
+            <div className="text-3xl font-bold">{dashboardData.overview.pendingAssessments}</div>
             <p className="text-sm text-muted-foreground">
               Students waiting for assessment
             </p>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="mt-2 w-full justify-between"
               onClick={() => navigate("/teacher/students")}
             >
@@ -102,21 +212,21 @@ const TeacherDashboard: React.FC = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center">
-              <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
-              Completed
+              <Users className="mr-2 h-5 w-5 text-green-500" />
+              Total Students
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{completedCount}</div>
+            <div className="text-3xl font-bold">{dashboardData.overview.totalStudents}</div>
             <p className="text-sm text-muted-foreground">
-              Assessments completed this term
+              Students assigned to you
             </p>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="mt-2 w-full justify-between"
               onClick={() => navigate("/teacher/students")}
             >
-              View completed <ArrowRight className="h-4 w-4" />
+              View students <ArrowRight className="h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
@@ -124,21 +234,21 @@ const TeacherDashboard: React.FC = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center">
-              <AlertCircle className="mr-2 h-5 w-5 text-red-500" />
-              Incomplete
+              <Target className="mr-2 h-5 w-5 text-purple-500" />
+              Quadrants
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{incompleteCount}</div>
+            <div className="text-3xl font-bold">{dashboardData.overview.assignedQuadrants}</div>
             <p className="text-sm text-muted-foreground">
-              Assessments with missing components
+              Quadrants you can assess
             </p>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="mt-2 w-full justify-between"
-              onClick={() => navigate("/teacher/students")}
+              onClick={() => navigate("/teacher/interventions")}
             >
-              View incomplete <ArrowRight className="h-4 w-4" />
+              View assignments <ArrowRight className="h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
@@ -148,76 +258,67 @@ const TeacherDashboard: React.FC = () => {
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Students Requiring Attention</CardTitle>
+              <CardTitle>Recent Assessment Activities</CardTitle>
               <CardDescription>
-                Students with pending or incomplete assessments
+                Your recent assessment activities and scores
               </CardDescription>
               <div className="flex flex-col sm:flex-row gap-2 mt-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
-                    placeholder="Search students..."
+                    placeholder="Search activities..."
                     className="pl-8"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="incomplete">Incomplete</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={selectedTerm} onValueChange={setSelectedTerm}>
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Select term" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Term1">Term 1</SelectItem>
-                    <SelectItem value="Term2">Term 2</SelectItem>
-                    <SelectItem value="Term3">Term 3</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Badge variant="outline" className="text-sm">
+                  {selectedTerm?.name || 'Current Term'}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-5 p-3 text-sm font-medium">
-                  <div className="col-span-2">Student</div>
-                  <div>Reg. No</div>
-                  <div>Status</div>
-                  <div className="text-right">Action</div>
-                </div>
-                <div className="divide-y">
-                  {filteredStudents.length > 0 ? (
-                    filteredStudents.map((student) => (
-                      <div key={student.id} className="grid grid-cols-5 p-3 text-sm items-center">
-                        <div className="col-span-2 font-medium">{student.name}</div>
-                        <div>{student.registrationNo}</div>
-                        <div>{getStatusBadge(student.status)}</div>
-                        <div className="text-right">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => navigate(`/teacher/score/${student.id}`)}
-                          >
-                            {student.status === "completed" ? "View" : "Score"}
-                          </Button>
-                        </div>
+              <div className="space-y-4">
+                {filteredActivities.length > 0 ? (
+                  filteredActivities.map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <div className="rounded-full bg-primary/10 p-2">
+                        <ClipboardCheck className="h-4 w-4 text-primary" />
                       </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-center text-muted-foreground">
-                      No students match your search criteria
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-medium">{activity.description}</p>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>Score: {activity.score}</span>
+                          <span>{new Date(activity.date).toLocaleDateString()}</span>
+                        </div>
+                        {activity.notes && (
+                          <p className="text-xs text-muted-foreground">{activity.notes}</p>
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate("/teacher/students")}
+                      >
+                        View Details
+                      </Button>
                     </div>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    <ClipboardCheck className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                    <p className="text-lg font-medium mb-2">No recent activities</p>
+                    <p className="text-sm">Start assessing students to see your activity here</p>
+                    <Button
+                      variant="outline"
+                      className="mt-4"
+                      onClick={() => navigate("/teacher/students")}
+                    >
+                      View Students
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -233,51 +334,60 @@ const TeacherDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-2 border-b pb-3 last:border-0 last:pb-0">
-                    <div className="rounded-full bg-primary/10 p-1">
-                      <ClipboardCheck className="h-4 w-4 text-primary" />
+                {dashboardData.recentActivities.length > 0 ? (
+                  dashboardData.recentActivities.slice(0, 5).map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-2 border-b pb-3 last:border-0 last:pb-0">
+                      <div className="rounded-full bg-primary/10 p-1">
+                        <ClipboardCheck className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">{activity.description}</p>
+                        <p className="text-xs text-muted-foreground">Score: {activity.score}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(activity.date).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">{activity.studentName}</p>
-                      <p className="text-xs text-muted-foreground">{activity.action}</p>
-                      <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground py-4">
+                    No recent activity
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
 
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Upcoming Schedule</CardTitle>
+              <CardTitle>Assigned Quadrants</CardTitle>
               <CardDescription>
-                Your upcoming assessment schedule
+                Quadrants you can assess for students
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-start gap-2 border-b pb-3">
-                  <div className="rounded-full bg-primary/10 p-1">
-                    <Calendar className="h-4 w-4 text-primary" />
+                {dashboardData.assignedQuadrants.length > 0 ? (
+                  dashboardData.assignedQuadrants.map((quadrant) => (
+                    <div key={quadrant.id} className="flex items-start gap-2 border-b pb-3 last:border-0 last:pb-0">
+                      <div className="rounded-full bg-blue-100 p-1">
+                        <Target className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">{quadrant.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Assessment quadrant
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground py-4">
+                    <Target className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
+                    <p className="text-sm">No quadrants assigned</p>
+                    <p className="text-xs">Contact admin for assignments</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Wellness Assessment</p>
-                    <p className="text-xs text-muted-foreground">Section A - 10 students</p>
-                    <p className="text-xs text-muted-foreground">Tomorrow, 10:00 AM</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="rounded-full bg-primary/10 p-1">
-                    <Calendar className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Wellness Assessment</p>
-                    <p className="text-xs text-muted-foreground">Section B - 12 students</p>
-                    <p className="text-xs text-muted-foreground">Friday, 2:00 PM</p>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

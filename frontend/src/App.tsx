@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { TermProvider } from "@/contexts/TermContext";
 
 import Layout from "./components/layout/Layout";
 import NotFound from "./pages/NotFound";
@@ -13,6 +14,7 @@ import Index from "./pages/Index";
 
 // Student pages
 import StudentDashboard from "./pages/student/StudentDashboard";
+import StudentTasks from "./pages/student/StudentTasks";
 import QuadrantDetail from "./pages/student/QuadrantDetail";
 import Feedback from "./pages/student/Feedback";
 import Settings from "./pages/student/Settings";
@@ -24,9 +26,14 @@ import InterventionDetailsPage from "./pages/student/InterventionDetailsPage";
 // Teacher pages
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherStudents from "./pages/teacher/TeacherStudents";
-import InterventionScoring from "./pages/teacher/InterventionScoring";
+
+import InterventionScoringPage from "./pages/teacher/InterventionScoringPage";
+import MicrocompetencyScoringPage from "./pages/teacher/MicrocompetencyScoringPage";
 import TeacherFeedback from "./pages/teacher/TeacherFeedback";
 import TeacherInterventions from "./pages/teacher/TeacherInterventions";
+import TeacherSettings from "./pages/teacher/TeacherSettings";
+import TeacherTasks from "./pages/teacher/TeacherTasks";
+import MyMicrocompetencies from "./pages/teacher/MyMicrocompetencies";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -35,8 +42,16 @@ import InputScores from "./pages/admin/InputScores";
 import Reports from "./pages/admin/Reports";
 import DataImport from "./pages/admin/DataImport";
 import ManageTeachers from "./pages/admin/ManageTeachers";
+import TermManagement from "./pages/admin/TermManagement";
 import ManageUsers from "./pages/admin/ManageUsers";
 import ManageInterventions from "./pages/admin/ManageInterventions";
+import ManageTasks from "./pages/admin/ManageTasks";
+import InterventionMicrocompetencies from "./pages/admin/InterventionMicrocompetencies";
+import InterventionTeachers from "./pages/admin/InterventionTeachers";
+import QuadrantManagement from "./pages/admin/QuadrantManagement";
+import InterventionStudents from "./pages/admin/InterventionStudents";
+import InterventionSettings from "./pages/admin/InterventionSettings";
+import InterventionAnalytics from "./pages/admin/InterventionAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -72,6 +87,13 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="student">
           <Layout>
             <StudentDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/student/tasks" element={
+        <ProtectedRoute requiredRole="student">
+          <Layout>
+            <StudentTasks />
           </Layout>
         </ProtectedRoute>
       } />
@@ -140,13 +162,7 @@ const AppRoutes = () => {
           </Layout>
         </ProtectedRoute>
       } />
-      <Route path="/teacher/score/:studentId" element={
-        <ProtectedRoute requiredRole="teacher">
-          <Layout>
-            <InterventionScoring />
-          </Layout>
-        </ProtectedRoute>
-      } />
+
       <Route path="/teacher/feedback" element={
         <ProtectedRoute requiredRole="teacher">
           <Layout>
@@ -154,10 +170,17 @@ const AppRoutes = () => {
           </Layout>
         </ProtectedRoute>
       } />
+      <Route path="/teacher/tasks" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <TeacherTasks />
+          </Layout>
+        </ProtectedRoute>
+      } />
       <Route path="/teacher/settings" element={
         <ProtectedRoute requiredRole="teacher">
           <Layout>
-            <Settings />
+            <TeacherSettings />
           </Layout>
         </ProtectedRoute>
       } />
@@ -165,6 +188,37 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="teacher">
           <Layout>
             <TeacherInterventions />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/microcompetencies" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <MyMicrocompetencies />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/interventions/:interventionId/scoring" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <InterventionScoringPage />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/interventions/:interventionId/microcompetencies/:microcompetencyId/scoring" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <MicrocompetencyScoringPage />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/teacher/students/:studentId/scores" element={
+        <ProtectedRoute requiredRole="teacher">
+          <Layout>
+            <div className="container mx-auto p-6">
+              <h1 className="text-2xl font-bold mb-4">Student Score Details</h1>
+              <p className="text-gray-600">Detailed student score view will be implemented here.</p>
+            </div>
           </Layout>
         </ProtectedRoute>
       } />
@@ -219,10 +273,66 @@ const AppRoutes = () => {
           </Layout>
         </ProtectedRoute>
       } />
+      <Route path="/admin/terms" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <TermManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
       <Route path="/admin/interventions" element={
         <ProtectedRoute requiredRole="admin">
           <Layout>
             <ManageInterventions />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/tasks" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <ManageTasks />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/quadrants" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <QuadrantManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/interventions/:interventionId/microcompetencies" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <InterventionMicrocompetencies />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/interventions/:interventionId/teachers" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <InterventionTeachers />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/interventions/:interventionId/students" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <InterventionStudents />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/interventions/:interventionId/analytics" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <InterventionAnalytics />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/interventions/:interventionId/settings" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <InterventionSettings />
           </Layout>
         </ProtectedRoute>
       } />
@@ -236,13 +346,15 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
+      <TermProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </TermProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

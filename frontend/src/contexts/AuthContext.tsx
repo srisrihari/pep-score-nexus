@@ -11,6 +11,21 @@ interface User {
   email: string;
   role: 'student' | 'teacher' | 'admin';
   status: string;
+  // Role-specific profile data
+  profile?: {
+    // Teacher profile
+    name?: string;
+    employee_id?: string;
+    department?: string;
+    specialization?: string;
+    // Student profile
+    registration_no?: string;
+    course?: string;
+    batch?: string;
+    section?: string;
+    // Admin profile
+    full_name?: string;
+  };
 }
 
 interface AuthContextType {

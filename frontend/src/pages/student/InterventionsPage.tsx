@@ -34,14 +34,17 @@ import {
   CheckCircle,
   PlayCircle,
 } from 'lucide-react';
-import { interventionAPI } from '@/lib/api';
+import { interventionAPI, studentInterventionAPI, studentAPI } from '@/lib/api';
 import { Intervention } from '@/types/intervention';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTerm } from '@/contexts/TermContext';
 
 const InterventionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { selectedTerm } = useTerm();
   const [interventions, setInterventions] = useState<Intervention[]>([]);
+  const [studentScores, setStudentScores] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,23 +52,54 @@ const InterventionsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('available');
 
   useEffect(() => {
-    fetchInterventions();
-  }, [statusFilter]);
+    fetchData();
+  }, [statusFilter, user, selectedTerm]);
 
-  const fetchInterventions = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await interventionAPI.getAllInterventions({
-        status: statusFilter === 'all' ? undefined : statusFilter,
-        search: searchTerm || undefined,
-      });
-      setInterventions(response.data.interventions);
+
+      // First get current student to get their ID
+      const currentStudentResponse = await studentAPI.getCurrentStudent();
+      const studentId = currentStudentResponse.data.id;
+
+      const [interventionsResponse, scoresResponse] = await Promise.all([
+        // Use student-specific interventions endpoint with term filtering
+        studentAPI.getStudentInterventions(studentId, selectedTerm?.id),
+        // Get student intervention scores
+        studentInterventionAPI.getStudentScores(studentId)
+      ]);
+
+      // Transform the interventions data to match the expected Intervention type
+      const transformedInterventions = (interventionsResponse.data.interventions || []).map(intervention => ({
+        id: intervention.id,
+        name: intervention.name,
+        description: intervention.description,
+        status: intervention.status as 'Draft' | 'Active' | 'Completed' | 'Cancelled',
+        start_date: intervention.start_date,
+        end_date: intervention.end_date,
+        max_students: intervention.max_students,
+        objectives: intervention.objectives,
+        is_scoring_open: intervention.is_scoring_open,
+        scoring_deadline: intervention.scoring_deadline || '',
+        enrolled_count: intervention.enrolled_count,
+        created_at: new Date().toISOString(), // Default value for missing field
+        updated_at: new Date().toISOString(), // Default value for missing field
+      }));
+
+      setInterventions(transformedInterventions);
+      if (scoresResponse) {
+        setStudentScores(scoresResponse.data);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch interventions');
+      console.error('Error fetching student interventions:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchInterventions = fetchData;
 
   const handleSearch = () => {
     fetchInterventions();
@@ -156,6 +190,11 @@ const InterventionsPage: React.FC = () => {
             <p className="text-gray-600 mt-1">
               Discover and participate in skill development programs
             </p>
+            <div className="mt-2">
+              <Badge variant="outline" className="text-sm">
+                {selectedTerm?.name || 'Current Term'}
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -283,21 +322,52 @@ const InterventionsPage: React.FC = () => {
                       
                       <div className="flex items-center text-gray-600">
                         <Target className="h-4 w-4 mr-2" />
-                        <span>{intervention.objectives.length} objectives</span>
+                        <span>{intervention.objectives?.length || 0} objectives</span>
                       </div>
                     </div>
 
-                    {/* Quadrant Weightages */}
+                    {/* Scoring Status */}
                     <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-900">Focus Areas</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {Object.entries(intervention.quadrant_weightages).map(([quadrant, weight]) => (
-                          <Badge key={quadrant} variant="outline" className="text-xs">
-                            {quadrant}: {weight}%
+                      <h4 className="text-sm font-medium text-gray-900">Scoring Status</h4>
+                      <div className="flex items-center gap-2">
+                        {intervention.is_scoring_open ? (
+                          <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Scoring Open
                           </Badge>
-                        ))}
+                        ) : (
+                          <Badge className="bg-red-100 text-red-800 border-red-200 text-xs">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Scoring Closed
+                          </Badge>
+                        )}
+                        {intervention.scoring_deadline && (
+                          <span className="text-xs text-gray-600">
+                            Due: {formatDate(intervention.scoring_deadline)}
+                          </span>
+                        )}
                       </div>
                     </div>
+
+                    {/* Student Score (if enrolled) */}
+                    {studentScores && studentScores.scores && studentScores.scores.find((score: any) => score.intervention.id === intervention.id) && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-gray-900">Your Score</h4>
+                        {(() => {
+                          const score = studentScores.scores?.find((s: any) => s.intervention.id === intervention.id);
+                          return score ? (
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                                {score.overall_score.percentage.toFixed(1)}%
+                              </Badge>
+                              <span className="text-xs text-gray-600">
+                                {score.overall_score.obtained_score}/{score.overall_score.max_score}
+                              </span>
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}

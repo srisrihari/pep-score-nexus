@@ -26,6 +26,8 @@ export const transformStudentPerformanceData = (
   const data = apiPerformance.data || apiPerformance;
   const { student, currentTerm, termHistory, batchStats } = data;
 
+
+
   // Validate required data
   if (!student || !currentTerm) {
     throw new Error('Invalid API response: missing student or currentTerm data');
@@ -35,28 +37,79 @@ export const transformStudentPerformanceData = (
   const currentTermData: TermData = {
     termId: currentTerm.termId || 'current',
     termName: currentTerm.termName || 'Current Term',
-    quadrants: Array.isArray(currentTerm.quadrants) ? currentTerm.quadrants.map((q: any) => ({
-      id: q.id || 'unknown',
-      name: q.name || 'Unknown Quadrant',
-      weightage: typeof q.weightage === 'number' ? q.weightage : 0,
-      obtained: typeof q.obtained === 'number' ? q.obtained : 0,
-      status: q.status as StatusType || 'IC',
-      attendance: typeof q.attendance === 'number' ? q.attendance : 0,
-      eligibility: (q.eligibility === 'Eligible' || q.eligibility === 'Not Eligible') ? q.eligibility : 'Not Eligible',
-      rank: typeof q.rank === 'number' ? q.rank : 0,
-      components: Array.isArray(q.components) ? q.components.map((c: any) => ({
+    quadrants: Array.isArray(currentTerm.quadrants) ? currentTerm.quadrants.map((q: any) => {
+      // Transform sub-categories (NEW hierarchical structure)
+      const subCategories = Array.isArray(q.sub_categories) ? q.sub_categories.map((sc: any) => ({
+        id: sc.id || 'unknown',
+        name: sc.name || 'Unknown Sub-category',
+        description: sc.description || '',
+        weightage: typeof sc.weightage === 'number' ? sc.weightage : 0,
+        obtained: typeof sc.obtained === 'number' ? sc.obtained : 0,
+        maxScore: typeof sc.maxScore === 'number' ? sc.maxScore : 0,
+        components: Array.isArray(sc.components) ? sc.components.map((c: any) => ({
+          id: c.id || 'unknown',
+          name: c.name || 'Unknown Component',
+          description: c.description || '',
+          score: typeof c.score === 'number' ? c.score : 0,
+          maxScore: typeof c.maxScore === 'number' ? c.maxScore : 100,
+                      weightage: typeof c.weightage === 'number' ? c.weightage : 0,
+            status: c.status as StatusType || 'Deteriorate',
+            category: (c.category === 'SHL' || c.category === 'Professional' || c.category === 'Academic' || c.category === 'Physical' || c.category === 'Mental' || c.category === 'Social' || c.category === 'Conduct') ? c.category : undefined,
+          microcompetencies: Array.isArray(c.microcompetencies) ? c.microcompetencies.map((m: any) => ({
+            id: m.id || 'unknown',
+            name: m.name || 'Unknown Microcompetency',
+            description: m.description || '',
+            score: typeof m.score === 'number' ? m.score : undefined,
+            maxScore: typeof m.maxScore === 'number' ? m.maxScore : 10,
+            weightage: typeof m.weightage === 'number' ? m.weightage : 0,
+            feedback: m.feedback || '',
+            status: m.status as StatusType || 'IC',
+            scoredAt: m.scoredAt || null,
+            scoredBy: m.scoredBy || null
+          })) : []
+        })) : []
+      })) : [];
+
+      // Transform flat components (for backward compatibility)
+      const flatComponents = Array.isArray(q.components) ? q.components.map((c: any) => ({
         id: c.id || 'unknown',
         name: c.name || 'Unknown Component',
         score: typeof c.score === 'number' ? c.score : 0,
         maxScore: typeof c.maxScore === 'number' ? c.maxScore : 100,
-        status: c.status as StatusType || 'IC',
-        category: (c.category === 'SHL' || c.category === 'Professional') ? c.category : undefined
-      })) : []
-    })) : [],
-    tests: [], // Will be populated if needed
+          status: c.status as StatusType || 'Deteriorate',
+          category: (c.category === 'SHL' || c.category === 'Professional' || c.category === 'Academic' || c.category === 'Physical' || c.category === 'Mental' || c.category === 'Social' || c.category === 'Conduct') ? c.category : undefined,
+        microcompetencies: Array.isArray(c.microcompetencies) ? c.microcompetencies.map((m: any) => ({
+          id: m.id || 'unknown',
+          name: m.name || 'Unknown Microcompetency',
+          description: m.description || '',
+          score: typeof m.score === 'number' ? m.score : undefined,
+          maxScore: typeof m.maxScore === 'number' ? m.maxScore : 10,
+          weightage: typeof m.weightage === 'number' ? m.weightage : 0,
+          feedback: m.feedback || '',
+          status: m.status as StatusType || 'IC',
+          scoredAt: m.scoredAt || null,
+          scoredBy: m.scoredBy || null
+        })) : []
+      })) : [];
+
+      return {
+        id: q.id || 'unknown',
+        name: q.name || 'Unknown Quadrant',
+        description: q.description || '',
+        weightage: typeof q.weightage === 'number' ? q.weightage : 0,
+        obtained: typeof q.obtained === 'number' ? q.obtained : 0,
+        status: q.status as StatusType || 'IC',
+        attendance: typeof q.attendance === 'number' ? q.attendance : 0,
+        eligibility: (q.eligibility === 'Eligible' || q.eligibility === 'Not Eligible') ? q.eligibility : 'Not Eligible',
+        rank: typeof q.rank === 'number' ? q.rank : 0,
+        sub_categories: subCategories, // NEW: Full hierarchical structure
+        components: flatComponents // LEGACY: For backward compatibility
+      };
+    }) : [],
+    tests: Array.isArray(currentTerm.tests) ? currentTerm.tests : [],
     totalScore: typeof currentTerm.totalScore === 'number' ? currentTerm.totalScore : 0,
     grade: currentTerm.grade as Grade || 'IC',
-    overallStatus: currentTerm.overallStatus as StatusType || 'IC'
+    overallStatus: currentTerm.overallStatus as StatusType || 'Deteriorate'
   };
 
   // Transform term history if available
@@ -68,7 +121,7 @@ export const transformStudentPerformanceData = (
       tests: Array.isArray(term.tests) ? term.tests : [],
       totalScore: typeof term.totalScore === 'number' ? term.totalScore : 0,
       grade: term.grade as Grade || 'IC',
-      overallStatus: term.overallStatus as StatusType || 'IC'
+      overallStatus: term.overallStatus as StatusType || 'Deteriorate'
     }))] :
     [currentTermData];
 
