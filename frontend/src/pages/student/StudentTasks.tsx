@@ -127,7 +127,11 @@ const StudentTasks: React.FC = () => {
         return;
       }
 
-      const response = await studentAPI.getStudentInterventions(user.id);
+      // Get current student profile to get student ID
+      const currentStudentResponse = await studentAPI.getCurrentStudent();
+      const studentId = currentStudentResponse.data.id;
+
+      const response = await studentAPI.getStudentInterventions(studentId);
       const transformedInterventions: Intervention[] = response.data.interventions.map(intervention => ({
         id: intervention.id,
         name: intervention.name,

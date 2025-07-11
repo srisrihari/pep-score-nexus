@@ -218,20 +218,23 @@ export const studentAPI = {
     return apiRequest<{
       success: boolean;
       data: {
-        overall: number;
-        wellness: number;
-        eligibility: string;
+        overall: {
+          attendance: number;
+          eligibility: string;
+          required: number;
+        };
+        quadrants: Array<{
+          id: string;
+          name: string;
+          attendance: number;
+          eligibility: string;
+          required: number;
+          totalSessions: number;
+          attendedSessions: number;
+        }>;
         history: Array<{
           term: string;
           overall: number;
-          wellness: number;
-        }>;
-        quadrantAttendance: Array<{
-          quadrantId: string;
-          quadrantName: string;
-          attendance: number;
-          required: number;
-          isEligible: boolean;
         }>;
       };
     }>(`/students/${studentId}/attendance${params.toString() ? '?' + params.toString() : ''}`);

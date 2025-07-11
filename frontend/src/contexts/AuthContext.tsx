@@ -35,6 +35,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (username: string, password: string) => Promise<boolean>;
+  loginWithSSO: (ssoData: any) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -104,6 +105,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithSSO = async (ssoData: any): Promise<boolean> => {
+    try {
+      console.log('🔐 AuthContext: Processing SSO login', ssoData);
+
+      if (ssoData.success && ssoData.data) {
+        const { user: userData, token: authToken } = ssoData.data;
+
+        // Store in localStorage
+        authService.setToken(authToken);
+        authService.setUser(userData);
+
+        // Update state
+        setIsAuthenticated(true);
+        setUserRole(userData.role);
+        setUserId(userData.id);
+        setUser(userData);
+        setToken(authToken);
+
+        toast.success(`Welcome, ${userData.name}!`);
+        return true;
+      } else {
+        toast.error(ssoData.message || "SSO authentication failed");
+        return false;
+      }
+    } catch (error) {
+      console.error("SSO login error:", error);
+      toast.error("SSO authentication failed. Please try again.");
+      return false;
+    }
+  };
+
   const logout = () => {
     authService.logout();
     setIsAuthenticated(false);
@@ -115,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userRole, userId, user, token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userRole, userId, user, token, login, loginWithSSO, logout }}>
       {children}
     </AuthContext.Provider>
   );

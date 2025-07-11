@@ -6,11 +6,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { TermProvider } from "@/contexts/TermContext";
+// Microsoft SSO imports - temporarily disabled to fix hook error
+// import { MsalProvider } from "@azure/msal-react";
+// import { PublicClientApplication } from "@azure/msal-browser";
+// import { msalConfig } from "@/config/msalConfig";
 
 import Layout from "./components/layout/Layout";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
+import AuthCallback from "./pages/AuthCallback";
 
 // Student pages
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -55,6 +60,9 @@ import InterventionAnalytics from "./pages/admin/InterventionAnalytics";
 
 const queryClient = new QueryClient();
 
+// Create MSAL instance - temporarily disabled
+// const msalInstance = new PublicClientApplication(msalConfig);
+
 // Protected route component
 const ProtectedRoute = ({
   children,
@@ -80,6 +88,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/index" element={<Index />} />
 
       {/* Student Routes */}

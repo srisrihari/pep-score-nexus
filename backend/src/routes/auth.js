@@ -1,6 +1,7 @@
 const express = require('express');
 const { register, login, getProfile, refreshToken, logout } = require('../controllers/authController');
 const { authenticateToken } = require('../middleware/auth');
+const microsoftAuthRoutes = require('./microsoftAuth');
 
 const router = express.Router();
 
@@ -8,6 +9,9 @@ const router = express.Router();
 router.post('/register', register);
 router.post('/login', login);
 router.post('/refresh', refreshToken);
+
+// Microsoft SSO routes
+router.use('/microsoft', microsoftAuthRoutes);
 
 // Protected routes (authentication required)
 router.get('/profile', authenticateToken, getProfile);

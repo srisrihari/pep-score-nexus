@@ -114,15 +114,17 @@ export const transformStudentPerformanceData = (
 
   // Transform term history if available
   const allTerms = Array.isArray(termHistory) ?
-    [currentTermData, ...termHistory.map((term: any) => ({
-      termId: term.termId || 'unknown',
-      termName: term.termName || 'Unknown Term',
-      quadrants: Array.isArray(term.quadrants) ? term.quadrants : [],
-      tests: Array.isArray(term.tests) ? term.tests : [],
-      totalScore: typeof term.totalScore === 'number' ? term.totalScore : 0,
-      grade: term.grade as Grade || 'IC',
-      overallStatus: term.overallStatus as StatusType || 'Deteriorate'
-    }))] :
+    [currentTermData, ...termHistory
+      .filter((term: any) => term.termId !== currentTermData.termId) // Avoid duplicates
+      .map((term: any) => ({
+        termId: term.termId || 'unknown',
+        termName: term.termName || 'Unknown Term',
+        quadrants: Array.isArray(term.quadrants) ? term.quadrants : [],
+        tests: Array.isArray(term.tests) ? term.tests : [],
+        totalScore: typeof term.totalScore === 'number' ? term.totalScore : 0,
+        grade: term.grade as Grade || 'IC',
+        overallStatus: term.overallStatus as StatusType || 'Deteriorate'
+      }))] :
     [currentTermData];
 
   return {
@@ -309,12 +311,21 @@ export const generateMockTermComparisonData = (currentScore: number) => {
 export const transformAttendanceData = (apiAttendance: any) => {
   const data = apiAttendance.data || apiAttendance;
 
+  // Handle the actual API response structure
+  const overallData = data.overall || {};
+  const quadrants = data.quadrants || [];
+
+  // Find wellness quadrant data
+  const wellnessQuadrant = quadrants.find((q: any) =>
+    q.id === 'wellness' || q.name?.toLowerCase().includes('wellness')
+  );
+
   return {
-    overall: typeof data.overall === 'number' ? data.overall : 0,
-    wellness: typeof data.wellness === 'number' ? data.wellness : 0,
-    eligibility: typeof data.eligibility === 'string' ? data.eligibility : 'Unknown',
+    overall: typeof overallData.attendance === 'number' ? overallData.attendance : 0,
+    wellness: wellnessQuadrant?.attendance || 0,
+    eligibility: typeof overallData.eligibility === 'string' ? overallData.eligibility : 'Unknown',
     history: Array.isArray(data.history) ? data.history : [],
-    quadrantAttendance: Array.isArray(data.quadrantAttendance) ? data.quadrantAttendance : []
+    quadrantAttendance: Array.isArray(quadrants) ? quadrants : []
   };
 };
 

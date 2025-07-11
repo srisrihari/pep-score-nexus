@@ -20,11 +20,7 @@ import { useTerm } from "@/contexts/TermContext";
 import {
   transformStudentPerformanceData,
   transformLeaderboardData,
-  transformAttendanceData,
-  generateMockLeaderboard,
-  generateMockTimeSeriesData,
-  generateMockTermComparisonData,
-  generateMockAttendanceData
+  transformAttendanceData
 } from "@/lib/dataTransform";
 // Import all necessary types
 
@@ -77,15 +73,15 @@ const StudentDashboard: React.FC = () => {
         // Transform API data to UI format
         const transformedStudent = transformStudentPerformanceData(performanceResponse);
 
-        // Use real leaderboard data if available, otherwise generate mock
+        // Use real leaderboard data if available, otherwise set null to show appropriate UI state
         const leaderboard = leaderboardResponse
           ? transformLeaderboardData(leaderboardResponse)
-          : generateMockLeaderboard(transformedStudent.totalScore);
+          : null;
 
-        // Use real attendance data if available, otherwise generate mock
+        // Use real attendance data if available, otherwise set null to show appropriate UI state
         const attendance = attendanceResponse
           ? transformAttendanceData(attendanceResponse)
-          : generateMockAttendanceData([]);
+          : null;
 
         // Process intervention data
         const interventions = interventionResponse?.data || null;
@@ -93,21 +89,21 @@ const StudentDashboard: React.FC = () => {
         // Data loaded successfully
 
         // Generate time series and term comparison from performance history
-        const timeSeries = transformedStudent.terms.length > 1
+        const timeSeries = transformedStudent.terms.length > 0
           ? {
               overall: transformedStudent.terms.map(term => ({
                 term: term.termName,
                 score: term.totalScore
               }))
             }
-          : generateMockTimeSeriesData(transformedStudent.totalScore);
+          : { overall: [] };
 
-        const termComparison = transformedStudent.terms.length > 1
+        const termComparison = transformedStudent.terms.length > 0
           ? transformedStudent.terms.map(term => ({
               termName: term.termName,
               overall: term.totalScore
             }))
-          : generateMockTermComparisonData(transformedStudent.totalScore);
+          : [];
 
         // Validate data before setting state
         if (!transformedStudent || !transformedStudent.terms || transformedStudent.terms.length === 0) {
@@ -153,15 +149,15 @@ const StudentDashboard: React.FC = () => {
   }
 
   // Show error state
-  if (error || !studentData || !leaderboardData) {
+  if (error || !studentData) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <p className="text-destructive mb-4">Failed to load dashboard data</p>
           <p className="text-muted-foreground text-sm">{error}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
-            variant="outline" 
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
             className="mt-4"
           >
             Retry
@@ -172,29 +168,49 @@ const StudentDashboard: React.FC = () => {
   }
 
   // Use current term data (first term in the array since we're filtering by selected term)
-  const currentTermData = studentData.terms[0] || studentData.terms[0];
+  const currentTermData = studentData.terms && studentData.terms.length > 0
+    ? studentData.terms[0]
+    : {
+        quadrants: [],
+        totalScore: 0,
+        overallStatus: 'Progress' as const,
+        grade: 'IC' as const
+      };
   const { quadrants, totalScore, overallStatus, grade } = currentTermData;
-  const overallLeaderboard = leaderboardData?.overall || { batchAvg: 0, batchBest: 0, topStudents: [], userRank: 0 };
+  const overallLeaderboard = leaderboardData?.overall || {
+    batchAvg: 0,
+    batchBest: 0,
+    topStudents: [],
+    userRank: 0
+  };
 
   const summaryMetrics = [
     {
       label: "Previous Term Score",
-      value: studentData.terms.length > 1 ? studentData.terms[studentData.terms.length - 2].totalScore : "-",
+      value: studentData.terms.length > 1
+        ? studentData.terms[studentData.terms.length - 2].totalScore.toFixed(1)
+        : "-",
       maxValue: 100
     },
     {
       label: "Best Term Score",
-      value: studentData.terms.length > 0 ? Math.max(...studentData.terms.map(term => term.totalScore)) : 0,
+      value: studentData.terms.length > 0
+        ? Math.max(...studentData.terms.map(term => term.totalScore)).toFixed(1)
+        : "0",
       maxValue: 100
     },
     {
       label: "Batch Avg Score",
-      value: typeof overallLeaderboard.batchAvg === 'number' ? overallLeaderboard.batchAvg : 0,
+      value: leaderboardData && typeof overallLeaderboard.batchAvg === 'number'
+        ? overallLeaderboard.batchAvg.toFixed(1)
+        : "-",
       maxValue: 100
     },
     {
       label: "Batch Best Score",
-      value: typeof overallLeaderboard.batchBest === 'number' ? overallLeaderboard.batchBest : 0,
+      value: leaderboardData && typeof overallLeaderboard.batchBest === 'number'
+        ? overallLeaderboard.batchBest.toFixed(1)
+        : "-",
       maxValue: 100
     },
   ];
@@ -266,41 +282,46 @@ const StudentDashboard: React.FC = () => {
             <CardTitle>Attendance Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">Overall Attendance</span>
-                  <span className="text-sm font-medium">{attendanceData?.overall || 0}%</span>
+            {attendanceData ? (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium">Overall Attendance</span>
+                    <span className="text-sm font-medium">{attendanceData.overall || 0}%</span>
+                  </div>
+                  <Progress value={attendanceData.overall || 0} className="h-2" />
                 </div>
-                <Progress value={attendanceData?.overall || 0} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">Wellness Attendance</span>
-                  <span className="text-sm font-medium">{attendanceData?.wellness || 0}%</span>
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium">Wellness Attendance</span>
+                    <span className="text-sm font-medium">{attendanceData.wellness || 0}%</span>
+                  </div>
+                  <Progress value={attendanceData.wellness || 0} className="h-2" />
                 </div>
-                <Progress value={attendanceData?.wellness || 0} className="h-2" />
+                <div className="flex items-center mt-4">
+                  <span className="mr-2">Eligibility Status:</span>
+                  <Badge variant={
+                    attendanceData.eligibility === "Eligible" ? "outline" : "destructive"
+                  }>
+                    {attendanceData.eligibility || "Unknown"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+                  <span>Note: Minimum 80% attendance required for eligibility in Persona and Wellness quadrants.</span>
+                  <Button variant="link" size="sm" className="p-0 h-auto" asChild>
+                    <Link to="/student/eligibility" className="flex items-center">
+                      <InfoIcon className="h-3 w-3 mr-1" />
+                      View Rules
+                    </Link>
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center mt-4">
-                <span className="mr-2">Eligibility Status:</span>
-                <Badge variant={
-                  (typeof attendanceData?.eligibility === 'string' && attendanceData.eligibility === "Eligible")
-                    ? "outline"
-                    : "destructive"
-                }>
-                  {typeof attendanceData?.eligibility === 'string' ? attendanceData.eligibility : "Unknown"}
-                </Badge>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">Attendance data not available</p>
+                <p className="text-xs mt-1">Please contact your administrator if this persists</p>
               </div>
-              <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
-                <span>Note: Minimum 80% attendance required for eligibility in Persona and Wellness quadrants.</span>
-                <Button variant="link" size="sm" className="p-0 h-auto" asChild>
-                  <Link to="/student/eligibility" className="flex items-center">
-                    <InfoIcon className="h-3 w-3 mr-1" />
-                    View Rules
-                  </Link>
-                </Button>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -309,19 +330,28 @@ const StudentDashboard: React.FC = () => {
             <CardTitle>Term Comparison</CardTitle>
           </CardHeader>
           <CardContent className="h-[220px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={termComparisonData}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="termName" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="overall" fill="hsl(var(--primary))" name="Overall Score" />
-              </BarChart>
-            </ResponsiveContainer>
+            {termComparisonData && termComparisonData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={termComparisonData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="termName" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="overall" fill="hsl(var(--primary))" name="Overall Score" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <div className="text-center">
+                  <p className="text-sm">No term comparison data available</p>
+                  <p className="text-xs mt-1">Data will appear as you complete more terms</p>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -605,11 +635,25 @@ const StudentDashboard: React.FC = () => {
       </Tabs>
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <LeaderboardCard
-          leaders={overallLeaderboard.topStudents}
-          userRank={overallLeaderboard.userRank}
-          maxScore={100}
-        />
+        {leaderboardData ? (
+          <LeaderboardCard
+            leaders={overallLeaderboard.topStudents}
+            userRank={overallLeaderboard.userRank}
+            maxScore={100}
+          />
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>Leaderboard</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">Leaderboard data not available</p>
+                <p className="text-xs mt-1">Rankings will appear once more students have scores</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <AreasForImprovement studentData={studentData} />
       </div>
