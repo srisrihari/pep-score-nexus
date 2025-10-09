@@ -14,11 +14,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import StatusBadge, { StatusType } from "@/components/common/StatusBadge";
-import { adminAPI } from "@/lib/api";
+import { adminAPI, uploadAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Search, ArrowUpDown, Eye, Edit, Trash2, Plus, UserPlus, Upload, Download } from "lucide-react";
+import { ErrorHandler, FormErrors } from "@/utils/errorHandling";
+import { FormValidator } from "@/utils/formValidation";
+import StudentTable from "@/components/admin/StudentTable";
+import StudentForm from "@/components/admin/StudentForm";
+import StudentFilters from "@/components/admin/StudentFilters";
 
 // Student interface
 interface Student {
@@ -62,6 +67,7 @@ const ManageStudents: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddStudentDialogOpen, setIsAddStudentDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -118,7 +124,7 @@ const ManageStudents: React.FC = () => {
   useEffect(() => {
     fetchStudents();
     fetchFilterOptions();
-  }, [currentPage, pageSize, sortField, sortOrder, selectedTerm]); // Reload when term changes
+  }, [currentPage, pageSize, sortField, sortOrder, selectedTerm, searchQuery]); // include search in deps
 
   const fetchFilterOptions = async () => {
     try {
@@ -143,14 +149,23 @@ const ManageStudents: React.FC = () => {
         limit: pageSize,
         sortBy: sortField,
         sortOrder: sortOrder,
+        search: searchQuery,
         termId: selectedTerm?.id // Filter by selected term
       });
-      const studentsData = response.data?.students || [];
-      const pagination = response.data?.pagination || {};
+      let studentsData = response?.data?.students || [];
+      const pagination = response?.data?.pagination || {} as any;
+      const totalRaw = (pagination.total ?? response?.data?.total ?? studentsData.length) as number;
+      const totalPagesCalc = (pagination.totalPages ?? (totalRaw && pageSize ? Math.ceil(totalRaw / pageSize) : 0)) as number;
+
+      // Defensive client-side paging if backend returns full list
+      if (!pagination?.limit || studentsData.length > pageSize) {
+        const start = (currentPage - 1) * pageSize;
+        studentsData = studentsData.slice(start, start + pageSize);
+      }
 
       setStudents(studentsData);
-      setTotalStudents(pagination.total || 0);
-      setTotalPages(pagination.totalPages || 0);
+      setTotalStudents(totalRaw);
+      setTotalPages(totalPagesCalc);
     } catch (error) {
       console.error('Error fetching students:', error);
       toast.error('Failed to fetch students');
@@ -170,6 +185,8 @@ const ManageStudents: React.FC = () => {
     setSortOrder(newSortOrder);
     setSortField(field);
     setCurrentPage(1); // Reset to first page when sorting
+    // Fetch after state updates
+    setTimeout(fetchStudents, 0);
   };
 
   const handleViewStudent = (student: Student) => {
@@ -179,81 +196,50 @@ const ManageStudents: React.FC = () => {
 
   // Handle adding a new student
   const handleAddStudent = async () => {
-    if (!newStudentFirstName.trim()) {
-      toast.error("Please enter first name");
-      return;
-    }
+    // Clear previous errors
+    setFormErrors(ErrorHandler.clearFormErrors());
 
-    if (!newStudentLastName.trim()) {
-      toast.error("Please enter last name");
-      return;
-    }
+    // Prepare student data for validation
+    const studentData = {
+      firstName: newStudentFirstName.trim(),
+      lastName: newStudentLastName.trim(),
+      email: newStudentEmail.trim(),
+      password: newStudentPassword.trim(),
+      registrationNo: newStudentRegistrationNo.trim(),
+      course: newStudentCourse.trim(),
+      batchId: newStudentBatch,
+      sectionId: newStudentSection,
+      gender: newStudentGender,
+      phone: newStudentPhone.trim(),
+    };
 
-    if (!newStudentEmail.trim()) {
-      toast.error("Please enter email address");
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newStudentEmail.trim())) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-
-    if (!newStudentPassword.trim()) {
-      toast.error("Please enter password");
-      return;
-    }
-
-    if (!newStudentRegistrationNo.trim()) {
-      toast.error("Please enter registration number");
-      return;
-    }
+    // Validate using comprehensive form validator
+    const validationErrors = FormValidator.validateStudentForm(studentData);
 
     // Check for duplicate registration number
-    const existingStudent = students.find(s => s.registration_no === newStudentRegistrationNo.trim());
+    const existingStudent = students.find(s => s.registration_no === studentData.registrationNo);
     if (existingStudent) {
-      toast.error("A student with this registration number already exists");
+      validationErrors.registrationNo = "A student with this registration number already exists";
+    }
+
+    // If there are validation errors, show them and return
+    if (Object.keys(validationErrors).length > 0) {
+      setFormErrors(validationErrors);
       return;
     }
 
-    if (!newStudentCourse.trim()) {
-      toast.error("Please enter course");
-      return;
-    }
 
-    if (!newStudentBatch) {
-      toast.error("Please select a batch");
-      return;
-    }
-
-    if (!newStudentSection) {
-      toast.error("Please select a section");
-      return;
-    }
-
-    if (!newStudentGender) {
-      toast.error("Please select gender");
-      return;
-    }
-
-    // Phone number validation (optional but if provided, should be valid)
-    if (newStudentPhone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(newStudentPhone.trim())) {
-      toast.error("Please enter a valid phone number");
-      return;
-    }
 
     try {
       setIsSubmitting(true);
 
       // Create student using the API
       await adminAPI.addStudent({
-        email: newStudentEmail,
-        password: newStudentPassword,
-        firstName: newStudentFirstName,
-        lastName: newStudentLastName,
-        registrationNo: newStudentRegistrationNo,
+        email: studentData.email,
+        password: studentData.password,
+        firstName: studentData.firstName,
+        lastName: studentData.lastName,
+        registrationNo: studentData.registrationNo,
         course: newStudentCourse,
         batchId: newStudentBatch,
         sectionId: newStudentSection,
@@ -261,7 +247,7 @@ const ManageStudents: React.FC = () => {
         phone: newStudentPhone || '',
       });
 
-      toast.success("Student added successfully");
+      ErrorHandler.showSuccess("Student added successfully");
       setIsAddStudentDialogOpen(false);
 
       // Reset form
@@ -275,12 +261,13 @@ const ManageStudents: React.FC = () => {
       setNewStudentSection("");
       setNewStudentGender("");
       setNewStudentPhone("");
+      setFormErrors(ErrorHandler.clearFormErrors());
 
       // Refresh students list
       fetchStudents();
     } catch (error) {
-      console.error('Error adding student:', error);
-      toast.error('Failed to add student');
+      const formErrors = ErrorHandler.handleFormError(error, 'adding student');
+      setFormErrors(formErrors);
     } finally {
       setIsSubmitting(false);
     }
@@ -388,14 +375,30 @@ const ManageStudents: React.FC = () => {
 
     setIsBulkImporting(true);
     try {
-      // This would need a proper bulk import API endpoint
-      toast.success('Students imported successfully');
-      setShowBulkImportDialog(false);
-      setBulkImportFile(null);
-      fetchStudents(); // Refresh the list
-    } catch (error) {
+      const formData = new FormData();
+      formData.append('file', bulkImportFile);
+      formData.append('importType', 'students');
+
+      const resp = await uploadAPI.importExcelData(formData);
+
+      if (resp?.success) {
+        const results = resp.data;
+        toast.success(
+          `Imported ${results?.successCount ?? 0}/${results?.totalRows ?? 0} rows`+
+          (results?.errorCount ? `, errors: ${results.errorCount}` : '')
+        );
+        if (results?.errors && results.errors.length) {
+          console.warn('Student import errors:', results.errors);
+        }
+        setShowBulkImportDialog(false);
+        setBulkImportFile(null);
+        await fetchStudents();
+      } else {
+        toast.error(resp?.message || 'Failed to import students');
+      }
+    } catch (error: any) {
       console.error('Error importing students:', error);
-      toast.error('Failed to import students');
+      toast.error(error?.message || 'Failed to import students');
     } finally {
       setIsBulkImporting(false);
     }
@@ -721,8 +724,17 @@ const ManageStudents: React.FC = () => {
                   id="firstName"
                   placeholder="Enter first name"
                   value={newStudentFirstName}
-                  onChange={(e) => setNewStudentFirstName(e.target.value)}
+                  onChange={(e) => {
+                    setNewStudentFirstName(e.target.value);
+                    if (formErrors.firstName) {
+                      setFormErrors(ErrorHandler.clearFieldError(formErrors, 'firstName'));
+                    }
+                  }}
+                  className={formErrors.firstName ? 'border-red-500' : ''}
                 />
+                {formErrors.firstName && (
+                  <p className="text-sm text-red-500">{formErrors.firstName}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
@@ -730,8 +742,17 @@ const ManageStudents: React.FC = () => {
                   id="lastName"
                   placeholder="Enter last name"
                   value={newStudentLastName}
-                  onChange={(e) => setNewStudentLastName(e.target.value)}
+                  onChange={(e) => {
+                    setNewStudentLastName(e.target.value);
+                    if (formErrors.lastName) {
+                      setFormErrors(ErrorHandler.clearFieldError(formErrors, 'lastName'));
+                    }
+                  }}
+                  className={formErrors.lastName ? 'border-red-500' : ''}
                 />
+                {formErrors.lastName && (
+                  <p className="text-sm text-red-500">{formErrors.lastName}</p>
+                )}
               </div>
             </div>
 
@@ -742,8 +763,17 @@ const ManageStudents: React.FC = () => {
                 type="email"
                 placeholder="Enter email address"
                 value={newStudentEmail}
-                onChange={(e) => setNewStudentEmail(e.target.value)}
+                onChange={(e) => {
+                  setNewStudentEmail(e.target.value);
+                  if (formErrors.email) {
+                    setFormErrors(ErrorHandler.clearFieldError(formErrors, 'email'));
+                  }
+                }}
+                className={formErrors.email ? 'border-red-500' : ''}
               />
+              {formErrors.email && (
+                <p className="text-sm text-red-500">{formErrors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -753,8 +783,17 @@ const ManageStudents: React.FC = () => {
                 type="password"
                 placeholder="Enter password for login"
                 value={newStudentPassword}
-                onChange={(e) => setNewStudentPassword(e.target.value)}
+                onChange={(e) => {
+                  setNewStudentPassword(e.target.value);
+                  if (formErrors.password) {
+                    setFormErrors(ErrorHandler.clearFieldError(formErrors, 'password'));
+                  }
+                }}
+                className={formErrors.password ? 'border-red-500' : ''}
               />
+              {formErrors.password && (
+                <p className="text-sm text-red-500">{formErrors.password}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -1030,15 +1069,15 @@ const ManageStudents: React.FC = () => {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="csvFile">CSV File</Label>
+              <Label htmlFor="csvFile">Excel File (.xlsx or .xls)</Label>
               <Input
                 id="csvFile"
                 type="file"
-                accept=".csv"
+                accept=".xlsx,.xls"
                 onChange={(e) => setBulkImportFile(e.target.files?.[0] || null)}
               />
               <p className="text-sm text-muted-foreground">
-                CSV should include columns: Name, Email, Registration No, Course, Batch, Section, Gender, Phone
+                Template columns: name, email, registration_no, password (optional), course, batch, section, gender, phone
               </p>
             </div>
 

@@ -74,6 +74,7 @@ import {
   InterventionMicrocompetency,
   Microcompetency
 } from '@/types/intervention';
+import { ErrorHandler, FormErrors } from '@/utils/errorHandling';
 
 const ManageInterventions: React.FC = () => {
   const navigate = useNavigate();

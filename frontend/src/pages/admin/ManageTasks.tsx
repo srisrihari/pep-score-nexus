@@ -40,7 +40,7 @@ import {
   FileText,
   Target
 } from "lucide-react";
-import { interventionAPI } from "@/lib/api";
+import { interventionAPI, adminAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 
 interface Task {
@@ -91,8 +91,10 @@ const ManageTasks: React.FC = () => {
 
       // Get interventions for filter and tasks data
       const [interventionsResponse, tasksResponse] = await Promise.all([
-        interventionAPI.getAllInterventions(),
-        interventionAPI.getAllTasks()
+        adminAPI.getAllInterventions(),
+        interventionAPI.getAllTasks({
+          termId: selectedTerm?.id // Filter tasks by selected term
+        })
       ]);
 
       setInterventions(interventionsResponse.data.interventions || []);

@@ -1,20 +1,49 @@
-import { Grade, StatusType, Student, QuadrantData, Component, TermData, Leaderboard } from '@/data/mockData';
+import { Grade, StatusType, Student, QuadrantScore, Component, Leaderboard } from '@/types/api';
 
-// Helper function to calculate grade based on score
+// Legacy types for backward compatibility
+interface QuadrantData {
+  id: string;
+  name: string;
+  score: number;
+  maxScore: number;
+  weightage: number;
+  obtained: number;
+  grade: Grade;
+  status: StatusType;
+  attendance?: number;
+  eligibility?: string;
+  components: Component[];
+  sub_categories?: any[];
+}
+
+interface TermData {
+  termId: string;
+  termName: string;
+  quadrants: QuadrantData[];
+}
+
+// NOTE: Grade and status calculations are now handled by the backend unified scoring system
+// These helper functions are deprecated and should not be used for new calculations
+
+// Legacy helper function - DO NOT USE for new calculations
+// Use backend-calculated grades instead
 const calculateGrade = (score: number): Grade => {
-  if (score >= 80) return 'A+';
-  if (score >= 70) return 'A';
-  if (score >= 60) return 'B';
-  if (score >= 50) return 'C';
-  if (score >= 40) return 'D';
-  if (score >= 30) return 'E';
+  console.warn('⚠️ Using deprecated frontend grade calculation. Use backend-calculated grades instead.');
+  if (score >= 90) return 'A+';
+  if (score >= 80) return 'A';
+  if (score >= 70) return 'B';
+  if (score >= 60) return 'C';
+  if (score >= 50) return 'D';
+  if (score >= 40) return 'E';
   return 'IC';
 };
 
-// Helper function to calculate status based on score and threshold
+// Legacy helper function - DO NOT USE for new calculations
+// Use backend-calculated status instead
 const calculateStatus = (score: number, threshold: number): StatusType => {
-  if (score >= threshold * 0.8) return 'Good';
-  if (score >= threshold * 0.6) return 'Progress';
+  console.warn('⚠️ Using deprecated frontend status calculation. Use backend-calculated status instead.');
+  if (score >= 70) return 'Good';
+  if (score >= 40) return 'Progress';
   return 'Deteriorate';
 };
 
@@ -25,6 +54,10 @@ export const transformStudentPerformanceData = (
   // Handle different API response structures
   const data = apiPerformance.data || apiPerformance;
   const { student, currentTerm, termHistory, batchStats } = data;
+
+  // Debug logging to understand the data structure
+  console.log('🔍 transformStudentPerformanceData - Raw API data:', data);
+  console.log('🔍 currentTerm quadrants:', currentTerm?.quadrants);
 
 
 
@@ -98,6 +131,7 @@ export const transformStudentPerformanceData = (
         description: q.description || '',
         weightage: typeof q.weightage === 'number' ? q.weightage : 0,
         obtained: typeof q.obtained === 'number' ? q.obtained : 0,
+        maxScore: typeof q.maxScore === 'number' ? q.maxScore : (typeof q.weightage === 'number' ? q.weightage : 100), // Use maxScore from API or fallback to weightage
         status: q.status as StatusType || 'IC',
         attendance: typeof q.attendance === 'number' ? q.attendance : 0,
         eligibility: (q.eligibility === 'Eligible' || q.eligibility === 'Not Eligible') ? q.eligibility : 'Not Eligible',
@@ -111,6 +145,14 @@ export const transformStudentPerformanceData = (
     grade: currentTerm.grade as Grade || 'IC',
     overallStatus: currentTerm.overallStatus as StatusType || 'Deteriorate'
   };
+
+  // Debug logging for quadrant data
+  console.log('🔍 Transformed quadrants:', currentTermData.quadrants.map(q => ({
+    name: q.name,
+    obtained: q.obtained,
+    maxScore: q.maxScore,
+    weightage: q.weightage
+  })));
 
   // Transform term history if available
   const allTerms = Array.isArray(termHistory) ?
@@ -165,7 +207,8 @@ export const transformStudentData = (
       id: qs.quadrant_id,
       name: qs.quadrant_name,
       weightage: qs.weight_percentage,
-      obtained: qs.weighted_score,
+      obtained: qs.total_score || 0, // Use total_score as obtained points
+      maxScore: qs.weight_percentage, // Use weightage as max score (since scores are out of weightage)
       status: qs.status as StatusType,
       attendance: qs.attendance_percentage,
       eligibility: qs.is_attendance_met ? 'Eligible' : 'Not Eligible' as const,
@@ -178,6 +221,7 @@ export const transformStudentData = (
       name: q.name,
       weightage: q.weightage,
       obtained: 0,
+      maxScore: q.weightage, // Maximum points possible for this quadrant
       status: 'IC' as StatusType,
       attendance: 0,
       eligibility: 'Not Eligible' as const,
@@ -284,28 +328,11 @@ export const generateMockLeaderboard = (studentScore: number): Leaderboard => {
   };
 };
 
-// Generate mock time series data
-export const generateMockTimeSeriesData = (currentScore: number) => {
-  const terms = ['Term 1', 'Term 2', 'Term 3', 'Term 4'];
-  const baseScore = Math.max(0, currentScore > 0 ? currentScore - 20 : 0);
-  
-  return {
-    overall: terms.map((term, index) => ({
-      term,
-      score: currentScore > 0 ? Math.min(100, Math.max(0, baseScore + (index * 5) + Math.random() * 10)) : 0
-    }))
-  };
-};
+// DEPRECATED: Mock data generators have been removed
+// Components should handle API errors gracefully instead of using fallback mock data
 
-// Generate mock term comparison data
-export const generateMockTermComparisonData = (currentScore: number) => {
-  return [
-    { termName: 'Term 1', overall: currentScore > 0 ? Math.max(0, currentScore - 15) : 0 },
-    { termName: 'Term 2', overall: currentScore > 0 ? Math.max(0, currentScore - 10) : 0 },
-    { termName: 'Term 3', overall: currentScore > 0 ? Math.max(0, currentScore - 5) : 0 },
-    { termName: 'Current', overall: currentScore }
-  ];
-};
+// REMOVED: Mock time series and term comparison generators
+// These have been removed to prevent masking API issues
 
 // Transform API attendance data to UI format
 export const transformAttendanceData = (apiAttendance: any) => {
@@ -329,21 +356,5 @@ export const transformAttendanceData = (apiAttendance: any) => {
   };
 };
 
-// Fallback: Generate mock attendance data when API is not available
-export const generateMockAttendanceData = (quadrantScores: any[]) => {
-  const personaQuadrant = quadrantScores.find(q => q.quadrant_name?.toLowerCase().includes('persona'));
-  const wellnessQuadrant = quadrantScores.find(q => q.quadrant_name?.toLowerCase().includes('wellness'));
-
-  const overallAttendance = Math.round(
-    (personaQuadrant?.attendance_percentage || 85) * 0.6 +
-    (wellnessQuadrant?.attendance_percentage || 80) * 0.4
-  );
-
-  const isEligible = (personaQuadrant?.is_attendance_met && wellnessQuadrant?.is_attendance_met) || true;
-
-  return {
-    overall: overallAttendance,
-    wellness: wellnessQuadrant?.attendance_percentage || 80,
-    eligibility: isEligible ? 'Eligible' : 'Not Eligible'
-  };
-};
+// REMOVED: Mock attendance data generator
+// Components should handle API errors gracefully instead of using fallback mock data

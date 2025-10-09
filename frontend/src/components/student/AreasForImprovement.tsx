@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ChevronRight, TrendingDown, AlertTriangle, ArrowRight } from 'lucide-react';
-import { Student, QuadrantData, Component } from '@/data/mockData';
+import { Student, QuadrantScore, Component } from '@/types/api';
 
 interface AreasForImprovementProps {
   studentData: Student;

@@ -79,19 +79,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(username, password);
       
       if (response.success) {
-        const { user: userData, token: authToken } = response.data;
-        
+        const { user: userData, token: authToken, refreshToken } = response.data;
+
         // Store in localStorage
         authService.setToken(authToken);
         authService.setUser(userData);
-        
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+        }
+
         // Update state
         setIsAuthenticated(true);
         setUserRole(userData.role);
         setUserId(userData.id);
         setUser(userData);
         setToken(authToken);
-        
+
         toast.success(`Logged in as ${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)}`);
         return true;
       } else {
@@ -110,11 +113,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('🔐 AuthContext: Processing SSO login', ssoData);
 
       if (ssoData.success && ssoData.data) {
-        const { user: userData, token: authToken } = ssoData.data;
+        const { user: userData, token: authToken, refreshToken } = ssoData.data;
 
         // Store in localStorage
         authService.setToken(authToken);
         authService.setUser(userData);
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+        }
 
         // Update state
         setIsAuthenticated(true);
@@ -138,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     authService.logout();
+    localStorage.removeItem('refreshToken');
     setIsAuthenticated(false);
     setUserRole(null);
     setUserId(null);

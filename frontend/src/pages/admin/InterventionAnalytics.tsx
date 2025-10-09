@@ -115,60 +115,55 @@ const InterventionAnalytics: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // For now, we'll use the existing intervention details API
-      // In a real implementation, you'd have a dedicated analytics endpoint
-      const response = await interventionAPI.getInterventionById(interventionId!);
-      
-      // Mock analytics data based on intervention details
-      const intervention = response.data;
-      
-      const mockAnalytics: AnalyticsData = {
+      // Fetch real analytics data from API
+      const analyticsResponse = await interventionAPI.getInterventionAnalytics(interventionId!);
+      const analyticsData = analyticsResponse.data;
+
+      // Transform API response to match our interface
+      const transformedAnalytics: AnalyticsData = {
         intervention: {
-          id: intervention.id,
-          name: intervention.name,
-          description: intervention.description,
-          status: intervention.status,
-          start_date: intervention.start_date,
-          end_date: intervention.end_date,
-          max_students: intervention.max_students || 100,
-          enrolled_count: intervention.enrolled_count || 0,
+          id: analyticsData.intervention.id,
+          name: analyticsData.intervention.name,
+          description: '', // Not provided in analytics API
+          status: analyticsData.intervention.status,
+          start_date: '', // Not provided in analytics API
+          end_date: '', // Not provided in analytics API
+          max_students: analyticsData.enrollment.max_capacity,
+          enrolled_count: analyticsData.enrollment.total_enrolled,
         },
         enrollment: {
-          totalEnrolled: intervention.enrolled_count || 0,
-          enrollmentRate: intervention.max_students ? 
-            ((intervention.enrolled_count || 0) / intervention.max_students) * 100 : 0,
-          activeStudents: Math.floor((intervention.enrolled_count || 0) * 0.85),
-          completedStudents: Math.floor((intervention.enrolled_count || 0) * 0.15),
+          totalEnrolled: analyticsData.enrollment.total_enrolled,
+          enrollmentRate: parseFloat(analyticsData.enrollment.capacity_utilization.replace('%', '')),
+          activeStudents: analyticsData.enrollment.by_status?.active || 0,
+          completedStudents: analyticsData.enrollment.by_status?.completed || 0,
         },
         microcompetencies: {
-          totalAssigned: intervention.microcompetencies?.length || 0,
-          averageScore: 78.5,
-          completionRate: 65,
-          topPerforming: [],
-          lowPerforming: [],
+          totalAssigned: analyticsData.scoring.total_microcompetencies,
+          averageScore: analyticsData.scoring.average_score,
+          completionRate: analyticsData.scoring.scoring_progress,
+          topPerforming: [], // Would need additional API call
+          lowPerforming: [], // Would need additional API call
         },
         tasks: {
-          totalTasks: 12,
-          completedTasks: 8,
-          averageTaskScore: 82.3,
-          taskCompletionRate: 67,
-          overdueSubmissions: 3,
+          totalTasks: 0, // Would need additional API call for task data
+          completedTasks: 0, // Would need additional API call for task data
+          averageTaskScore: 0, // Would need additional API call for task data
+          taskCompletionRate: 0, // Would need additional API call for task data
+          overdueSubmissions: 0, // Would need additional API call for task data
         },
         teachers: {
-          totalAssigned: intervention.teachers?.length || 0,
-          activeTeachers: Math.max(1, intervention.teachers?.length || 0),
-          teacherWorkload: [],
+          totalAssigned: 0, // Would need additional API call for teacher data
+          activeTeachers: 0, // Would need additional API call for teacher data
+          teacherWorkload: [], // Would need additional API call for teacher data
         },
         timeline: {
-          daysRemaining: Math.max(0, Math.ceil(
-            (new Date(intervention.end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-          )),
-          progressPercentage: 45,
-          milestones: [],
+          daysRemaining: analyticsData.intervention.duration_days || 0,
+          progressPercentage: analyticsData.scoring.scoring_progress || 0,
+          milestones: [], // Would need additional API call for milestone data
         },
       };
 
-      setAnalyticsData(mockAnalytics);
+      setAnalyticsData(transformedAnalytics);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch analytics data';
       setError(errorMessage);

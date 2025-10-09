@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, requireRole } = require('../middleware/auth');
+const { validateInput, validationSchemas } = require('../middleware/weightageValidation');
+const { validateCascadeDelete } = require('../middleware/businessLogicValidation');
+const { withTransaction } = require('../utils/transactionWrapper');
 const {
   getAllQuadrants,
   getQuadrantById,
@@ -14,16 +17,16 @@ const {
 /**
  * @route   GET /api/v1/quadrants
  * @desc    Get all quadrants
- * @access  Public
+ * @access  Authenticated users only
  */
-router.get('/', getAllQuadrants);
+router.get('/', authenticateToken, getAllQuadrants);
 
 /**
  * @route   GET /api/v1/quadrants/stats
  * @desc    Get quadrant statistics
- * @access  Public
+ * @access  Authenticated users only
  */
-router.get('/stats', getQuadrantStats);
+router.get('/stats', authenticateToken, getQuadrantStats);
 
 /**
  * @route   GET /api/v1/quadrants/:id/hierarchy
@@ -41,9 +44,9 @@ router.get('/:id/hierarchy',
 /**
  * @route   GET /api/v1/quadrants/:id
  * @desc    Get quadrant by ID
- * @access  Public
+ * @access  Authenticated users only
  */
-router.get('/:id', getQuadrantById);
+router.get('/:id', authenticateToken, getQuadrantById);
 
 /**
  * @route   POST /api/v1/quadrants
@@ -53,6 +56,7 @@ router.get('/:id', getQuadrantById);
 router.post('/',
   authenticateToken,
   requireRole('admin'),
+  validateInput(validationSchemas.createQuadrant),
   createQuadrant
 );
 
@@ -69,6 +73,18 @@ router.put('/:id',
 );
 
 /**
+ * @route   PATCH /api/v1/quadrants/:id
+ * @desc    Partially update quadrant
+ * @access  Admin
+ * @params  id: quadrant ID
+ */
+router.patch('/:id',
+  authenticateToken,
+  requireRole('admin'),
+  updateQuadrant
+);
+
+/**
  * @route   DELETE /api/v1/quadrants/:id
  * @desc    Delete quadrant (soft delete)
  * @access  Admin
@@ -77,7 +93,8 @@ router.put('/:id',
 router.delete('/:id',
   authenticateToken,
   requireRole('admin'),
-  deleteQuadrant
+  validateCascadeDelete('quadrant'),
+  withTransaction(deleteQuadrant)
 );
 
 module.exports = router;

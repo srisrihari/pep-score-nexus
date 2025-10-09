@@ -12,6 +12,8 @@ export interface LoginResponse {
       status: string;
     };
     token: string;
+    refreshToken?: string;
+    profile?: any;
   };
   timestamp: string;
 }
@@ -28,15 +30,17 @@ export interface RegisterResponse {
       status: string;
     };
     token: string;
+    refreshToken?: string;
+    profile?: any;
   };
   timestamp: string;
 }
 
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export const authService = {
   async login(username: string, password: string): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +58,7 @@ export const authService = {
     name: string;
     role: 'student' | 'teacher' | 'admin';
   }): Promise<RegisterResponse> {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +70,7 @@ export const authService = {
   },
 
   async getProfile(token: string) {
-    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/profile`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -107,10 +111,24 @@ export const authService = {
     return this.login('admin', 'admin123');
   },
 
+  // Refresh token management
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  },
+
+  setRefreshToken(refreshToken: string): void {
+    localStorage.setItem('refreshToken', refreshToken);
+  },
+
+  removeRefreshToken(): void {
+    localStorage.removeItem('refreshToken');
+  },
+
   // Logout
   logout(): void {
     this.removeToken();
     this.removeUser();
+    this.removeRefreshToken();
   }
 };
 

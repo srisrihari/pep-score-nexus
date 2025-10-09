@@ -94,7 +94,7 @@ const InputScores: React.FC = () => {
     try {
       const [studentsResponse, interventionsResponse, teachersResponse] = await Promise.all([
         adminAPI.getAllStudents({ termId: selectedTerm?.id }),
-        interventionAPI.getAllInterventions(),
+        adminAPI.getAllInterventions(),
         adminAPI.getAllTeachers()
       ]);
 

@@ -2,7 +2,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export type StatusType = "Good" | "Progress" | "Deteriorate" | "Cleared" | "Not Cleared" | "Attendance Shortage" | "IC" | "Not Scored";
+export type StatusType = "Good" | "Progress" | "Deteriorate" | "Cleared" | "Not Cleared" | "Incomplete" | "Attendance Shortage" | "IC" | "Not Scored";
 
 interface StatusBadgeProps {
   status: StatusType;
@@ -19,9 +19,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) => {
       case "Deteriorate":
         return "bg-red-500 text-white";
       case "Cleared":
-        return "bg-blue-500 text-white";
+        return "bg-green-600 text-white";
       case "Not Cleared":
-        return "bg-orange-500 text-white";
+        return "bg-red-600 text-white";
+      case "Incomplete":
+        return "bg-gray-500 text-white";
       case "Attendance Shortage":
         return "bg-purple-500 text-white";
       case "IC":

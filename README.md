@@ -159,12 +159,18 @@ pep-score-nexus/
 # 1. Start PostgreSQL service
 sudo systemctl start postgresql
 
-# 2. Create database and tables
+# 2. Create database
 psql -U postgres -h localhost -c "CREATE DATABASE pep_score_nexus;"
-psql -U postgres -h localhost -d pep_score_nexus -f database_setup.sql
 
-# 3. Insert sample data
-psql -U postgres -h localhost -d pep_score_nexus -f sample_data.sql
+# 3. Restore schema + data from Supabase backup (recommended)
+# Option A: Plain SQL backup
+psql -U postgres -h localhost -d pep_score_nexus -f "seed_data(Supabase Backup)/pep_full_backup_2025-10-09_1313.sql"
+
+# Option B: Custom dump (use pg_restore)
+pg_restore \
+  -h localhost -U postgres -d pep_score_nexus \
+  --no-owner --no-privileges --clean \
+  "seed_data(Supabase Backup)/pep_full_backup_2025-10-09_1313.dump"
 
 # 4. Setup pgAdmin for team access (optional)
 ./team_pgadmin_setup.sh
@@ -197,6 +203,20 @@ npm run dev
 # Or use Bun: bun dev
 # Frontend runs on http://localhost:8080
 ```
+
+### 🔧 Environment Configuration (New)
+
+Use the examples in `deployment/` as your starting point:
+
+```bash
+cp deployment/backend.env.example backend/.env
+cp deployment/frontend.env.example frontend/.env
+```
+
+- Backend requires `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (or `SUPABASE_ANON_KEY`) and `JWT_SECRET`.
+- Frontend requires `VITE_API_BASE_URL` (e.g., `http://localhost:3001`).
+
+See `deployment/README.md` for detailed deployment steps.
 
 #### ✅ **Verify Setup**
 ```bash
@@ -240,8 +260,18 @@ npm test           # Run tests (when implemented)
 # Test database connection
 psql -U postgres -h localhost -d pep_score_nexus
 
-# Backup database
-pg_dump -U postgres -h localhost -d pep_score_nexus > backup.sql
+# Backup database (cloud/Supabase via pg_dump 17)
+# Custom dump (recommended for restore)
+pg_dump \
+  "postgresql://<USER>:<PASSWORD>@<HOST>:5432/<DB>?sslmode=require" \
+  --format=custom --no-owner --no-privileges \
+  -f seed_data/pep_full_backup_$(date +%F_%H%M).dump
+
+# Plain SQL
+pg_dump \
+  "postgresql://<USER>:<PASSWORD>@<HOST>:5432/<DB>?sslmode=require" \
+  --format=plain --no-owner --no-privileges \
+  -f seed_data/pep_full_backup_$(date +%F_%H%M).sql
 
 # Test APIs
 ./test_apis.sh
@@ -292,6 +322,37 @@ The PostgreSQL database schema is compatible with:
 - ✅ **Railway** (Development)
 
 See [Database Architecture](docs/database/PEP_Score_Nexus_Database_Architecture.md) for detailed deployment instructions.
+
+### 📦 Production Deployment (New)
+
+Refer to `deployment/README.md` for a concise, step‑by‑step guide to configure environment variables, install dependencies, and run backend/frontend in production. Environment example files are included in `deployment/`.
+
+## 📥 Student Import Guide (Admin)
+
+Import is done with Excel (.xlsx/.xls) via Admin → Manage Students → Import Students dialog.
+
+- Accepted file types: `.xlsx`, `.xls` (CSV is not accepted by the API)
+- Required columns: `name, email, registration_no`
+- Optional columns: `password, course, batch, section, gender, phone`
+- Default password when not provided: the `registration_no`
+- Batch/Section: must already exist (matched by name)
+
+Backend endpoint used by the UI:
+
+```
+POST /api/v1/uploads/excel-import
+Headers: Authorization: Bearer <admin token>
+Body: multipart/form-data (file=<excel>, importType=students)
+```
+
+Troubleshooting:
+- "Imported but not visible": check per‑row errors returned by API (duplicates, missing fields, unknown batch/section).
+- Ensure `VITE_API_BASE_URL` points to your backend; the UI uses that base URL for uploads.
+
+## 🔎 Admin List Search & Pagination (UI)
+
+- Search filters are sent to the backend; clicking Search refreshes results.
+- Pagination honors page size; if backend returns full list, the UI slices page‑wise.
 
 ## 🤝 Contributing
 

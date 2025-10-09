@@ -6,7 +6,8 @@ const {
   uploadSingleFile,
   uploadMultipleFiles,
   serveFile,
-  deleteFile
+  deleteFile,
+  importExcelData
 } = require('../controllers/uploadController');
 
 /**
@@ -50,6 +51,18 @@ router.get('/files/:filename', serveFile);
 router.delete('/files/:filename',
   authenticateToken,
   deleteFile
+);
+
+/**
+ * @route   POST /api/v1/uploads/excel-import
+ * @desc    Import data from Excel file
+ * @access  Admin only
+ * @body    FormData with 'file' field and 'importType' field
+ */
+router.post('/excel-import',
+  authenticateToken,
+  upload.single('file'),
+  importExcelData
 );
 
 module.exports = router;

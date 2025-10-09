@@ -33,7 +33,13 @@ import {
   Target,
   Calendar,
   TrendingUp,
-  Shield
+  Shield,
+  Activity,
+  UserCog,
+  UserCheck2,
+  Edit3,
+  GitBranch,
+  TrendingUp as TrendingUpIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -48,6 +54,7 @@ export function AppSidebar() {
     { title: "Dashboard", path: "/student", icon: Home },
     { title: "Interventions", path: "/student/interventions", icon: BookOpen },
     { title: "My Tasks", path: "/student/tasks", icon: ClipboardEdit },
+    { title: "Profile Update", path: "/student/profile-update", icon: Edit3 },
     { title: "Improvement Plan", path: "/student/improvement", icon: TrendingUp },
     { title: "Eligibility", path: "/student/eligibility", icon: Shield },
     { title: "Feedback", path: "/student/feedback", icon: MessageSquare },
@@ -69,8 +76,14 @@ export function AppSidebar() {
     { title: "Manage Students", path: "/admin/students", icon: Users },
     { title: "Manage Teachers", path: "/admin/teachers", icon: PenTool },
     { title: "Manage Users", path: "/admin/users", icon: User },
+    { title: "Role Management", path: "/admin/role-management", icon: UserCog },
+    { title: "Profile Approval", path: "/admin/profile-approval", icon: UserCheck2 },
+    { title: "Audit Log", path: "/admin/audit-log", icon: Activity },
     { title: "Term Management", path: "/admin/terms", icon: Calendar },
+    { title: "Batch Progression", path: "/admin/batch-progression", icon: GitBranch },
+    { title: "Level Progression", path: "/admin/level-progression", icon: TrendingUpIcon },
     { title: "Quadrant Management", path: "/admin/quadrants", icon: Target },
+    { title: "Batch-Term Weightages", path: "/admin/batch-term-weightages", icon: Settings },
     { title: "Interventions", path: "/admin/interventions", icon: BookOpen },
     { title: "Manage Tasks", path: "/admin/tasks", icon: ClipboardEdit },
     { title: "Input Scores", path: "/admin/scores", icon: ClipboardEdit },

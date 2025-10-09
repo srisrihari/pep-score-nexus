@@ -31,6 +31,10 @@ const {
   getStudentInterventionPerformance
 } = require('../controllers/studentController');
 const { authenticateToken, requireRole } = require('../middleware/auth');
+const { validateInput, validationSchemas } = require('../middleware/weightageValidation');
+const { authorizeStudentAccess } = require('../middleware/resourceAuthorization');
+const { paginateSearchFilter } = require('../middleware/pagination');
+const { successResponse, paginatedResponse } = require('../utils/responseFormatter');
 
 // @route   GET /api/v1/students/me
 // @desc    Get current student's profile
@@ -69,7 +73,7 @@ router.get('/eligibility-rules', authenticateToken, getEligibilityRules);
 // @desc    Get student performance data for dashboard
 // @access  Students (own data), Teachers, Admins
 // @query   termId, includeHistory
-router.get('/:studentId/performance', authenticateToken, getStudentPerformance);
+router.get('/:studentId/performance', authenticateToken, authorizeStudentAccess, getStudentPerformance);
 
 // @route   GET /api/v1/students/:studentId/leaderboard
 // @desc    Get student leaderboard and rankings
@@ -101,12 +105,12 @@ router.get('/:studentId/feedback', authenticateToken, getFeedbackHistory);
 // @route   GET /api/v1/students/:studentId/profile
 // @desc    Get student profile information
 // @access  Students (own data), Teachers, Admins
-router.get('/:studentId/profile', authenticateToken, getStudentProfile);
+router.get('/:studentId/profile', authenticateToken, authorizeStudentAccess, getStudentProfile);
 
 // @route   PUT /api/v1/students/:studentId/profile
 // @desc    Update student profile
 // @access  Students (own data), Admins
-router.put('/:studentId/profile', authenticateToken, updateStudentProfile);
+router.put('/:studentId/profile', authenticateToken, authorizeStudentAccess, updateStudentProfile);
 
 // @route   POST /api/v1/students/:studentId/change-password
 // @desc    Change student password
@@ -200,7 +204,16 @@ router.get('/filter-options', authenticateToken, requireRole('teacher', 'admin')
 // @desc    Get all students with enhanced pagination and filters
 // @access  Teachers, Admins
 // @query   page, limit, search, batch, section, status, course, house, batch_ids, batch_years, courses, sections, houses, exclude_enrolled
-router.get('/', authenticateToken, requireRole('teacher', 'admin'), getAllStudents);
+router.get('/',
+  authenticateToken,
+  requireRole('teacher', 'admin'),
+  ...paginateSearchFilter('students', {
+    allowedFilters: ['batch_id', 'section_id', 'house_id', 'is_active', 'course'],
+    searchFields: ['name', 'registration_no', 'course'],
+    defaultSort: 'name'
+  }),
+  getAllStudents
+);
 
 // @route   GET /api/v1/students/:id
 // @desc    Get student by ID with detailed information
@@ -210,7 +223,12 @@ router.get('/:id', authenticateToken, requireRole('teacher', 'admin'), getStuden
 // @route   POST /api/v1/students
 // @desc    Create new student
 // @access  Admin only
-router.post('/', authenticateToken, requireRole('admin'), createStudent);
+router.post('/',
+  authenticateToken,
+  requireRole('admin'),
+  validateInput(validationSchemas.createStudent),
+  createStudent
+);
 
 // @route   POST /api/v1/students/create-for-user
 // @desc    Create student record for existing user (temporary helper)

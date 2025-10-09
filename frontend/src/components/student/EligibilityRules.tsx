@@ -2,39 +2,34 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { GRADING_SCALE, QUADRANT_WEIGHTAGE } from '@/utils/gradeUtils';
 
 const EligibilityRules: React.FC = () => {
   const eligibilityRules = [
     {
       quadrant: 'Persona',
+      weightage: `${QUADRANT_WEIGHTAGE.Persona}%`,
       attendanceRequired: '80%',
       otherRequirements: 'Completion of all SHL competency assessments and Professional Readiness components'
     },
     {
       quadrant: 'Wellness',
+      weightage: `${QUADRANT_WEIGHTAGE.Wellness}%`,
       attendanceRequired: '80%',
       otherRequirements: 'Participation in all fitness tests and wellness activities'
     },
     {
       quadrant: 'Behavior',
+      weightage: `${QUADRANT_WEIGHTAGE.Behavior}%`,
       attendanceRequired: '80%',
       otherRequirements: 'Minimum score of 2 in each behavior component'
     },
     {
       quadrant: 'Discipline',
+      weightage: `${QUADRANT_WEIGHTAGE.Discipline}%`,
       attendanceRequired: '80%',
       otherRequirements: 'No disciplinary actions or violations of code of conduct'
     }
-  ];
-
-  const gradingScale = [
-    { grade: 'A+', range: '80-100', description: 'Excellent' },
-    { grade: 'A', range: '66-79', description: 'Good' },
-    { grade: 'B', range: '50-65', description: 'Average' },
-    { grade: 'C', range: '40-49', description: 'Marginal' },
-    { grade: 'D', range: '34-39', description: 'Poor' },
-    { grade: 'E', range: 'Below 34', description: 'Very Poor' },
-    { grade: 'IC', range: 'N/A', description: 'Incomplete' }
   ];
 
   return (
@@ -48,6 +43,7 @@ const EligibilityRules: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Quadrant</TableHead>
+                <TableHead>Weightage</TableHead>
                 <TableHead>Attendance Required</TableHead>
                 <TableHead>Other Requirements</TableHead>
               </TableRow>
@@ -56,6 +52,9 @@ const EligibilityRules: React.FC = () => {
               {eligibilityRules.map((rule) => (
                 <TableRow key={rule.quadrant}>
                   <TableCell className="font-medium">{rule.quadrant}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{rule.weightage}</Badge>
+                  </TableCell>
                   <TableCell>{rule.attendanceRequired}</TableCell>
                   <TableCell>{rule.otherRequirements}</TableCell>
                 </TableRow>
@@ -80,15 +79,15 @@ const EligibilityRules: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {gradingScale.map((grade) => (
+              {GRADING_SCALE.map((grade) => (
                 <TableRow key={grade.grade}>
                   <TableCell>
                     <Badge variant={
-                      grade.grade === 'A+' ? "default" : 
-                      grade.grade === 'A' ? "secondary" : 
-                      grade.grade === 'B' ? "outline" : 
-                      grade.grade === 'IC' ? "destructive" : 
-                      "destructive"
+                      grade.grade === 'A+' ? "default" :
+                      grade.grade === 'A' ? "secondary" :
+                      grade.grade === 'B' ? "outline" :
+                      ['D', 'E', 'IC', 'NC'].includes(grade.grade) ? "destructive" :
+                      "outline"
                     }>
                       {grade.grade}
                     </Badge>
@@ -96,13 +95,13 @@ const EligibilityRules: React.FC = () => {
                   <TableCell>{grade.range}</TableCell>
                   <TableCell>{grade.description}</TableCell>
                   <TableCell>
-                    {grade.grade === 'IC' ? (
-                      <Badge variant="destructive">Not Cleared</Badge>
-                    ) : grade.grade === 'E' || grade.grade === 'D' ? (
-                      <Badge variant="destructive">Not Cleared</Badge>
-                    ) : (
-                      <Badge variant="default">Cleared</Badge>
-                    )}
+                    <Badge variant={
+                      grade.status === 'Cleared' ? "default" :
+                      grade.status === 'Not Cleared' ? "destructive" :
+                      "secondary"
+                    }>
+                      {grade.status}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}

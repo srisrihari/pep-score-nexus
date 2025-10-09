@@ -46,6 +46,7 @@ export interface QuadrantData {
   description?: string;
   weightage: number;
   obtained: number;
+  maxScore: number; // Maximum possible score for this quadrant
   components: Component[]; // Legacy flat structure
   sub_categories?: SubCategory[]; // NEW: Hierarchical structure
   status: StatusType;
@@ -150,6 +151,7 @@ export const studentData: Student = {
           name: "Persona",
           weightage: 50, // Updated to match Excel (50 instead of 40)
           obtained: 45,
+          maxScore: 50, // Maximum possible score for this quadrant
           status: "Cleared",
           attendance: 90,
           eligibility: "Eligible",
@@ -200,6 +202,7 @@ export const studentData: Student = {
           name: "Wellness",
           weightage: 30,
           obtained: 28,
+          maxScore: 30,
           status: "Cleared",
           attendance: 85,
           eligibility: "Eligible",
@@ -229,6 +232,7 @@ export const studentData: Student = {
           name: "Behavior",
           weightage: 10, // Updated to match Excel (10 instead of 20)
           obtained: 9,
+          maxScore: 10,
           status: "Cleared",
           components: [
             {
@@ -253,6 +257,7 @@ export const studentData: Student = {
           name: "Discipline",
           weightage: 10,
           obtained: 8,
+          maxScore: 10,
           status: "Cleared",
           components: [
             { id: "attendance", name: "Overall Attendance", score: 90, maxScore: 100 },
@@ -333,6 +338,7 @@ export const studentData: Student = {
           name: "Wellness",
           weightage: 30,
           obtained: 26,
+          maxScore: 30,
           status: "Cleared",
           attendance: 82,
           eligibility: "Eligible",
@@ -351,6 +357,7 @@ export const studentData: Student = {
           name: "Behavior",
           weightage: 10,
           obtained: 8,
+          maxScore: 10,
           status: "Cleared",
           components: [
             { id: "prepares-class", name: "Prepares for Class", score: 4, maxScore: 5 },
@@ -365,6 +372,7 @@ export const studentData: Student = {
           name: "Discipline",
           weightage: 10,
           obtained: 9,
+          maxScore: 10,
           status: "Cleared",
           components: [
             { id: "attendance", name: "Overall Attendance", score: 88, maxScore: 100 },
@@ -445,6 +453,7 @@ export const studentData: Student = {
           name: "Wellness",
           weightage: 30,
           obtained: 27,
+          maxScore: 30,
           status: "Cleared",
           attendance: 88,
           eligibility: "Eligible",
@@ -463,6 +472,7 @@ export const studentData: Student = {
           name: "Behavior",
           weightage: 10,
           obtained: 9,
+          maxScore: 10,
           status: "Cleared",
           components: [
             { id: "prepares-class", name: "Prepares for Class", score: 4, maxScore: 5 },
@@ -477,6 +487,7 @@ export const studentData: Student = {
           name: "Discipline",
           weightage: 10,
           obtained: 9,
+          maxScore: 10,
           status: "Cleared",
           components: [
             { id: "attendance", name: "Overall Attendance", score: 92, maxScore: 100 },
@@ -524,6 +535,7 @@ export const studentData: Student = {
       name: "Wellness",
       weightage: 30,
       obtained: 28,
+      maxScore: 30,
       status: "Cleared",
       attendance: 85,
       eligibility: "Eligible",
@@ -542,6 +554,7 @@ export const studentData: Student = {
       name: "Behavior",
       weightage: 10, // Updated to match Excel (10 instead of 20)
       obtained: 9,
+      maxScore: 10,
       status: "Cleared",
       components: [
         { id: "prepares-class", name: "Prepares for Class", score: 3, maxScore: 5 },
@@ -556,6 +569,7 @@ export const studentData: Student = {
       name: "Discipline",
       weightage: 10,
       obtained: 8,
+      maxScore: 10,
       status: "Cleared",
       components: [
         { id: "attendance", name: "Overall Attendance", score: 90, maxScore: 100 },

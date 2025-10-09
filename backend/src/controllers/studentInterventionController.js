@@ -39,7 +39,8 @@ const getStudentInterventionScores = async (req, res) => {
           description,
           start_date,
           end_date,
-          status
+          status,
+          term_id
         )
       `)
       .eq('student_id', studentId)
@@ -69,33 +70,33 @@ const getStudentInterventionScores = async (req, res) => {
     for (const enrollment of interventionsResult.rows) {
       const intervention = enrollment.interventions;
       
-      // Get total intervention score
+      // Get total intervention score (using term_id in unified system)
       const totalScoreResult = await query(
         supabase
           .from('student_intervention_scores')
           .select('*')
           .eq('student_id', studentId)
-          .eq('intervention_id', intervention.id)
+          .eq('term_id', intervention.term_id)
       );
 
-      // Get quadrant scores
+      // Get quadrant scores (using term_id instead of intervention_id in unified system)
       const quadrantScoresResult = await query(
         supabase
           .from('student_quadrant_scores')
           .select('*')
           .eq('student_id', studentId)
-          .eq('intervention_id', intervention.id)
+          .eq('term_id', intervention.term_id)
           .order('quadrant_name', { ascending: true })
       );
 
-      // Get competency scores
+      // Get competency scores (using term_id instead of intervention_id in unified system)
       const competencyScoresResult = await query(
         supabase
           .from('student_competency_scores')
           .select('*')
           .eq('student_id', studentId)
-          .eq('intervention_id', intervention.id)
-          .order('competency_name', { ascending: true })
+          .eq('term_id', intervention.term_id)
+          .order('component_name', { ascending: true })
       );
 
       // Get microcompetency scores
@@ -131,7 +132,7 @@ const getStudentInterventionScores = async (req, res) => {
             )
           `)
           .eq('student_id', studentId)
-          .eq('intervention_id', intervention.id)
+          .eq('term_id', intervention.term_id)
           .order('scored_at', { ascending: false })
       );
 
@@ -195,7 +196,7 @@ const getInterventionScoreBreakdown = async (req, res) => {
     const interventionCheck = await query(
       supabase
         .from('interventions')
-        .select('id, name, description, start_date, end_date, status')
+        .select('id, name, description, start_date, end_date, status, term_id')
         .eq('id', interventionId)
     );
 

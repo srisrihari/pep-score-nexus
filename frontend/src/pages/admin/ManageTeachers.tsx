@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { adminAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
+import { ErrorHandler, FormErrors } from "@/utils/errorHandling";
 
 // Teacher interface
 interface Teacher {
@@ -65,6 +66,7 @@ const ManageTeachers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   // Assignment management state
   const [interventions, setInterventions] = useState<any[]>([]);

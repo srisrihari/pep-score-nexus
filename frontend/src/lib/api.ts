@@ -1,4 +1,11 @@
-const API_BASE_URL = 'http://localhost:3001/api/v1';
+import { toast } from 'sonner';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+
+// Make toast available globally for error handling
+if (typeof window !== 'undefined') {
+  (window as any).toast = toast;
+}
 
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
@@ -14,19 +21,84 @@ const createHeaders = (): HeadersInit => {
   };
 };
 
-// Generic API request function
+// Token refresh function
+const refreshToken = async (): Promise<string | null> => {
+  try {
+    const refreshTokenValue = localStorage.getItem('refreshToken');
+    if (!refreshTokenValue) {
+      return null;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        refreshToken: refreshTokenValue
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && data.data.token) {
+        localStorage.setItem('authToken', data.data.token);
+        if (data.data.refreshToken) {
+          localStorage.setItem('refreshToken', data.data.refreshToken);
+        }
+        return data.data.token;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    return null;
+  }
+};
+
+// Generic API request function with automatic token refresh
 const apiRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
   const url = `${API_BASE_URL}${endpoint}`;
-  const config: RequestInit = {
-    headers: createHeaders(),
-    ...options,
+
+  const makeRequest = async (headers: HeadersInit): Promise<Response> => {
+    const config: RequestInit = {
+      headers,
+      ...options,
+    };
+    return await fetch(url, config);
   };
 
   try {
-    const response = await fetch(url, config);
+    // First attempt with current token
+    let response = await makeRequest(createHeaders());
+
+    // If unauthorized and we have a refresh token, try to refresh
+    if (response.status === 401) {
+      const newToken = await refreshToken();
+      if (newToken) {
+        // Retry with new token
+        const newHeaders = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${newToken}`,
+        };
+        response = await makeRequest(newHeaders);
+      } else {
+        // Refresh failed, redirect to login
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userData');
+
+        // Show a toast notification
+        toast.error('Your session has expired. Please log in again.');
+
+        // Redirect to login with error message
+        window.location.href = '/login?error=session_expired&message=Your%20session%20has%20expired.%20Please%20log%20in%20again.';
+        throw new Error('Token expired');
+      }
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -54,7 +126,7 @@ export const authAPI = {
         role: string;
         name: string;
       };
-    }>('/auth/login', {
+    }>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
@@ -70,7 +142,220 @@ export const authAPI = {
         role: string;
         name: string;
       };
-    }>('/auth/profile');
+    }>('/api/v1/auth/profile');
+  },
+};
+
+// Batch Progression API calls
+export const batchProgressionAPI = {
+  getAllBatchesWithProgression: async () => {
+    return apiRequest<{
+      success: boolean;
+      data: Array<{
+        id: string;
+        name: string;
+        year: number;
+        current_term_number: number;
+        max_terms: number;
+        batch_status: string;
+        student_count: number;
+        progressions: Array<{
+          term_number: number;
+          status: string;
+          students_enrolled: number;
+          students_completed: number;
+          students_failed: number;
+          start_date: string;
+          end_date: string;
+        }>;
+        currentTermStats: {
+          enrolled: number;
+          active: number;
+          completed: number;
+          failed: number;
+        };
+      }>;
+      timestamp: string;
+    }>('/api/v1/level-progression/batches');
+  },
+
+  getBatchProgressionStatus: async (batchId: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: {
+        batch: {
+          id: string;
+          name: string;
+          current_term_number: number;
+          max_terms: number;
+          batch_status: string;
+          student_count: number;
+        };
+        progressions: Array<{
+          term_number: number;
+          status: string;
+          students_enrolled: number;
+          students_completed: number;
+          students_failed: number;
+          start_date: string;
+          end_date: string;
+        }>;
+        currentTermStats: {
+          enrolled: number;
+          active: number;
+          completed: number;
+          failed: number;
+        };
+      };
+    }>(`/api/v1/level-progression/batches/${batchId}/progression-status`);
+  },
+
+  initializeBatchProgression: async (batchId: string, progressionPlan: any) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/level-progression/batches/${batchId}/initialize-progression`, {
+      method: 'POST',
+      body: JSON.stringify(progressionPlan),
+    });
+  },
+
+  completeBatchTerm: async (batchId: string, termNumber: number) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/level-progression/batches/${batchId}/complete-term/${termNumber}`, {
+      method: 'POST',
+      body: JSON.stringify({ triggeredBy: 'admin' }),
+    });
+  },
+};
+
+// Level Progression API calls
+export const levelProgressionAPI = {
+  getStudentLevelProgression: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: {
+        current_level: number;
+        level_name: string;
+        eligibility_status: string;
+        attendance_percentage: number;
+        attendance_threshold: number;
+        quadrant_clearance: {
+          persona: boolean;
+          wellness: boolean;
+          behavior: boolean;
+          discipline: boolean;
+        };
+        next_level_requirements: {
+          attendance_required: number;
+          quadrant_thresholds: Record<string, number>;
+        };
+        progression_history: Array<{
+          level: number;
+          completed_date: string;
+          status: string;
+        }>;
+        can_progress: boolean;
+      };
+    }>(`/api/v1/level-progression/students/${studentId}/level-progression?termId=${termId}`);
+  },
+
+  getStudentRankings: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: {
+        overall_ranking: {
+          rank_position: number;
+          total_students: number;
+          score: number;
+          grade: string;
+        };
+        quadrant_rankings: Record<string, {
+          rank_position: number;
+          total_students: number;
+          score: number;
+        }>;
+      };
+    }>(`/api/v1/level-progression/students/${studentId}/rankings?termId=${termId}`);
+  },
+
+  updateAttendanceEligibility: async (studentId: string, attendanceData: any) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/level-progression/students/${studentId}/attendance-eligibility`, {
+      method: 'POST',
+      body: JSON.stringify(attendanceData),
+    });
+  },
+};
+
+// Term Management API calls
+export const termManagementAPI = {
+  createTerm: async (termData: any) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>('/api/v1/level-progression/terms/create', {
+      method: 'POST',
+      body: JSON.stringify(termData),
+    });
+  },
+
+  activateTerm: async (termId: string, triggeredBy?: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/level-progression/terms/${termId}/activate`, {
+      method: 'POST',
+      body: JSON.stringify({ triggeredBy }),
+    });
+  },
+
+  completeTerm: async (termId: string, triggeredBy?: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/level-progression/terms/${termId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({ triggeredBy }),
+    });
+  },
+
+  archiveTerm: async (termId: string, triggeredBy?: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/level-progression/terms/${termId}/archive`, {
+      method: 'POST',
+      body: JSON.stringify({ triggeredBy }),
+    });
+  },
+
+  getTermLifecycleStatus: async (termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+    }>(`/api/v1/level-progression/terms/${termId}/lifecycle-status`);
+  },
+
+  autoTransitionTerms: async () => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>('/api/v1/level-progression/terms/auto-transition', {
+      method: 'POST',
+    });
   },
 };
 
@@ -117,7 +402,7 @@ export const studentAPI = {
           };
         };
       };
-    }>('/auth/profile');
+    }>('/api/v1/auth/profile');
 
     if (!profileResponse.data.profile) {
       throw new Error('Student profile not found. Please contact your administrator to set up your student profile.');
@@ -183,7 +468,7 @@ export const studentAPI = {
           totalStudents: number;
         };
       };
-    }>(`/students/${studentId}/performance${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/performance${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Leaderboard API
@@ -207,7 +492,7 @@ export const studentAPI = {
           batchBest: number;
         }>;
       };
-    }>(`/students/${studentId}/leaderboard${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/leaderboard${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Attendance API
@@ -237,7 +522,7 @@ export const studentAPI = {
           overall: number;
         }>;
       };
-    }>(`/students/${studentId}/attendance${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/attendance${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Score Breakdown API
@@ -269,7 +554,7 @@ export const studentAPI = {
           }>;
         }>;
       };
-    }>(`/students/${studentId}/scores/breakdown${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/scores/breakdown${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Quadrant Details API
@@ -313,7 +598,7 @@ export const studentAPI = {
           userRank: number;
         };
       };
-    }>(`/students/${studentId}/quadrants/${quadrantId}${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/quadrants/${quadrantId}${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Feedback APIs
@@ -333,7 +618,7 @@ export const studentAPI = {
         status: string;
         submittedAt: string;
       };
-    }>(`/students/${studentId}/feedback`, {
+    }>(`/api/v1/students/${studentId}/feedback`, {
       method: 'POST',
       body: JSON.stringify(feedbackData),
     });
@@ -365,7 +650,7 @@ export const studentAPI = {
           itemsPerPage: number;
         };
       };
-    }>(`/students/${studentId}/feedback${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/feedback${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Profile Management APIs
@@ -387,7 +672,7 @@ export const studentAPI = {
         createdAt: string;
         updatedAt: string;
       };
-    }>(`/students/${studentId}/profile`);
+    }>(`/api/v1/students/${studentId}/profile`);
   },
 
   updateStudentProfile: async (studentId: string, profileData: {
@@ -407,7 +692,7 @@ export const studentAPI = {
         preferences: any;
         updatedAt: string;
       };
-    }>(`/students/${studentId}/profile`, {
+    }>(`/api/v1/students/${studentId}/profile`, {
       method: 'PUT',
       body: JSON.stringify(profileData),
     });
@@ -421,7 +706,7 @@ export const studentAPI = {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/students/${studentId}/change-password`, {
+    }>(`/api/v1/students/${studentId}/change-password`, {
       method: 'POST',
       body: JSON.stringify(passwordData),
     });
@@ -444,7 +729,7 @@ export const studentAPI = {
           description: string;
         }>;
       };
-    }>('/students/eligibility-rules');
+    }>('/api/v1/students/eligibility-rules');
   },
 
   checkStudentEligibility: async (studentId: string, termId?: string) => {
@@ -465,7 +750,7 @@ export const studentAPI = {
         }>;
         recommendations: Array<string>;
       };
-    }>(`/students/${studentId}/eligibility${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/eligibility${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Improvement Plan APIs
@@ -496,7 +781,7 @@ export const studentAPI = {
           progress: number;
         }>;
       };
-    }>(`/students/${studentId}/improvement-plan${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/improvement-plan${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   setImprovementGoals: async (studentId: string, goalsData: {
@@ -514,7 +799,7 @@ export const studentAPI = {
         goalsSet: number;
         targetDate: string;
       };
-    }>(`/students/${studentId}/improvement-goals`, {
+    }>(`/api/v1/students/${studentId}/improvement-goals`, {
       method: 'POST',
       body: JSON.stringify(goalsData),
     });
@@ -547,11 +832,14 @@ export const studentAPI = {
         overallBehaviorScore: number;
         recommendations: Array<string>;
       };
-    }>(`/students/${studentId}/behavior-rating-scale${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/behavior-rating-scale${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Get student intervention performance
-  getStudentInterventionPerformance: async (studentId: string) => {
+  getStudentInterventionPerformance: async (studentId: string, termId?: string) => {
+    const params = new URLSearchParams();
+    if (termId) params.append('termId', termId);
+
     return apiRequest<{
       success: boolean;
       message: string;
@@ -587,7 +875,7 @@ export const studentAPI = {
         };
       };
       timestamp: string;
-    }>(`/students/${studentId}/intervention-performance`);
+    }>(`/api/v1/students/${studentId}/intervention-performance${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Get student's enrolled interventions
@@ -634,7 +922,7 @@ export const studentAPI = {
         };
       };
       timestamp: string;
-    }>(`/students/${studentId}/interventions${params.toString() ? '?' + params.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/interventions${params.toString() ? '?' + params.toString() : ''}`);
   },
 
   // Get specific intervention details for a student
@@ -684,7 +972,7 @@ export const studentAPI = {
         }>;
       };
       timestamp: string;
-    }>(`/students/${studentId}/interventions/${interventionId}`);
+    }>(`/api/v1/students/${studentId}/interventions/${interventionId}`);
   },
 
   // Get intervention tasks for a student
@@ -720,7 +1008,7 @@ export const studentAPI = {
         };
       };
       timestamp: string;
-    }>(`/students/${studentId}/interventions/${interventionId}/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
+    }>(`/api/v1/students/${studentId}/interventions/${interventionId}/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
   },
 };
 
@@ -756,7 +1044,7 @@ export const scoreAPI = {
           is_current: boolean;
         };
       };
-    }>(`/scores/student/${studentId}/summary`);
+    }>(`/api/v1/scores/student/${studentId}/summary`);
   },
 
   getStudentScores: async (studentId: string) => {
@@ -794,7 +1082,7 @@ export const scoreAPI = {
           role: string;
         };
       }>;
-    }>(`/scores/student/${studentId}`);
+    }>(`/api/v1/scores/student/${studentId}`);
   },
 };
 
@@ -817,7 +1105,7 @@ export const quadrantAPI = {
       }>;
       count: number;
       timestamp: string;
-    }>('/quadrants');
+    }>('/api/v1/quadrants');
   },
 
   getQuadrantHierarchy: async (id: string, includeInactive = false) => {
@@ -870,7 +1158,7 @@ export const quadrantAPI = {
         }>;
       };
       timestamp: string;
-    }>(`/quadrants/${id}/hierarchy?includeInactive=${includeInactive}`);
+    }>(`/api/v1/quadrants/${id}/hierarchy?includeInactive=${includeInactive}`);
   },
 
   createQuadrant: async (data: {
@@ -886,7 +1174,7 @@ export const quadrantAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>('/quadrants', {
+    }>('/api/v1/quadrants', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -906,7 +1194,7 @@ export const quadrantAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>(`/quadrants/${id}`, {
+    }>(`/api/v1/quadrants/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -918,7 +1206,7 @@ export const quadrantAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>(`/quadrants/${id}`, {
+    }>(`/api/v1/quadrants/${id}`, {
       method: 'DELETE',
     });
   },
@@ -934,7 +1222,7 @@ export const subCategoryAPI = {
     if (params?.quadrant_id) searchParams.append('quadrant_id', params.quadrant_id);
     if (params?.include_inactive) searchParams.append('include_inactive', params.include_inactive.toString());
 
-    const url = `/sub-categories${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/sub-categories${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -983,7 +1271,7 @@ export const subCategoryAPI = {
         }>;
       };
       timestamp: string;
-    }>(`/sub-categories/${id}`);
+    }>(`/api/v1/sub-categories/${id}`);
   },
 
   createSubCategory: async (data: {
@@ -998,7 +1286,7 @@ export const subCategoryAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>('/sub-categories', {
+    }>('/api/v1/sub-categories', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -1016,7 +1304,7 @@ export const subCategoryAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>(`/sub-categories/${id}`, {
+    }>(`/api/v1/sub-categories/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -1028,7 +1316,7 @@ export const subCategoryAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>(`/sub-categories/${id}`, {
+    }>(`/api/v1/sub-categories/${id}`, {
       method: 'DELETE',
     });
   },
@@ -1046,7 +1334,7 @@ export const componentAPI = {
     if (params?.quadrant_id) searchParams.append('quadrant_id', params.quadrant_id);
     if (params?.include_inactive) searchParams.append('include_inactive', params.include_inactive.toString());
 
-    const url = `/components${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/components${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -1106,7 +1394,7 @@ export const componentAPI = {
         }>;
       };
       timestamp: string;
-    }>(`/components/${id}`);
+    }>(`/api/v1/components/${id}`);
   },
 
   createComponent: async (data: {
@@ -1123,7 +1411,7 @@ export const componentAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>('/components', {
+    }>('/api/v1/components', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -1143,7 +1431,7 @@ export const componentAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>(`/components/${id}`, {
+    }>(`/api/v1/components/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -1155,7 +1443,7 @@ export const componentAPI = {
       message: string;
       data: any;
       timestamp: string;
-    }>(`/components/${id}`, {
+    }>(`/api/v1/components/${id}`, {
       method: 'DELETE',
     });
   },
@@ -1202,7 +1490,7 @@ export const adminAPI = {
         }>;
       };
       timestamp: string;
-    }>('/admin/dashboard');
+    }>('/api/v1/admin/dashboard');
   },
 
   searchStudents: async (query: string, limit: number = 10) => {
@@ -1223,7 +1511,7 @@ export const adminAPI = {
         total: number;
       };
       timestamp: string;
-    }>(`/admin/students/search?query=${encodeURIComponent(query)}&limit=${limit}`);
+    }>(`/api/v1/admin/students/search?query=${encodeURIComponent(query)}&limit=${limit}`);
   },
 
 
@@ -1242,7 +1530,7 @@ export const adminAPI = {
     if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
     if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
 
-    const url = `/admin/teachers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/admin/teachers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -1289,7 +1577,7 @@ export const adminAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>('/admin/teachers', {
+    }>('/api/v1/admin/teachers', {
       method: 'POST',
       body: JSON.stringify(teacherData),
     });
@@ -1333,7 +1621,7 @@ export const adminAPI = {
     if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
     if (params?.termId) queryParams.append('termId', params.termId);
 
-    const url = `/admin/students${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/admin/students${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -1414,7 +1702,7 @@ export const adminAPI = {
         }>;
         years: number[];
       };
-    }>('/students/filter-options');
+    }>('/api/v1/students/filter-options');
   },
 
   addStudent: async (studentData: {
@@ -1433,7 +1721,7 @@ export const adminAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>('/admin/students', {
+    }>('/api/v1/admin/students', {
       method: 'POST',
       body: JSON.stringify(studentData),
     });
@@ -1457,7 +1745,7 @@ export const adminAPI = {
     if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
     if (params?.termId) queryParams.append('termId', params.termId);
 
-    const url = `/admin/interventions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/admin/interventions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -1515,7 +1803,7 @@ export const adminAPI = {
     if (params?.interventionId) searchParams.append('interventionId', params.interventionId);
     if (params?.quadrantId) searchParams.append('quadrantId', params.quadrantId);
 
-    const url = `/admin/reports${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/admin/reports${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -1577,7 +1865,7 @@ export const adminAPI = {
     if (params?.startDate) searchParams.append('startDate', params.startDate);
     if (params?.endDate) searchParams.append('endDate', params.endDate);
 
-    const url = `/admin/reports/export${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/admin/reports/export${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     // For file downloads, we need to handle the response differently
     const token = localStorage.getItem('authToken');
@@ -1688,7 +1976,7 @@ export const userAPI = {
         }>;
       };
       timestamp: string;
-    }>('/users/stats');
+    }>('/api/v1/users/stats');
   },
 
   createUser: async (userData: {
@@ -1709,7 +1997,7 @@ export const userAPI = {
         role: string;
         status: string;
       };
-    }>('/users', {
+    }>('/api/v1/users', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -1778,49 +2066,13 @@ export const interventionAPI = {
         scoring_deadline?: string;
         created_at: string;
       };
-    }>('/interventions', {
+    }>('/api/v1/interventions', {
       method: 'POST',
       body: JSON.stringify(interventionData),
     });
   },
 
-  getAllInterventions: async (params?: {
-    page?: number;
-    limit?: number;
-    status?: string;
-    search?: string;
-  }) => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.limit) searchParams.append('limit', params.limit.toString());
-    if (params?.status) searchParams.append('status', params.status);
-    if (params?.search) searchParams.append('search', params.search);
 
-    return apiRequest<{
-      success: boolean;
-      data: {
-        interventions: Array<{
-          id: string;
-          name: string;
-          description: string;
-          start_date: string;
-          end_date: string;
-          status: string;
-          max_students: number;
-          enrolled_count: number;
-          is_scoring_open: boolean;
-          scoring_deadline?: string;
-          created_at: string;
-        }>;
-        pagination: {
-          page: number;
-          limit: number;
-          total: number;
-          totalPages: number;
-        };
-      };
-    }>(`/interventions${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
-  },
 
   getInterventionById: async (id: string) => {
     return apiRequest<{
@@ -1859,7 +2111,7 @@ export const interventionAPI = {
           status: string;
         }>;
       };
-    }>(`/interventions/${id}`);
+    }>(`/api/v1/interventions/${id}`);
   },
 
   updateIntervention: async (id: string, updateData: {
@@ -1879,7 +2131,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}`, {
+    }>(`/api/v1/interventions/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updateData),
     });
@@ -1890,7 +2142,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}/status`, {
+    }>(`/api/v1/interventions/${id}/status`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
     });
@@ -1906,7 +2158,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}/assign-teachers`, {
+    }>(`/api/v1/interventions/${id}/assign-teachers`, {
       method: 'POST',
       body: JSON.stringify({ teachers }),
     });
@@ -1917,7 +2169,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}/enroll-students`, {
+    }>(`/api/v1/interventions/${id}/enroll-students`, {
       method: 'POST',
       body: JSON.stringify({ students, enrollmentType }),
     });
@@ -1938,7 +2190,7 @@ export const interventionAPI = {
         total_enrolled: number;
         criteria: any;
       };
-    }>(`/interventions/${id}/enroll-batch`, {
+    }>(`/api/v1/interventions/${id}/enroll-batch`, {
       method: 'POST',
       body: JSON.stringify(params),
     });
@@ -1962,7 +2214,7 @@ export const interventionAPI = {
         total_enrolled: number;
         criteria: any;
       };
-    }>(`/interventions/${id}/enroll-criteria`, {
+    }>(`/api/v1/interventions/${id}/enroll-criteria`, {
       method: 'POST',
       body: JSON.stringify(params),
     });
@@ -2001,7 +2253,7 @@ export const interventionAPI = {
           is_overdue: boolean;
         };
       };
-    }>(`/interventions/${id}/analytics`);
+    }>(`/api/v1/interventions/${id}/analytics`);
   },
 
   // New Intervention-Centric APIs
@@ -2057,7 +2309,7 @@ export const interventionAPI = {
         quadrantId?: string;
         includeInactive: boolean;
       };
-    }>(`/interventions/${id}/microcompetencies${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
+    }>(`/api/v1/interventions/${id}/microcompetencies${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
   },
 
   addMicrocompetenciesToIntervention: async (id: string, data: {
@@ -2071,7 +2323,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}/microcompetencies`, {
+    }>(`/api/v1/interventions/${id}/microcompetencies`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -2089,7 +2341,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}/assign-teachers-microcompetencies`, {
+    }>(`/api/v1/interventions/${id}/assign-teachers-microcompetencies`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -2102,7 +2354,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${id}/scoring-deadline`, {
+    }>(`/api/v1/interventions/${id}/scoring-deadline`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -2114,7 +2366,7 @@ export const interventionAPI = {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/interventions/${id}`, {
+    }>(`/api/v1/interventions/${id}`, {
       method: 'DELETE',
     });
   },
@@ -2131,7 +2383,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${interventionId}/microcompetencies/${microcompetencyId}`, {
+    }>(`/api/v1/interventions/${interventionId}/microcompetencies/${microcompetencyId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -2141,7 +2393,7 @@ export const interventionAPI = {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/interventions/${interventionId}/microcompetencies/${microcompetencyId}`, {
+    }>(`/api/v1/interventions/${interventionId}/microcompetencies/${microcompetencyId}`, {
       method: 'DELETE',
     });
   },
@@ -2154,7 +2406,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/${interventionId}/microcompetencies/bulk-update`, {
+    }>(`/api/v1/interventions/${interventionId}/microcompetencies/bulk-update`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -2164,7 +2416,7 @@ export const interventionAPI = {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/interventions/${interventionId}/microcompetencies/bulk-remove`, {
+    }>(`/api/v1/interventions/${interventionId}/microcompetencies/bulk-remove`, {
       method: 'DELETE',
       body: JSON.stringify({ microcompetencyIds }),
     });
@@ -2176,14 +2428,14 @@ export const interventionAPI = {
       data: {
         assignments: any[];
       };
-    }>(`/interventions/${interventionId}/teacher-assignments`);
+    }>(`/api/v1/interventions/${interventionId}/teacher-assignments`);
   },
 
   removeTeacherAssignment: async (interventionId: string, assignmentId: string) => {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/interventions/${interventionId}/teacher-assignments/${assignmentId}`, {
+    }>(`/api/v1/interventions/${interventionId}/teacher-assignments/${assignmentId}`, {
       method: 'DELETE',
     });
   },
@@ -2212,7 +2464,7 @@ export const interventionAPI = {
           assigned_microcompetencies_count: number;
         }>;
       };
-    }>(`/teacher-microcompetencies/${teacherId}/interventions`);
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/interventions`);
   },
 
   getTeacherInterventionMicrocompetencies: async (teacherId: string, interventionId: string) => {
@@ -2258,7 +2510,7 @@ export const interventionAPI = {
           permissions: string[];
         };
       };
-    }>(`/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/microcompetencies`);
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/microcompetencies`);
   },
 
   getTeacherInterventionStudents: async (teacherId: string, interventionId: string, microcompetencyId?: string) => {
@@ -2267,7 +2519,7 @@ export const interventionAPI = {
       params.append('microcompetencyId', microcompetencyId);
     }
 
-    const url = `/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/students${params.toString() ? '?' + params.toString() : ''}`;
+    const url = `/api/v1/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/students${params.toString() ? '?' + params.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2329,7 +2581,7 @@ export const interventionAPI = {
           name: string;
         };
       };
-    }>(`/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/students/${studentId}/microcompetencies/${microcompetencyId}/score`, {
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/students/${studentId}/microcompetencies/${microcompetencyId}/score`, {
       method: 'POST',
       body: JSON.stringify(scoreData),
     });
@@ -2351,7 +2603,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/microcompetencies/${microcompetencyId}/batch-score`, {
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/microcompetencies/${microcompetencyId}/batch-score`, {
       method: 'POST',
       body: JSON.stringify(scoreData),
     });
@@ -2404,7 +2656,7 @@ export const interventionAPI = {
         }>;
         totalMicrocompetencies: number;
       };
-    }>(`/interventions/${interventionId}/tasks`, {
+    }>(`/api/v1/interventions/${interventionId}/tasks`, {
       method: 'POST',
       body: JSON.stringify(taskData),
     });
@@ -2423,7 +2675,7 @@ export const interventionAPI = {
     if (params?.teacherId) searchParams.append('teacherId', params.teacherId);
     if (params?.termId) searchParams.append('termId', params.termId);
 
-    const url = `/interventions/admin/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/interventions/admin/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2491,7 +2743,7 @@ export const interventionAPI = {
           assessed_by: string;
         };
       };
-    }>(`/interventions/tasks/${taskId}/direct-assessment`, {
+    }>(`/api/v1/interventions/tasks/${taskId}/direct-assessment`, {
       method: 'POST',
       body: JSON.stringify(assessmentData),
     });
@@ -2518,7 +2770,7 @@ export const interventionAPI = {
           assessed_by: string;
         };
       };
-    }>(`/interventions/direct-assessments/${assessmentId}`, {
+    }>(`/api/v1/interventions/direct-assessments/${assessmentId}`, {
       method: 'PUT',
       body: JSON.stringify(updateData)
     });
@@ -2558,7 +2810,7 @@ export const interventionAPI = {
           has_assessment: boolean;
         }>;
       };
-    }>(`/interventions/tasks/${taskId}/direct-assessments`);
+    }>(`/api/v1/interventions/tasks/${taskId}/direct-assessments`);
   },
 
   // Get enrolled students for an intervention
@@ -2575,7 +2827,7 @@ export const interventionAPI = {
         course: string;
       }>;
       timestamp: string;
-    }>(`/interventions/${interventionId}/students`);
+    }>(`/api/v1/interventions/${interventionId}/students`);
   },
 
   // Submit task (Student)
@@ -2587,7 +2839,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/tasks/${taskId}/submit`, {
+    }>(`/api/v1/interventions/tasks/${taskId}/submit`, {
       method: 'POST',
       body: JSON.stringify(submissionData),
     });
@@ -2602,7 +2854,7 @@ export const interventionAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/interventions/tasks/${taskId}/draft`, {
+    }>(`/api/v1/interventions/tasks/${taskId}/draft`, {
       method: 'POST',
       body: JSON.stringify(draftData),
     });
@@ -2616,7 +2868,7 @@ export const teacherAPI = {
     const queryParams = new URLSearchParams();
     if (termId) queryParams.append('termId', termId);
 
-    const url = `/teachers/${teacherId}/dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/teachers/${teacherId}/dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2677,7 +2929,7 @@ export const teacherAPI = {
     if (params?.status) queryParams.append('status', params.status);
     if (params?.interventionId) queryParams.append('interventionId', params.interventionId);
 
-    const url = `/teachers/${teacherId}/students${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/teachers/${teacherId}/students${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2716,7 +2968,7 @@ export const teacherAPI = {
     const queryParams = new URLSearchParams();
     if (termId) queryParams.append('termId', termId);
 
-    const url = `/teachers/${teacherId}/students/${studentId}/assessment${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/teachers/${teacherId}/students/${studentId}/assessment${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2770,7 +3022,7 @@ export const teacherAPI = {
         submitted_at: string;
         scores_count: number;
       };
-    }>(`/teachers/${teacherId}/students/${studentId}/assessment`, {
+    }>(`/api/v1/teachers/${teacherId}/students/${studentId}/assessment`, {
       method: 'POST',
       body: JSON.stringify(assessmentData),
     });
@@ -2794,7 +3046,7 @@ export const teacherAPI = {
         draft_id: string;
         saved_at: string;
       };
-    }>(`/teachers/${teacherId}/students/${studentId}/assessment/draft`, {
+    }>(`/api/v1/teachers/${teacherId}/students/${studentId}/assessment/draft`, {
       method: 'POST',
       body: JSON.stringify(draftData),
     });
@@ -2813,7 +3065,7 @@ export const teacherAPI = {
     if (params?.status) queryParams.append('status', params.status);
     if (params?.studentId) queryParams.append('studentId', params.studentId);
 
-    const url = `/teachers/${teacherId}/feedback${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/teachers/${teacherId}/feedback${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2855,7 +3107,7 @@ export const teacherAPI = {
         feedback_id: string;
         submitted_at: string;
       };
-    }>(`/teachers/${teacherId}/feedback`, {
+    }>(`/api/v1/teachers/${teacherId}/feedback`, {
       method: 'POST',
       body: JSON.stringify(feedbackData),
     });
@@ -2872,7 +3124,7 @@ export const teacherAPI = {
     if (params?.reportType) queryParams.append('reportType', params.reportType);
     if (params?.format) queryParams.append('format', params.format);
 
-    const url = `/teachers/${teacherId}/reports${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/teachers/${teacherId}/reports${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -2948,7 +3200,7 @@ export const microcompetencyAPI = {
         componentId?: string;
         includeInactive: boolean;
       };
-    }>(`/microcompetencies${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
+    }>(`/api/v1/microcompetencies${searchParams.toString() ? '?' + searchParams.toString() : ''}`);
   },
 
   getMicrocompetenciesByQuadrant: async (quadrantId: string) => {
@@ -2976,7 +3228,7 @@ export const microcompetencyAPI = {
           };
         };
       }>;
-    }>(`/microcompetencies/quadrant/${quadrantId}`);
+    }>(`/api/v1/microcompetencies/quadrant/${quadrantId}`);
   },
 
   getMicrocompetenciesByComponent: async (componentId: string) => {
@@ -2991,7 +3243,7 @@ export const microcompetencyAPI = {
         display_order: number;
         is_active: boolean;
       }>;
-    }>(`/microcompetencies/component/${componentId}`);
+    }>(`/api/v1/microcompetencies/component/${componentId}`);
   },
 
   getMicrocompetenciesForIntervention: async (interventionId: string) => {
@@ -3019,7 +3271,7 @@ export const microcompetencyAPI = {
           };
         };
       }>;
-    }>(`/microcompetencies/intervention/${interventionId}`);
+    }>(`/api/v1/microcompetencies/intervention/${interventionId}`);
   },
 
   createMicrocompetency: async (microcompetencyData: {
@@ -3045,7 +3297,7 @@ export const microcompetencyAPI = {
         created_at: string;
         updated_at: string;
       };
-    }>('/microcompetencies', {
+    }>('/api/v1/microcompetencies', {
       method: 'POST',
       body: JSON.stringify(microcompetencyData),
     });
@@ -3074,7 +3326,7 @@ export const microcompetencyAPI = {
         created_at: string;
         updated_at: string;
       };
-    }>(`/microcompetencies/${id}`, {
+    }>(`/api/v1/microcompetencies/${id}`, {
       method: 'PUT',
       body: JSON.stringify(microcompetencyData),
     });
@@ -3084,7 +3336,7 @@ export const microcompetencyAPI = {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/microcompetencies/${id}`, {
+    }>(`/api/v1/microcompetencies/${id}`, {
       method: 'DELETE',
     });
   },
@@ -3117,7 +3369,7 @@ export const microcompetencyAPI = {
           };
         };
       };
-    }>(`/microcompetencies/${id}`);
+    }>(`/api/v1/microcompetencies/${id}`);
   },
 
   getComponentWeightageUsage: async (componentId: string) => {
@@ -3140,11 +3392,136 @@ export const microcompetencyAPI = {
           percentage: number;
         };
       };
-    }>(`/microcompetencies/component/${componentId}/weightage`);
+    }>(`/api/v1/microcompetencies/component/${componentId}/weightage`);
   },
 };
 
-// Score Calculation API calls
+// Unified Score API calls (New System)
+export const unifiedScoreAPI = {
+  // Calculate unified HPS for a student in a term
+  calculateStudentHPS: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        student: {
+          id: string;
+          name: string;
+          registration_no: string;
+        };
+        term: {
+          id: string;
+          name: string;
+          academic_year: string;
+        };
+        hps: {
+          success: boolean;
+          studentId: string;
+          termId: string;
+          quadrantScores: Record<string, {
+            id: string;
+            name: string;
+            traditionalScore: number;
+            interventionScore: number;
+            finalScore: number;
+            grade: string;
+            status: string;
+            sources: string[];
+          }>;
+          totalHPS: number;
+          grade: string;
+          status: string;
+          calculatedAt: string;
+        };
+      };
+    }>(`/api/v1/unified-scores/students/${studentId}/hps`, {
+      method: 'POST',
+      body: JSON.stringify({ termId }),
+    });
+  },
+
+  // Get unified score summary for a student in a term
+  getStudentScoreSummary: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        summary: {
+          id: string;
+          student_id: string;
+          term_id: string;
+          persona_score: number;
+          wellness_score: number;
+          behavior_score: number;
+          discipline_score: number;
+          total_hps: number;
+          overall_grade: string;
+          overall_status: string;
+          last_calculated_at: string;
+          calculation_version: number;
+        };
+      };
+    }>(`/api/v1/unified-scores/students/${studentId}/summary?termId=${termId}`);
+  },
+
+  // Get detailed score breakdown by quadrants
+  getScoreBreakdown: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        breakdown: {
+          studentId: string;
+          termId: string;
+          totalHPS: number;
+          grade: string;
+          status: string;
+          quadrants: Array<{
+            id: string;
+            name: string;
+            finalScore: number;
+            traditionalScore: number;
+            interventionScore: number;
+            sources: string[];
+            grade: string;
+            status: string;
+          }>;
+          calculatedAt: string;
+        };
+      };
+    }>(`/api/v1/unified-scores/students/${studentId}/breakdown?termId=${termId}`);
+  },
+
+  // Recalculate scores after microcompetency update
+  recalculateAfterMicrocompetencyUpdate: async (studentId: string, microcompetencyId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        recalculation: any;
+      };
+    }>(`/api/v1/unified-scores/recalculate/microcompetency`, {
+      method: 'POST',
+      body: JSON.stringify({ studentId, microcompetencyId }),
+    });
+  },
+
+  // Recalculate scores after traditional score update
+  recalculateAfterTraditionalUpdate: async (studentId: string, componentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        recalculation: any;
+      };
+    }>(`/api/v1/unified-scores/recalculate/traditional`, {
+      method: 'POST',
+      body: JSON.stringify({ studentId, componentId, termId }),
+    });
+  }
+};
+
+// Score Calculation API calls (Legacy - Deprecated)
 export const scoreCalculationAPI = {
   getStudentCompetencyScores: async (studentId: string, interventionId: string) => {
     return apiRequest<{
@@ -3161,7 +3538,7 @@ export const scoreCalculationAPI = {
           is_complete: boolean;
         }>;
       };
-    }>(`/score-calculation/students/${studentId}/interventions/${interventionId}/competencies`);
+    }>(`/api/v1/score-calculation/students/${studentId}/interventions/${interventionId}/competencies`);
   },
 
   getStudentQuadrantScores: async (studentId: string, interventionId: string) => {
@@ -3179,7 +3556,7 @@ export const scoreCalculationAPI = {
           is_complete: boolean;
         }>;
       };
-    }>(`/score-calculation/students/${studentId}/interventions/${interventionId}/quadrants`);
+    }>(`/api/v1/score-calculation/students/${studentId}/interventions/${interventionId}/quadrants`);
   },
 
   getStudentOverallScore: async (studentId: string, interventionId: string) => {
@@ -3197,7 +3574,7 @@ export const scoreCalculationAPI = {
           rank?: number;
         };
       };
-    }>(`/score-calculation/students/${studentId}/interventions/${interventionId}/overall`);
+    }>(`/api/v1/score-calculation/students/${studentId}/interventions/${interventionId}/overall`);
   },
 
   getInterventionStatistics: async (interventionId: string) => {
@@ -3220,7 +3597,7 @@ export const scoreCalculationAPI = {
           completion_rate: number;
         };
       };
-    }>(`/score-calculation/interventions/${interventionId}/statistics`);
+    }>(`/api/v1/score-calculation/interventions/${interventionId}/statistics`);
   },
 
   recalculateStudentScores: async (studentId: string, interventionId: string) => {
@@ -3228,7 +3605,7 @@ export const scoreCalculationAPI = {
       success: boolean;
       message: string;
       data: any;
-    }>(`/score-calculation/students/${studentId}/interventions/${interventionId}/recalculate`, {
+    }>(`/api/v1/score-calculation/students/${studentId}/interventions/${interventionId}/recalculate`, {
       method: 'POST',
       body: JSON.stringify({}),
     });
@@ -3275,7 +3652,7 @@ export const scoreCalculationAPI = {
         }>;
         total_count: number;
       };
-    }>(`/teacher-microcompetencies/${teacherId}/microcompetencies`);
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/microcompetencies`);
   },
 
   getTeacherInterventionMicrocompetencies: async (teacherId: string, interventionId: string) => {
@@ -3298,7 +3675,7 @@ export const scoreCalculationAPI = {
         }>;
         totalCount: number;
       };
-    }>(`/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/microcompetencies`);
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/interventions/${interventionId}/microcompetencies`);
   },
 
 
@@ -3336,7 +3713,7 @@ export const scoreCalculationAPI = {
           percentage: number;
         };
       };
-    }>(`/interventions/submissions/${submissionId}/grade`, {
+    }>(`/api/v1/interventions/submissions/${submissionId}/grade`, {
       method: 'POST',
       body: JSON.stringify(gradeData),
     });
@@ -3353,7 +3730,7 @@ export const scoreCalculationAPI = {
     if (params?.interventionId) searchParams.append('interventionId', params.interventionId);
     if (params?.termId) searchParams.append('termId', params.termId);
 
-    const url = `/interventions/teacher/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/interventions/teacher/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -3406,7 +3783,7 @@ export const scoreCalculationAPI = {
     if (params?.taskId) searchParams.append('taskId', params.taskId);
     if (params?.status) searchParams.append('status', params.status);
 
-    const url = `/interventions/teacher/${interventionId}/submissions${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/interventions/teacher/${interventionId}/submissions${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -3485,7 +3862,7 @@ export const scoreCalculationAPI = {
         }>;
       };
       timestamp: string;
-    }>(`/interventions/tasks/${taskId}`, {
+    }>(`/api/v1/interventions/tasks/${taskId}`, {
       method: 'PUT',
       body: JSON.stringify(taskData),
     });
@@ -3501,7 +3878,7 @@ export const scoreCalculationAPI = {
         taskName: string;
       };
       timestamp: string;
-    }>(`/interventions/tasks/${taskId}`, {
+    }>(`/api/v1/interventions/tasks/${taskId}`, {
       method: 'DELETE',
     });
   },
@@ -3513,7 +3890,7 @@ export const scoreCalculationAPI = {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.append('status', params.status);
 
-    const url = `/interventions/student/${interventionId}/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/api/v1/interventions/student/${interventionId}/tasks${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
     return apiRequest<{
       success: boolean;
@@ -3590,7 +3967,7 @@ export const scoreCalculationAPI = {
         };
       };
       timestamp: string;
-    }>(`/interventions/tasks/${taskId}/submit`, {
+    }>(`/api/v1/interventions/tasks/${taskId}/submit`, {
       method: 'POST',
       body: JSON.stringify(submissionData),
     });
@@ -3613,7 +3990,7 @@ export const scoreCalculationAPI = {
         status: string;
       };
       timestamp: string;
-    }>(`/interventions/tasks/${taskId}/draft`, {
+    }>(`/api/v1/interventions/tasks/${taskId}/draft`, {
       method: 'POST',
       body: JSON.stringify(draftData),
     });
@@ -3674,7 +4051,7 @@ export const studentInterventionAPI = {
           };
         }>;
       };
-    }>(`/student-interventions/${studentId}/scores`);
+    }>(`/api/v1/student-interventions/${studentId}/scores`);
   },
 
   getStudentInterventionBreakdown: async (studentId: string, interventionId: string) => {
@@ -3741,7 +4118,7 @@ export const studentInterventionAPI = {
           percentage: number;
         };
       };
-    }>(`/student-interventions/${studentId}/interventions/${interventionId}/breakdown`);
+    }>(`/api/v1/student-interventions/${studentId}/interventions/${interventionId}/breakdown`);
   },
 };
 
@@ -3766,7 +4143,7 @@ export const uploadAPI = {
         url: string;
       };
       timestamp: string;
-    }>('/uploads/single', {
+    }>('/api/v1/uploads/single', {
       method: 'POST',
       body: formData,
       headers: {
@@ -3797,7 +4174,7 @@ export const uploadAPI = {
         url: string;
       }>;
       timestamp: string;
-    }>('/uploads/multiple', {
+    }>('/api/v1/uploads/multiple', {
       method: 'POST',
       body: formData,
       headers: {
@@ -3821,9 +4198,27 @@ export const uploadAPI = {
         filename: string;
       };
       timestamp: string;
-    }>(`/uploads/files/${filename}`, {
+    }>(`/api/v1/uploads/files/${filename}`, {
       method: 'DELETE',
     });
+  },
+
+  // Import Excel data
+  importExcelData: async (formData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/api/v1/uploads/excel-import`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
   },
 };
 
@@ -3833,7 +4228,7 @@ export const termAPI = {
     const queryParams = new URLSearchParams();
     if (includeInactive) queryParams.append('includeInactive', 'true');
 
-    const url = `/terms${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const url = `/api/v1/terms${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     return apiRequest<{
       success: boolean;
       data: Array<{
@@ -3864,7 +4259,7 @@ export const termAPI = {
         academic_year: string;
         created_at: string;
       };
-    }>('/terms/current');
+    }>('/api/v1/terms/current');
   },
 
   createTerm: async (termData: {
@@ -3880,7 +4275,7 @@ export const termAPI = {
       success: boolean;
       data: any;
       message: string;
-    }>('/terms', {
+    }>('/api/v1/terms', {
       method: 'POST',
       body: JSON.stringify(termData),
     });
@@ -3891,7 +4286,7 @@ export const termAPI = {
       success: boolean;
       data: any;
       message: string;
-    }>(`/terms/${termId}`, {
+    }>(`/api/v1/terms/${termId}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
@@ -3902,7 +4297,7 @@ export const termAPI = {
       success: boolean;
       data: any;
       message: string;
-    }>(`/terms/${termId}/activate`, {
+    }>(`/api/v1/terms/${termId}/activate`, {
       method: 'POST',
     });
   },
@@ -3912,7 +4307,7 @@ export const termAPI = {
       success: boolean;
       data: any;
       message: string;
-    }>(`/terms/${termId}/transition`, {
+    }>(`/api/v1/terms/${termId}/transition`, {
       method: 'POST',
       body: JSON.stringify({ studentIds, resetScores }),
     });
@@ -3923,7 +4318,7 @@ export const termAPI = {
       success: boolean;
       data: any;
       message: string;
-    }>(`/terms/${termId}/reset-scores`, {
+    }>(`/api/v1/terms/${termId}/reset-scores`, {
       method: 'POST',
       body: JSON.stringify({ studentIds }),
     });
@@ -3933,7 +4328,7 @@ export const termAPI = {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/terms/${termId}`, {
+    }>(`/api/v1/terms/${termId}`, {
       method: 'DELETE',
     });
   },
@@ -3946,6 +4341,172 @@ export const teacherMicrocompetencyAPI = {
   getTeacherInterventionStudents: interventionAPI.getTeacherInterventionStudents,
   scoreStudentMicrocompetency: interventionAPI.scoreStudentMicrocompetency,
   batchScoreStudents: interventionAPI.batchScoreStudents,
+};
+
+// SHL Competency API calls
+export const shlCompetencyAPI = {
+  getSHLCompetencyComponents: async () => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        components: Array<{
+          id: string;
+          name: string;
+          description: string;
+          weightage: number;
+          max_score: number;
+          category: string;
+          display_order: number;
+          sub_categories: {
+            id: string;
+            name: string;
+            quadrants: {
+              id: string;
+              name: string;
+            };
+          };
+        }>;
+        count: number;
+      };
+      timestamp: string;
+    }>('/api/v1/shl-competencies/components');
+  },
+
+  calculateStudentSHLScores: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        student: {
+          id: string;
+          name: string;
+          registration_no: string;
+        };
+        term: {
+          id: string;
+          name: string;
+          academic_year: string;
+        };
+        shlAssessment: {
+          success: boolean;
+          studentId: string;
+          termId: string;
+          competencyScores: Array<{
+            id: string;
+            name: string;
+            description: string;
+            shortCode: string;
+            rawScore: number;
+            maxScore: number;
+            percentage: number;
+            rating: number;
+            isAssessed: boolean;
+            assessmentDate: string | null;
+          }>;
+          overallMetrics: {
+            totalRawScore: number;
+            totalMaxScore: number;
+            overallPercentage: number;
+            potentialLevel: string;
+            topCompetencies: Array<{
+              shortCode: string;
+              name: string;
+              percentage: number;
+              rating: number;
+            }>;
+            bottomCompetencies: Array<{
+              shortCode: string;
+              name: string;
+              percentage: number;
+              rating: number;
+            }>;
+          };
+          calculatedAt: string;
+        };
+      };
+      timestamp: string;
+    }>(`/api/v1/shl-competencies/students/${studentId}/calculate`, {
+      method: 'POST',
+      body: JSON.stringify({ termId }),
+    });
+  },
+
+  getStudentSHLSummary: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        success: boolean;
+        summary: {
+          studentId: string;
+          termId: string;
+          overallPercentage: number;
+          potentialLevel: string;
+          topCompetencies: Array<{
+            shortCode: string;
+            name: string;
+            percentage: number;
+            rating: number;
+          }>;
+          bottomCompetencies: Array<{
+            shortCode: string;
+            name: string;
+            percentage: number;
+            rating: number;
+          }>;
+          assessmentProgress: {
+            assessed: number;
+            total: number;
+            percentage: number;
+          };
+        };
+        detailedScores: Array<{
+          id: string;
+          name: string;
+          description: string;
+          shortCode: string;
+          rawScore: number;
+          maxScore: number;
+          percentage: number;
+          rating: number;
+          isAssessed: boolean;
+          assessmentDate: string | null;
+        }>;
+      };
+      timestamp: string;
+    }>(`/api/v1/shl-competencies/students/${studentId}/summary?termId=${termId}`);
+  },
+
+  submitSHLCompetencyScore: async (
+    studentId: string,
+    componentId: string,
+    scoreData: {
+      obtainedScore: number;
+      maxScore: number;
+      termId: string;
+      notes?: string;
+    }
+  ) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        studentId: string;
+        componentId: string;
+        componentName: string;
+        obtainedScore: number;
+        maxScore: number;
+        percentage: number;
+        termId: string;
+        submittedAt: string;
+      };
+      timestamp: string;
+    }>(`/api/v1/shl-competencies/students/${studentId}/components/${componentId}/score`, {
+      method: 'POST',
+      body: JSON.stringify(scoreData),
+    });
+  },
 };
 
 export default {
@@ -3965,4 +4526,5 @@ export default {
   teacherMicrocompetency: teacherMicrocompetencyAPI,
   upload: uploadAPI,
   term: termAPI,
+  shlCompetency: shlCompetencyAPI,
 };

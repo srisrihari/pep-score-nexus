@@ -10,12 +10,12 @@ import ScoreRing from "@/components/common/ScoreRing";
 import QuadrantCard from "@/components/common/QuadrantCard";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
 import AreasForImprovement from "@/components/student/AreasForImprovement";
-import { Student, Leaderboard } from "@/data/mockData";
+import { Student, Leaderboard } from "@/types/api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import StatusBadge from "@/components/common/StatusBadge";
 import { Link } from "react-router-dom";
 import { InfoIcon } from "lucide-react";
-import { studentAPI } from "@/lib/api";
+import { studentAPI, unifiedScoreAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import {
   transformStudentPerformanceData,
@@ -43,26 +43,52 @@ const StudentDashboard: React.FC = () => {
         setError(null);
 
         // First get current student to get their ID
+        console.log('🔄 Loading student data...');
         const currentStudentResponse = await studentAPI.getCurrentStudent();
         const studentId = currentStudentResponse.data.id;
+        console.log('✅ Student ID:', studentId);
 
         // Use selected term ID for data fetching
         const termId = selectedTerm?.id;
+        console.log('📅 Selected term ID:', termId);
 
-        // Fetch all required data using the new comprehensive APIs
+        // Fetch all required data using both legacy and new unified APIs
         const [
           performanceResponse,
           leaderboardResponse,
           attendanceResponse,
-          interventionResponse
+          interventionResponse,
+          unifiedScoreResponse
         ] = await Promise.all([
           studentAPI.getStudentPerformance(studentId, termId, true).catch((error) => {
             console.error('Performance API failed:', error);
+            // Show user-friendly error for critical data
+            if (error.message.includes('401') || error.message.includes('unauthorized')) {
+              throw new Error('Your session has expired. Please log in again.');
+            }
+            throw new Error('Unable to load performance data. Please try refreshing the page.');
+          }),
+          studentAPI.getStudentLeaderboard(studentId, termId).catch((error) => {
+            console.warn('Leaderboard API failed (non-critical):', error);
             return null;
           }),
-          studentAPI.getStudentLeaderboard(studentId).catch(() => null), // Optional
-          studentAPI.getStudentAttendance(studentId, termId).catch(() => null), // Optional
-          studentAPI.getStudentInterventionPerformance(studentId).catch(() => null) // Optional
+          studentAPI.getStudentAttendance(studentId, termId).catch((error) => {
+            console.warn('Attendance API failed (non-critical):', error);
+            return null;
+          }),
+          studentAPI.getStudentInterventionPerformance(studentId, termId).catch((error) => {
+            console.warn('Intervention API failed (non-critical):', error);
+            return null;
+          }),
+          // Try to get unified score data (new system)
+          termId ? unifiedScoreAPI.getStudentScoreSummary(studentId, termId).catch((error) => {
+            console.warn('Unified score API failed, using legacy data:', error);
+            // Check for authentication errors
+            if (error.message.includes('401') || error.message.includes('unauthorized')) {
+              console.warn('Authentication issue with unified scores, will use legacy data');
+            }
+            return null;
+          }) : Promise.resolve(null)
         ]);
 
         // Check if we have the minimum required data
@@ -72,6 +98,47 @@ const StudentDashboard: React.FC = () => {
 
         // Transform API data to UI format
         const transformedStudent = transformStudentPerformanceData(performanceResponse);
+
+        // Enhance with unified score data if available
+        if (unifiedScoreResponse?.data?.summary) {
+          const unifiedSummary = unifiedScoreResponse.data.summary;
+          console.log('✅ Using unified score data:', unifiedSummary);
+
+          // Update the transformed student data with unified scores
+          if (transformedStudent.terms && transformedStudent.terms.length > 0) {
+            const currentTermData = transformedStudent.terms[0];
+            currentTermData.totalScore = unifiedSummary.total_hps;
+            currentTermData.grade = unifiedSummary.overall_grade as any;
+            currentTermData.overallStatus = unifiedSummary.overall_status as any;
+
+            // Update quadrant scores with unified data (convert percentage to points)
+            if (currentTermData.quadrants) {
+              currentTermData.quadrants.forEach(quadrant => {
+                let percentageScore = 0;
+                switch (quadrant.name.toLowerCase()) {
+                  case 'persona':
+                    percentageScore = unifiedSummary.persona_score;
+                    break;
+                  case 'wellness':
+                    percentageScore = unifiedSummary.wellness_score;
+                    break;
+                  case 'behavior':
+                    percentageScore = unifiedSummary.behavior_score;
+                    break;
+                  case 'discipline':
+                    percentageScore = unifiedSummary.discipline_score;
+                    break;
+                }
+
+                // Convert percentage score to actual points based on weightage
+                quadrant.obtained = (percentageScore * quadrant.weightage) / 100;
+                quadrant.maxScore = quadrant.weightage; // Ensure maxScore is set
+              });
+            }
+          }
+        } else {
+          console.log('📊 Using legacy score data (unified scores not available)');
+        }
 
         // Use real leaderboard data if available, otherwise set null to show appropriate UI state
         const leaderboard = leaderboardResponse
@@ -88,21 +155,23 @@ const StudentDashboard: React.FC = () => {
 
         // Data loaded successfully
 
-        // Generate time series and term comparison from performance history
-        const timeSeries = transformedStudent.terms.length > 0
+        // Generate time series and term comparison from current term only
+        // Note: Using only current term data to avoid showing incorrect historical data
+        const currentTerm = transformedStudent.terms.find(term => term.termId === termId) || transformedStudent.terms[0];
+        const timeSeries = currentTerm
           ? {
-              overall: transformedStudent.terms.map(term => ({
-                term: term.termName,
-                score: term.totalScore
-              }))
+              overall: [{
+                term: currentTerm.termName,
+                score: currentTerm.totalScore
+              }]
             }
           : { overall: [] };
 
-        const termComparison = transformedStudent.terms.length > 0
-          ? transformedStudent.terms.map(term => ({
-              termName: term.termName,
-              overall: term.totalScore
-            }))
+        const termComparison = currentTerm
+          ? [{
+              termName: currentTerm.termName,
+              overall: currentTerm.totalScore
+            }]
           : [];
 
         // Validate data before setting state
@@ -122,11 +191,18 @@ const StudentDashboard: React.FC = () => {
         console.error('Failed to load student data:', err);
         const errorMessage = err instanceof Error ? err.message : 'Failed to load data';
 
-        // If student profile not found, show a specific message
+        // Provide user-friendly error messages based on error type
         if (errorMessage.includes('Student profile not found')) {
           setError('Student profile not found. Please contact your administrator to set up your student profile.');
+        } else if (errorMessage.includes('session has expired') || errorMessage.includes('unauthorized')) {
+          setError('Your session has expired. Please log in again to continue.');
+        } else if (errorMessage.includes('performance data')) {
+          setError('Unable to load your performance data. This might be a temporary issue. Please try refreshing the page.');
+        } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+          setError('Network connection issue. Please check your internet connection and try again.');
         } else {
-          setError(errorMessage);
+          // Generic fallback with helpful suggestion
+          setError('Unable to load dashboard data. Please try refreshing the page or contact support if the issue persists.');
         }
       } finally {
         setLoading(false);
@@ -464,7 +540,7 @@ const StudentDashboard: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex justify-between">
                     <span>{quadrant.name} - Sub-categories & Components</span>
-                    <Badge variant="outline">{quadrant.obtained.toFixed(1)}/{quadrant.weightage}</Badge>
+                    <Badge variant="outline">{quadrant.obtained.toFixed(1)}/{quadrant.maxScore || quadrant.weightage}</Badge>
                   </CardTitle>
                   <CardDescription>
                     Hierarchical breakdown showing sub-categories and their components
@@ -565,7 +641,7 @@ const StudentDashboard: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex justify-between">
                     <span>{quadrant.name} Microcompetencies</span>
-                    <Badge variant="outline">{quadrant.obtained}/{quadrant.weightage}</Badge>
+                    <Badge variant="outline">{quadrant.obtained}/{quadrant.maxScore || quadrant.weightage}</Badge>
                   </CardTitle>
                   <CardDescription>
                     Detailed breakdown of microcompetency scores within each component

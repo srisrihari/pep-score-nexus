@@ -637,7 +637,7 @@ const scoreStudentMicrocompetency = async (req, res) => {
     const interventionCheck = await query(
       supabase
         .from('interventions')
-        .select('is_scoring_open, scoring_deadline')
+        .select('is_scoring_open, scoring_deadline, term_id')
         .eq('id', interventionId)
         .limit(1)
     );
@@ -677,7 +677,8 @@ const scoreStudentMicrocompetency = async (req, res) => {
       max_score: parseFloat(maxScore),
       scored_by: teacher.id,
       feedback: feedback || null,
-      status: status
+      status: status,
+      term_id: intervention.term_id
     };
 
     const result = await query(
@@ -797,7 +798,7 @@ const batchScoreStudents = async (req, res) => {
     const interventionCheck = await query(
       supabase
         .from('interventions')
-        .select('is_scoring_open, scoring_deadline')
+        .select('is_scoring_open, scoring_deadline, term_id')
         .eq('id', interventionId)
         .limit(1)
     );
@@ -836,7 +837,8 @@ const batchScoreStudents = async (req, res) => {
       max_score: parseFloat(maxScore),
       scored_by: teacherId,
       feedback: score.feedback || null,
-      status: score.status || 'Submitted'
+      status: score.status || 'Submitted',
+      term_id: intervention.term_id
     }));
 
     // Insert/update scores

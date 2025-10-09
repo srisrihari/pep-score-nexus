@@ -12,7 +12,23 @@ import BehaviorRatingScale from "@/components/student/BehaviorRatingScale";
 import { studentAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { transformStudentPerformanceData, transformLeaderboardData } from "@/lib/dataTransform";
-import { Student, QuadrantData, Leaderboard } from "@/data/mockData";
+import { Student, Leaderboard } from "@/types/api";
+
+// Legacy type for backward compatibility
+interface QuadrantData {
+  id: string;
+  name: string;
+  score: number;
+  maxScore: number;
+  weightage: number;
+  obtained: number;
+  grade: string;
+  status: string;
+  attendance?: number;
+  eligibility?: string;
+  components: any[];
+  sub_categories?: any[];
+}
 import {
   LineChart,
   Line,
@@ -121,16 +137,21 @@ const QuadrantDetail: React.FC = () => {
   const quadrant = currentTermData?.quadrants.find((q) => q.id === activeQuadrant);
   const leaderboard = leaderboardData?.quadrants?.[activeQuadrant || ""];
 
+  // Use quadrant details data if available, otherwise fall back to transformed student data
+  const quadrantDisplayData = quadrantDetails?.quadrant ? {
+    ...quadrant,
+    obtained: quadrantDetails.quadrant.obtainedScore || 0,
+    maxScore: quadrantDetails.quadrant.totalMax || quadrantDetails.quadrant.weightage,
+    weightage: quadrantDetails.quadrant.weightage,
+    status: quadrantDetails.quadrant.status,
+    sub_categories: quadrantDetails.subCategories || quadrant?.sub_categories || []
+  } : quadrant;
 
-
-  // Generate chart data from term history
-  const chartData = studentData.terms?.map(term => {
-    const termQuadrant = term.quadrants.find(q => q.id === activeQuadrant);
-    return {
-      term: term.termName,
-      score: termQuadrant?.obtained || 0
-    };
-  }) || [];
+  // Generate chart data from current term only (to avoid showing incorrect historical data)
+  const chartData = currentTermData ? [{
+    term: currentTermData.termName,
+    score: quadrantDisplayData?.obtained || 0
+  }] : [];
 
   if (!quadrant) {
     return (
@@ -194,7 +215,7 @@ const QuadrantDetail: React.FC = () => {
                   <span className="mr-1">{q.name}</span>
                   {q.status && (
                     <Badge variant={q.status === "Cleared" ? "outline" : "destructive"} className="ml-1 text-xs py-0 h-5">
-                      {q.obtained}/{q.weightage}
+                      {q.obtained?.toFixed(1) || '0.0'}/{q.weightage}
                     </Badge>
                   )}
                 </div>
@@ -210,11 +231,11 @@ const QuadrantDetail: React.FC = () => {
             <div className="text-center">
               <h2 className="text-xl font-bold mb-1">Your Score</h2>
               <div className="text-4xl font-bold mb-4">
-              {quadrant.obtained.toFixed(1)}/{quadrant.weightage}
+              {quadrantDisplayData?.obtained?.toFixed(1) || '0.0'}/{quadrantDisplayData?.maxScore || quadrantDisplayData?.weightage || 0}
               </div>
               <div className="inline-flex">
                 <StatusBadge
-                  status={quadrant.status}
+                  status={quadrantDisplayData?.status || 'Not Assessed'}
                   className="border border-white/20"
                 />
               </div>
@@ -272,7 +293,7 @@ const QuadrantDetail: React.FC = () => {
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="term" />
-                <YAxis domain={[0, quadrant.weightage]} />
+                <YAxis domain={[0, quadrantDisplayData?.maxScore || quadrantDisplayData?.weightage || 100]} />
                 <Tooltip />
                 <Line
                   type="monotone"
@@ -291,22 +312,22 @@ const QuadrantDetail: React.FC = () => {
         <h2 className="text-xl font-semibold mt-8">Breakdown by Sub-Categories</h2>
 
         {/* NEW: Dynamic sub-category structure */}
-        {quadrant.sub_categories && quadrant.sub_categories.length > 0 ? (
+        {quadrantDisplayData?.sub_categories && quadrantDisplayData.sub_categories.length > 0 ? (
           <div className="space-y-8 mt-6">
-            {quadrant.sub_categories.map((subCategory) => (
+            {quadrantDisplayData.sub_categories.map((subCategory) => (
               <div key={subCategory.id} className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">{subCategory.name}</h3>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">
-                      {subCategory.weightage}% of {quadrant.name}
+                      {subCategory.weightage}% of {quadrantDisplayData.name}
                     </Badge>
                     <Badge variant="outline">
-                      {subCategory.obtained.toFixed(1)}/{subCategory.maxScore.toFixed(1)}
+                      {(subCategory.obtained || 0).toFixed(1)}/{(subCategory.maxScore || 0).toFixed(1)}
                     </Badge>
                   </div>
                 </div>
-                
+
                 {subCategory.description && (
                   <p className="text-sm text-muted-foreground">{subCategory.description}</p>
                 )}

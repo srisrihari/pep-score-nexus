@@ -163,9 +163,35 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
+// Middleware to require admin role
+const requireAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin access required',
+      timestamp: new Date().toISOString()
+    });
+  }
+  next();
+};
+
+// Middleware to require teacher or admin role
+const requireTeacher = (req, res, next) => {
+  if (!req.user || !['admin', 'teacher'].includes(req.user.role)) {
+    return res.status(403).json({
+      success: false,
+      message: 'Teacher or admin access required',
+      timestamp: new Date().toISOString()
+    });
+  }
+  next();
+};
+
 module.exports = {
   authenticateToken,
   requireRole,
   requireOwnershipOrAdmin,
-  optionalAuth
-}; 
+  optionalAuth,
+  requireAdmin,
+  requireTeacher
+};

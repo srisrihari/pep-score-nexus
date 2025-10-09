@@ -2,15 +2,25 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
 // Supabase configuration
-const supabaseUrl = process.env.SUPABASE_URL || 'https://hxxjdvecnhvqkgkscnmv.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh4eGpkdmVjbmh2cWtna3Njbm12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4MzM0NzIsImV4cCI6MjA2NTQwOTQ3Mn0.DdzkZs9DdsWYzS-mx7v6cmOtESahiVUXhqY06mARah4';
+// IMPORTANT: Never hardcode Supabase credentials. Use environment variables.
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
-// Create Supabase client
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Missing Supabase configuration. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY) in your environment.');
+}
+
+// Create Supabase client (will throw if undefined)
+const supabase = (supabaseUrl && supabaseKey)
+  ? createClient(supabaseUrl, supabaseKey)
+  : null;
 
 // Helper function to execute queries using Supabase REST API
 const query = async (queryObject) => {
   try {
+    if (!supabase) {
+      throw new Error('Supabase client is not initialized. Check SUPABASE_URL and keys.');
+    }
     const { data, error, count } = await queryObject;
     
     if (error) {
@@ -47,10 +57,16 @@ const rawQuery = async (sql, params = []) => {
 // Test Supabase connection
 const testConnection = async () => {
   try {
+    if (!supabase) {
+      console.error('❌ Supabase not configured. Skipping connection test.');
+      return false;
+    }
+
+    // simple ping by selecting minimal row
     const result = await query(
       supabase
         .from('quadrants')
-        .select('*')
+        .select('id')
         .limit(1)
     );
     

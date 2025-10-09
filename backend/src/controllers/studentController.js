@@ -1,5 +1,6 @@
 const { supabase, query } = require('../config/supabase');
 const scoreCalculationService = require('../services/scoreCalculationService');
+const unifiedScoreService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
 
 // Get all students with enhanced pagination and filtering
 const getAllStudents = async (req, res) => {
@@ -39,14 +40,15 @@ const getAllStudents = async (req, res) => {
         overall_score,
         grade,
         status,
-        current_term,
+        current_term_id,
         created_at,
         batch_id,
         section_id,
         house_id,
         batches:batch_id(id, name, year),
         sections:section_id(id, name),
-        houses:house_id(id, name, color)
+        houses:house_id(id, name, color),
+        terms:current_term_id(id, name, is_current)
       `)
       .neq('status', 'Dropped');
 
@@ -343,13 +345,14 @@ const getStudentById = async (req, res) => {
           overall_score,
           grade,
           status,
-          current_term,
+          current_term_id,
           created_at,
           updated_at,
           batches:batch_id(name, year),
           sections:section_id(name),
           houses:house_id(name, color),
-          users:user_id(username, email)
+          users:user_id(username, email),
+          terms:current_term_id(id, name, is_current)
         `)
         .eq('id', id)
         .limit(1)
@@ -497,6 +500,21 @@ const createStudent = async (req, res) => {
 
     const userId = userResult.rows[0].id;
 
+    // Get current term ID
+    const currentTermResult = await query(
+      supabase
+        .from('terms')
+        .select('id')
+        .eq('is_current', true)
+        .limit(1)
+    );
+
+    if (!currentTermResult.rows || currentTermResult.rows.length === 0) {
+      throw new Error('No current term found');
+    }
+
+    const currentTermId = currentTermResult.rows[0].id;
+
     // Create student record
     const studentResult = await query(
       supabase
@@ -512,7 +530,7 @@ const createStudent = async (req, res) => {
           gender,
           phone,
           status: 'Active',
-          current_term: 'Term1'
+          current_term_id: currentTermId
         })
         .select('*')
     );
@@ -581,12 +599,13 @@ const getCurrentStudent = async (req, res) => {
           overall_score,
           grade,
           status,
-          current_term,
+          current_term_id,
           created_at,
           updated_at,
           batches:batch_id(name, year),
           sections:section_id(name),
-          houses:house_id(name, color)
+          houses:house_id(name, color),
+          terms:current_term_id(id, name, is_current)
         `)
         .eq('user_id', req.user.userId)
         .limit(1)
@@ -775,6 +794,19 @@ const createStudentForExistingUser = async (req, res) => {
     const userId = userResult.rows[0].id;
     console.log('Found user ID:', userId);
 
+    // Get current term ID
+    const currentTermResult = await query(
+      supabase
+        .from('terms')
+        .select('id')
+        .eq('is_current', true)
+        .limit(1)
+    );
+
+    const currentTermId = currentTermResult.rows && currentTermResult.rows.length > 0
+      ? currentTermResult.rows[0].id
+      : null;
+
     // Create student record
     const studentData = {
       user_id: userId,
@@ -793,7 +825,7 @@ const createStudentForExistingUser = async (req, res) => {
         date_of_birth: date_of_birth || '2000-01-01'
       },
       status: 'Active',
-      current_term: 'Term1'
+      current_term_id: currentTermId
     };
 
     const studentResult = await query(
@@ -874,12 +906,13 @@ const getStudentPerformance = async (req, res) => {
           name,
           course,
           gender,
-          current_term,
+          current_term_id,
           overall_score,
           grade,
           batches:batch_id(name, year),
           sections:section_id(name),
-          houses:house_id(name, color)
+          houses:house_id(name, color),
+          terms:current_term_id(id, name, is_current)
         `)
         .eq('id', studentId)
         .limit(1)
@@ -898,7 +931,9 @@ const getStudentPerformance = async (req, res) => {
 
     // Get current term if not specified
     let currentTermId = termId;
+    let isCurrentTerm = false;
     if (!currentTermId) {
+      console.log('🔍 No termId provided, fetching current term...');
       const termResult = await query(
         supabase
           .from('terms')
@@ -908,7 +943,38 @@ const getStudentPerformance = async (req, res) => {
       );
       if (termResult.rows && termResult.rows.length > 0) {
         currentTermId = termResult.rows[0].id;
+        isCurrentTerm = true;
+        console.log('✅ Current term found:', currentTermId);
+      } else {
+        console.log('❌ No current term found in database');
+        return res.status(400).json({
+          success: false,
+          message: 'No current term is set. Please specify a termId parameter.',
+          timestamp: new Date().toISOString()
+        });
       }
+    } else {
+      // Check if the specified term is the current term
+      const termCheckResult = await query(
+        supabase
+          .from('terms')
+          .select('is_current')
+          .eq('id', currentTermId)
+          .limit(1)
+      );
+      if (termCheckResult.rows && termCheckResult.rows.length > 0) {
+        isCurrentTerm = termCheckResult.rows[0].is_current;
+      }
+    }
+
+    // Safety check to ensure currentTermId is valid
+    if (!currentTermId) {
+      console.log('❌ currentTermId is still undefined after term resolution');
+      return res.status(400).json({
+        success: false,
+        message: 'Unable to determine term. Please specify a valid termId parameter.',
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Get student term info
@@ -1110,11 +1176,7 @@ const getStudentPerformance = async (req, res) => {
               let obtainedScore = microScore?.obtained_score || 0;
               const maxScore = micro.max_score;
 
-              // FALLBACK: Generate sample data for demo
-              if (obtainedScore === 0 && maxScore > 0) {
-                const percentage = 0.65 + (Math.random() * 0.3);
-                obtainedScore = maxScore * percentage;
-              }
+              // Do not generate demo data; keep zero when no real score exists
 
               const weightedObtained = (obtainedScore * micro.weightage) / 100;
               const weightedMax = (maxScore * micro.weightage) / 100;
@@ -1136,17 +1198,10 @@ const getStudentPerformance = async (req, res) => {
               };
       });
 
-            // If no microcompetency scores, use component score directly
+            // If no microcompetency scores, DO NOT fallback to traditional component scores
             if (componentMicrocompetencies.length === 0) {
-              const componentScore = componentScoresMap[component.id];
-              componentObtainedScore = componentScore?.obtained_score || 0;
-              componentMaxScore = component.max_score || 10;
-              
-              // FALLBACK: Generate sample data for demo
-              if (componentObtainedScore === 0 && componentMaxScore > 0) {
-                const percentage = 0.7 + (Math.random() * 0.25);
-                componentObtainedScore = componentMaxScore * percentage;
-              }
+              componentObtainedScore = 0;
+              componentMaxScore = component.max_score || 0;
             }
 
             // Calculate component status
@@ -1234,6 +1289,7 @@ const getStudentPerformance = async (req, res) => {
           description: quadrant.description,
           weightage: parseFloat(quadrant.weightage),
           obtained: quadrantObtainedScore,
+          maxScore: quadrantMaxScore, // Include the calculated max score
           status: status,
           attendance: attendancePercentage,
           eligibility: eligibility,
@@ -1268,29 +1324,151 @@ const getStudentPerformance = async (req, res) => {
 
     if (currentTermId) {
       try {
-        hpsData = await scoreCalculationService.calculateStudentHPS(studentId, currentTermId);
+        // For current term: use unified scoring system (live calculation)
+        // For historical terms: use stored data from student_terms table
+        if (isCurrentTerm) {
+          console.log('📊 Using unified scoring for current term');
+          hpsData = await unifiedScoreService.calculateUnifiedHPS(studentId, currentTermId);
+        } else {
+          console.log('📚 Using historical data for non-current term');
+          // Get historical data from student_terms table
+          if (studentTermResult.rows && studentTermResult.rows.length > 0) {
+            const historicalData = studentTermResult.rows[0];
 
-        if (hpsData.quadrant_breakdown) {
-          updatedQuadrants = hpsData.quadrant_breakdown.map(hpsQuadrant => {
-            const existingQuadrant = quadrants.find(q => q.id === hpsQuadrant.quadrant.id) || {};
+            // Get historical quadrant scores from student_score_summary table
+            const historicalQuadrantResult = await query(
+              supabase
+                .from('student_score_summary')
+                .select('persona_score, wellness_score, behavior_score, discipline_score')
+                .eq('student_id', studentId)
+                .eq('term_id', currentTermId)
+                .limit(1)
+            );
+
+            // Get historical component scores for detailed breakdown
+            const historicalScoresResult = await query(
+              supabase
+                .from('scores')
+                .select(`
+                  id,
+                  component_id,
+                  obtained_score,
+                  max_score,
+                  percentage,
+                  assessment_date,
+                  components:component_id(
+                    id,
+                    name,
+                    max_score,
+                    sub_categories:sub_category_id(
+                      id,
+                      name,
+                      quadrants:quadrant_id(
+                        id,
+                        name
+                      )
+                    )
+                  )
+                `)
+                .eq('student_id', studentId)
+                .eq('term_id', currentTermId)
+                .eq('status', 'Approved')
+            );
+
+            // Build historical quadrant scores with detailed breakdown
+            const historicalQuadrantScores = {};
+            if (historicalQuadrantResult.rows && historicalQuadrantResult.rows.length > 0) {
+              const scores = historicalQuadrantResult.rows[0];
+              quadrants.forEach(quadrant => {
+                const scoreKey = `${quadrant.name.toLowerCase()}_score`;
+                historicalQuadrantScores[quadrant.id] = {
+                  id: quadrant.id,
+                  name: quadrant.name,
+                  finalScore: parseFloat(scores[scoreKey]) || 0,
+                  traditionalScore: parseFloat(scores[scoreKey]) || 0,
+                  interventionScore: 0,
+                  sources: ['historical'],
+                  grade: unifiedScoreService.calculateGrade(parseFloat(scores[scoreKey]) || 0),
+                  status: unifiedScoreService.calculateStatus(parseFloat(scores[scoreKey]) || 0)
+                };
+              });
+            }
+
+            // Build hierarchical structure from historical scores
+            const historicalHierarchy = await buildHistoricalHierarchy(historicalScoresResult.rows || [], quadrants);
+
+            hpsData = {
+              success: true,
+              studentId: studentId,
+              termId: currentTermId,
+              totalHPS: parseFloat(historicalData.total_score) || 0,
+              grade: historicalData.grade || 'IC',
+              status: historicalData.overall_status || 'Progress',
+              quadrantScores: historicalQuadrantScores,
+              calculatedAt: new Date().toISOString(),
+              isHistorical: true,
+              historicalScores: historicalScoresResult.rows || [],
+              historicalHierarchy: historicalHierarchy
+            };
+          } else {
+            // Fallback: calculate if no historical data exists
+            console.log('⚠️ No historical data found, calculating...');
+            hpsData = await unifiedScoreService.calculateUnifiedHPS(studentId, currentTermId);
+          }
+        }
+
+        console.log('🔍 HPS Data structure:', {
+          hasQuadrantScores: !!hpsData.quadrantScores,
+          quadrantScoresKeys: hpsData.quadrantScores ? Object.keys(hpsData.quadrantScores) : 'none',
+          hasQuadrantWeightages: !!hpsData.quadrantWeightages
+        });
+
+        if (hpsData.quadrantScores) {
+          console.log('✅ Using HPS quadrant scores for current term');
+          updatedQuadrants = Object.values(hpsData.quadrantScores).map(hpsQuadrant => {
+            const existingQuadrant = quadrants.find(q => q.id === hpsQuadrant.id) || {};
+
+            // Get correct weightage from batch-term configuration
+            const correctWeightage = hpsData.quadrantWeightages
+              ? hpsData.quadrantWeightages.find(qw => qw.id === hpsQuadrant.id)?.weightage || 25
+              : existingQuadrant.weightage || 25;
+
+            // Convert percentage score to actual points based on weightage
+            const obtainedPoints = (hpsQuadrant.finalScore * correctWeightage) / 100;
+
+            console.log(`🔍 HPS Quadrant ${hpsQuadrant.name}:`, {
+              finalScore: hpsQuadrant.finalScore,
+              correctWeightage: correctWeightage,
+              obtainedPoints: obtainedPoints,
+              maxScore: correctWeightage
+            });
 
             return {
-              id: hpsQuadrant.quadrant.id,
-              name: hpsQuadrant.quadrant.name,
+              id: hpsQuadrant.id,
+              name: hpsQuadrant.name,
               description: existingQuadrant.description || '',
-              weightage: hpsQuadrant.quadrant.weightage,
-              obtained: hpsQuadrant.traditional_score.obtained + hpsQuadrant.intervention_score.total_contribution,
-              status: hpsQuadrant.combined_percentage >= 60 ? 'Cleared' : 'Not Cleared',
+              weightage: correctWeightage,
+              obtained: obtainedPoints, // Convert percentage to actual points
+              maxScore: correctWeightage, // Maximum points possible for this quadrant
+              status: hpsQuadrant.finalScore >= 60 ? 'Cleared' : 'Not Cleared',
               attendance: existingQuadrant.attendance || 0,
               eligibility: existingQuadrant.eligibility || 'Not Eligible',
               rank: existingQuadrant.rank || 1,
               sub_categories: existingQuadrant.sub_categories || [],
               components: existingQuadrant.components || [],
-              intervention_contributions: hpsQuadrant.intervention_score.contributions || [],
-              combined_percentage: hpsQuadrant.combined_percentage,
+              traditional_score: hpsQuadrant.traditionalScore || 0,
+              intervention_score: hpsQuadrant.interventionScore || 0,
+              sources: hpsQuadrant.sources || [],
               grade: hpsQuadrant.grade
             };
           });
+        } else {
+          console.log('⚠️ No HPS quadrant scores available, using traditional quadrant data');
+          console.log('🔍 Traditional quadrants:', updatedQuadrants.map(q => ({
+            name: q.name,
+            obtained: q.obtained,
+            weightage: q.weightage
+          })));
         }
       } catch (error) {
         console.warn('⚠️ Could not calculate HPS, using traditional scores:', error.message);
@@ -1298,21 +1476,52 @@ const getStudentPerformance = async (req, res) => {
     }
 
     // Current term data
+    console.log('🔍 Building currentTerm object...');
+    console.log('📊 HPS Data available:', !!hpsData);
+    console.log('📊 Updated quadrants count:', updatedQuadrants.length);
+
+    // Use historical hierarchy for historical terms, current data for current term
+    let finalQuadrants = updatedQuadrants;
+    if (hpsData?.isHistorical && hpsData?.historicalHierarchy) {
+      console.log('📚 Using historical hierarchy for quadrant structure');
+      finalQuadrants = Object.values(hpsData.historicalHierarchy).map(quadrant => ({
+        id: quadrant.id,
+        name: quadrant.name,
+        weightage: 25, // Default equal weightage
+        obtained: quadrant.percentage,
+        status: quadrant.percentage >= 60 ? 'Cleared' : 'Not Cleared',
+        attendance: 0,
+        eligibility: 'Historical Data',
+        rank: 1,
+        sub_categories: quadrant.sub_categories,
+        components: quadrant.components,
+        traditional_score: quadrant.percentage,
+        intervention_score: 0,
+        sources: ['historical'],
+        grade: unifiedScoreService.calculateGrade(quadrant.percentage)
+      }));
+    }
+
     const currentTerm = {
       termId: currentTermId,
       termName: studentTermResult.rows?.[0]?.terms?.name || 'Current Term',
-      totalScore: hpsData?.hps?.total_score || studentTermResult.rows?.[0]?.total_score || student.overall_score || 0,
-      grade: hpsData?.hps?.grade || studentTermResult.rows?.[0]?.grade || student.grade || 'IC',
-      overallStatus: studentTermResult.rows?.[0]?.overall_status || 'Progress',
-      quadrants: updatedQuadrants,
+      totalScore: hpsData?.totalHPS || studentTermResult.rows?.[0]?.total_score || student.overall_score || 0,
+      grade: hpsData?.grade || studentTermResult.rows?.[0]?.grade || student.grade || 'IC',
+      overallStatus: hpsData?.status || studentTermResult.rows?.[0]?.overall_status || 'Progress',
+      quadrants: finalQuadrants,
       tests: testScores,
       hps_breakdown: hpsData ? {
-        intervention_contribution: hpsData.hps.intervention_contribution,
-        traditional_contribution: hpsData.hps.traditional_contribution,
-        interventions_included: hpsData.interventions_included,
-        calculated_at: hpsData.calculated_at
+        total_hps: hpsData.totalHPS,
+        grade: hpsData.grade,
+        status: hpsData.status,
+        quadrant_count: Object.keys(hpsData.quadrantScores || {}).length,
+        calculation_method: hpsData.isHistorical ? 'historical_data' : 'unified_simple_average',
+        calculated_at: hpsData.calculatedAt,
+        is_historical: hpsData.isHistorical || false
       } : null
     };
+
+    console.log('✅ Current term object built successfully');
 
     // Get all terms if requested
     let termHistory = [];
@@ -1352,6 +1561,14 @@ const getStudentPerformance = async (req, res) => {
 
     console.log('✅ Performance data built successfully');
 
+    // Debug: Log the final quadrants data being sent to frontend
+    console.log('🔍 Final quadrants being sent to frontend:', finalQuadrants.map(q => ({
+      name: q.name,
+      obtained: q.obtained,
+      maxScore: q.maxScore,
+      weightage: q.weightage
+    })));
+
     // Format response
     res.status(200).json({
       success: true,
@@ -1365,7 +1582,7 @@ const getStudentPerformance = async (req, res) => {
           section: student.sections?.name || null,
           houseName: student.houses?.name || null,
           gender: student.gender,
-          currentTerm: student.current_term,
+          currentTerm: student.terms?.name || null,
           overall_percentage: hpsData?.hps?.total_score || null,
           overall_grade: hpsData?.hps?.grade || null,
           overall_score: hpsData?.hps?.total_score || null
@@ -1675,12 +1892,20 @@ const getStudentQuadrantDetails = async (req, res) => {
 
     const quadrant = quadrantResult.rows[0];
 
-    // Get sub-categories for this quadrant
+    // Use unified scoring service to get accurate scores
+    const unifiedScoreService = require('../services/unifiedScoreCalculationService');
+    const unifiedScores = await unifiedScoreService.calculateUnifiedHPS(studentId, currentTermId);
+
+    // Get the specific quadrant data from unified scores
+    const quadrantScoreData = unifiedScores.quadrantScores ? unifiedScores.quadrantScores[quadrantId] : null;
+
+    // Get sub-categories for this quadrant with detailed structure
     const subCategoriesResult = await query(
       supabase
         .from('sub_categories')
-        .select('id, name, weightage, display_order')
+        .select('id, name, description, weightage, display_order')
         .eq('quadrant_id', quadrantId)
+        .eq('is_active', true)
         .order('display_order', { ascending: true })
     );
 
@@ -1702,13 +1927,30 @@ const getStudentQuadrantDetails = async (req, res) => {
         .order('display_order', { ascending: true })
     );
 
-    // Get scores for these components
-    const scoresResult = await query(
+    // Get microcompetencies for these components
+    const microcompetenciesResult = await query(
+      supabase
+        .from('microcompetencies')
+        .select(`
+          id,
+          name,
+          description,
+          weightage,
+          component_id
+        `)
+        .in('component_id', componentsResult.rows?.map(c => c.id) || [])
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+    );
+
+    // Get traditional scores (from scores table)
+    const traditionalScoresResult = await query(
       supabase
         .from('scores')
         .select(`
           component_id,
           obtained_score,
+          max_score,
           percentage,
           assessment_date,
           notes,
@@ -1720,6 +1962,22 @@ const getStudentQuadrantDetails = async (req, res) => {
         .in('component_id', componentsResult.rows?.map(c => c.id) || [])
     );
 
+    // Get intervention microcompetency scores
+    const microScoresResult = await query(
+      supabase
+        .from('microcompetency_scores')
+        .select(`
+          microcompetency_id,
+          obtained_score,
+          max_score,
+          scored_at,
+          feedback
+        `)
+        .eq('student_id', studentId)
+        .eq('term_id', currentTermId)
+        .in('microcompetency_id', microcompetenciesResult.rows?.map(m => m.id) || [])
+    );
+
     // Create lookup maps
     const subCategoriesMap = {};
     if (subCategoriesResult.rows) {
@@ -1728,10 +1986,27 @@ const getStudentQuadrantDetails = async (req, res) => {
       });
     }
 
-    const scoresMap = {};
-    if (scoresResult.rows) {
-      scoresResult.rows.forEach(score => {
-        scoresMap[score.component_id] = score;
+    const traditionalScoresMap = {};
+    if (traditionalScoresResult.rows) {
+      traditionalScoresResult.rows.forEach(score => {
+        traditionalScoresMap[score.component_id] = score;
+      });
+    }
+
+    const microScoresMap = {};
+    if (microScoresResult.rows) {
+      microScoresResult.rows.forEach(score => {
+        microScoresMap[score.microcompetency_id] = score;
+      });
+    }
+
+    const microcompetenciesMap = {};
+    if (microcompetenciesResult.rows) {
+      microcompetenciesResult.rows.forEach(micro => {
+        if (!microcompetenciesMap[micro.component_id]) {
+          microcompetenciesMap[micro.component_id] = [];
+        }
+        microcompetenciesMap[micro.component_id].push(micro);
       });
     }
 
@@ -1758,56 +2033,6 @@ const getStudentQuadrantDetails = async (req, res) => {
         .limit(10)
     );
 
-    // Group components by sub-category
-    const subCategories = {};
-
-    if (componentsResult.rows) {
-      componentsResult.rows.forEach(comp => {
-        const subCat = subCategoriesMap[comp.sub_category_id];
-        const score = scoresMap[comp.id];
-
-        if (!subCategories[comp.sub_category_id]) {
-          subCategories[comp.sub_category_id] = {
-            id: comp.sub_category_id,
-            name: subCat?.name || 'Unknown',
-            weightage: parseFloat(subCat?.weightage || 0),
-            components: []
-          };
-        }
-
-        const obtainedScore = score?.obtained_score || null;
-        const percentage = score?.percentage || (obtainedScore && comp.max_score ? (obtainedScore / comp.max_score) * 100 : null);
-
-        subCategories[comp.sub_category_id].components.push({
-          id: comp.id,
-          name: comp.name,
-          description: comp.description,
-          maxScore: parseFloat(comp.max_score),
-          category: comp.category,
-          obtainedScore: obtainedScore ? parseFloat(obtainedScore) : null,
-          percentage: percentage ? parseFloat(percentage) : null,
-          assessmentDate: score?.assessment_date || null,
-          notes: score?.notes || null,
-          assessedBy: score?.users?.username || null,
-          status: obtainedScore
-            ? (percentage >= 80 ? 'Good' : percentage >= 60 ? 'Progress' : 'Deteriorate')
-            : 'Not Assessed'
-        });
-      });
-    }
-
-    // Calculate quadrant totals
-    let totalObtained = 0;
-    let totalMax = 0;
-
-    if (componentsResult.rows) {
-      componentsResult.rows.forEach(comp => {
-        const score = scoresMap[comp.id];
-        totalObtained += score?.obtained_score || 0;
-        totalMax += comp.max_score;
-      });
-    }
-
     const attendance = attendanceResult.rows?.[0] || {
       total_sessions: 0,
       attended_sessions: 0,
@@ -1815,23 +2040,153 @@ const getStudentQuadrantDetails = async (req, res) => {
       last_updated: null
     };
 
-    // Get improvement suggestions (simplified)
-    const lowPerformingComponents = [];
+    // Build detailed sub-category structure with unified scores
+    const subCategories = {};
+
     if (componentsResult.rows) {
       componentsResult.rows.forEach(comp => {
-        const score = scoresMap[comp.id];
-        const percentage = score?.percentage || (score?.obtained_score && comp.max_score ? (score.obtained_score / comp.max_score) * 100 : 0);
+        const subCat = subCategoriesMap[comp.sub_category_id];
+        const traditionalScore = traditionalScoresMap[comp.id];
 
-        if (score?.obtained_score && percentage < 60) {
+        if (!subCategories[comp.sub_category_id]) {
+          subCategories[comp.sub_category_id] = {
+            id: comp.sub_category_id,
+            name: subCat?.name || 'Unknown',
+            description: subCat?.description || '',
+            weightage: parseFloat(subCat?.weightage || 0),
+            obtained: 0,
+            maxScore: 0,
+            components: []
+          };
+        }
+
+        // Calculate component score using unified approach
+        let componentObtained = 0;
+        let componentMax = parseFloat(comp.max_score);
+
+        // Get traditional score if available
+        if (traditionalScore) {
+          componentObtained = parseFloat(traditionalScore.obtained_score || 0);
+        }
+
+        // Get microcompetency scores for this component
+        const componentMicros = microcompetenciesMap[comp.id] || [];
+        const microcompetencies = componentMicros.map(micro => {
+          const microScore = microScoresMap[micro.id];
+          const microObtained = microScore ? parseFloat(microScore.obtained_score || 0) : 0;
+          const microMax = parseFloat(micro.weightage || 0); // Use weightage as max score for micros
+
+          return {
+            id: micro.id,
+            name: micro.name,
+            description: micro.description,
+            weightage: parseFloat(micro.weightage || 0),
+            score: microObtained,
+            maxScore: microMax,
+            assessmentDate: microScore?.scored_at || null,
+            notes: microScore?.feedback || null
+          };
+        });
+
+        // If we have microcompetency scores, use them to supplement/override traditional scores
+        if (componentMicros.length > 0) {
+          const microTotalObtained = microcompetencies.reduce((sum, m) => sum + m.score, 0);
+          const microTotalMax = microcompetencies.reduce((sum, m) => sum + m.maxScore, 0);
+
+          if (microTotalMax > 0) {
+            // Convert microcompetency percentage to component score
+            const microPercentage = (microTotalObtained / microTotalMax) * 100;
+            componentObtained = Math.max(componentObtained, (microPercentage * componentMax) / 100);
+          }
+        }
+
+        const componentPercentage = componentMax > 0 ? (componentObtained / componentMax) * 100 : 0;
+
+        const componentData = {
+          id: comp.id,
+          name: comp.name,
+          description: comp.description,
+          maxScore: componentMax,
+          category: comp.category,
+          score: componentObtained, // Use 'score' instead of 'obtainedScore' for consistency
+          percentage: componentPercentage,
+          assessmentDate: traditionalScore?.assessment_date || null,
+          notes: traditionalScore?.notes || null,
+          assessedBy: traditionalScore?.users?.username || null,
+          status: componentObtained > 0
+            ? (componentPercentage >= 80 ? 'Good' : componentPercentage >= 60 ? 'Progress' : 'Deteriorate')
+            : 'Not Assessed',
+          microcompetencies: microcompetencies
+        };
+
+        subCategories[comp.sub_category_id].components.push(componentData);
+
+        // Add to sub-category totals
+        subCategories[comp.sub_category_id].obtained += componentObtained;
+        subCategories[comp.sub_category_id].maxScore += componentMax;
+      });
+    }
+
+    // Calculate quadrant totals and sub-category scores
+    let quadrantObtainedPoints = 0;
+    let quadrantPercentage = 0;
+    const quadrantWeightage = parseFloat(quadrant.weightage);
+
+    if (quadrantScoreData) {
+      // Use unified scores for quadrant totals (convert percentage to points)
+      quadrantPercentage = quadrantScoreData.finalScore || 0;
+      quadrantObtainedPoints = (quadrantPercentage * quadrantWeightage) / 100;
+
+      // Calculate sub-category scores based on weightage
+      Object.values(subCategories).forEach(subCat => {
+        if (subCat.maxScore > 0) {
+          const subCatPercentage = (subCat.obtained / subCat.maxScore) * 100;
+          // Convert percentage to points based on sub-category weightage within quadrant
+          subCat.obtained = (subCatPercentage * quadrantWeightage * subCat.weightage) / (100 * 100);
+          subCat.maxScore = (quadrantWeightage * subCat.weightage) / 100;
+        }
+      });
+    } else {
+      // Fallback to traditional calculation when unified scores are not available
+      console.log('⚠️ No unified scores available, falling back to traditional calculation');
+
+      let totalObtained = 0;
+      let totalMax = 0;
+
+      Object.values(subCategories).forEach(subCat => {
+        totalObtained += subCat.obtained;
+        totalMax += subCat.maxScore;
+      });
+
+      quadrantPercentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
+      quadrantObtainedPoints = (quadrantPercentage * quadrantWeightage) / 100;
+
+      // For traditional calculation, keep sub-category scores as raw scores
+      Object.values(subCategories).forEach(subCat => {
+        if (subCat.maxScore > 0) {
+          const subCatPercentage = (subCat.obtained / subCat.maxScore) * 100;
+          // Convert to points based on sub-category weightage
+          const subCatPoints = (subCatPercentage * quadrantWeightage * subCat.weightage) / (100 * 100);
+          subCat.obtained = subCatPoints;
+          subCat.maxScore = (quadrantWeightage * subCat.weightage) / 100;
+        }
+      });
+    }
+
+    // Get improvement suggestions
+    const lowPerformingComponents = [];
+    Object.values(subCategories).forEach(subCat => {
+      subCat.components.forEach(comp => {
+        if (comp.score > 0 && comp.percentage < 60) {
           lowPerformingComponents.push({
             component: comp.name,
-            currentScore: score.obtained_score,
-            maxScore: comp.max_score,
+            currentScore: comp.score,
+            maxScore: comp.maxScore,
             suggestion: `Focus on improving ${comp.name} - current performance is below expectations`
           });
         }
       });
-    }
+    });
 
     res.status(200).json({
       success: true,
@@ -1848,13 +2203,13 @@ const getStudentQuadrantDetails = async (req, res) => {
           id: quadrant.id,
           name: quadrant.name,
           description: quadrant.description,
-          weightage: parseFloat(quadrant.weightage),
+          weightage: quadrantWeightage,
           minimumAttendance: parseFloat(quadrant.minimum_attendance),
-          totalObtained: totalObtained,
-          totalMax: totalMax,
-          percentage: totalMax > 0 ? (totalObtained / totalMax) * 100 : 0,
-          status: attendance.percentage >= quadrant.minimum_attendance 
-            ? (totalMax > 0 && (totalObtained / totalMax) * 100 >= 40 ? 'Cleared' : 'Not Cleared')
+          obtainedScore: quadrantObtainedPoints, // Use calculated score converted to points
+          totalMax: quadrantWeightage, // Max score is the weightage
+          percentage: quadrantPercentage, // Use calculated percentage
+          status: attendance.percentage >= quadrant.minimum_attendance
+            ? (quadrantPercentage >= 40 ? 'Cleared' : 'Not Cleared')
             : 'Attendance Shortage'
         },
         subCategories: Object.values(subCategories),
@@ -1872,9 +2227,8 @@ const getStudentQuadrantDetails = async (req, res) => {
         improvementSuggestions: lowPerformingComponents,
         eligibility: {
           attendanceEligible: attendance.percentage >= quadrant.minimum_attendance,
-          scoreEligible: totalMax > 0 ? (totalObtained / totalMax) * 100 >= 40 : false,
-          overallEligible: attendance.percentage >= quadrant.minimum_attendance && 
-                          totalMax > 0 && (totalObtained / totalMax) * 100 >= 40
+          scoreEligible: quadrantPercentage >= 40,
+          overallEligible: attendance.percentage >= quadrant.minimum_attendance && quadrantPercentage >= 40
         }
       },
       timestamp: new Date().toISOString()
@@ -3031,7 +3385,22 @@ const getStudentAttendance = async (req, res) => {
       );
       if (termResult.rows && termResult.rows.length > 0) {
         currentTermId = termResult.rows[0].id;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'No current term is set. Please specify a termId parameter.',
+          timestamp: new Date().toISOString()
+        });
       }
+    }
+
+    // Safety check to ensure currentTermId is valid
+    if (!currentTermId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Unable to determine term. Please specify a valid termId parameter.',
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Get quadrants
@@ -3656,8 +4025,44 @@ const getStudentInterventions = async (req, res) => {
           last_activity: enrollment.enrollment_date,
           total_tasks: 0, // Simplified - would need tasks table
           completed_tasks: 0, // Simplified - would need task_submissions table
-          enrolled_count: 0 // Will be populated separately if needed
+          enrolled_count: 0 // Will be populated below
         }));
+    }
+
+    // Populate enrollment counts and other metrics for each intervention
+    for (let i = 0; i < interventions.length; i++) {
+      const intervention = interventions[i];
+
+      // Get actual enrollment count for this intervention
+      const enrollmentCountResult = await query(
+        supabase
+          .from('intervention_enrollments')
+          .select('count', { count: 'exact' })
+          .eq('intervention_id', intervention.id)
+          .in('enrollment_status', ['Enrolled', 'Completed'])
+      );
+
+      // Get microcompetency count for this intervention
+      const microcompetencyCountResult = await query(
+        supabase
+          .from('intervention_microcompetencies')
+          .select('count', { count: 'exact' })
+          .eq('intervention_id', intervention.id)
+      );
+
+      // Get task count for this intervention
+      const taskCountResult = await query(
+        supabase
+          .from('tasks')
+          .select('count', { count: 'exact' })
+          .eq('intervention_id', intervention.id)
+      );
+
+      // Update the intervention object with correct counts
+      interventions[i].enrolled_count = enrollmentCountResult.totalCount || 0;
+      interventions[i].microcompetencies_count = microcompetencyCountResult.totalCount || 0;
+      interventions[i].tasks_count = taskCountResult.totalCount || 0;
+      interventions[i].objectives_count = Array.isArray(intervention.objectives) ? intervention.objectives.length : 0;
     }
 
     // Filter by quadrant if provided (simplified - would need intervention_quadrants table)
@@ -4235,71 +4640,76 @@ const getInterventionQuadrantImpact = async (req, res) => {
       }
     }
 
-    let impactQuery = `
-      SELECT 
-        q.id as quadrant_id,
-        q.name as quadrant_name,
-        q.weightage as max_score,
-        COALESCE(SUM(sc.obtained_score), 0) as base_score,
-        COALESCE(SUM(i_scores.intervention_score), 0) as intervention_contribution,
-        COALESCE(SUM(sc.obtained_score), 0) + COALESCE(SUM(i_scores.intervention_score), 0) as total_score
-      FROM quadrants q
-      LEFT JOIN sub_categories subcats ON q.id = subcats.quadrant_id
-      LEFT JOIN components c ON subcats.id = c.sub_category_id
-      LEFT JOIN scores sc ON c.id = sc.component_id AND sc.student_id = $1 AND sc.term_id = $2
-      LEFT JOIN (
-        SELECT 
-          iq.quadrant_id,
-          SUM(ie.current_score * (iq.weightage / 100)) as intervention_score
-        FROM intervention_enrollments ie
-        JOIN intervention_quadrants iq ON ie.intervention_id = iq.intervention_id
-        WHERE ie.student_id = $1
-        GROUP BY iq.quadrant_id
-      ) i_scores ON q.id = i_scores.quadrant_id
-      WHERE q.is_active = true
-    `;
+    // Use unified scoring system instead of complex SQL
+    const unifiedScores = await unifiedScoreService.calculateUnifiedHPS(studentId, currentTermId);
 
-    const params = [studentId, currentTermId];
-    
-    if (quadrant) {
-      impactQuery += ` AND q.id = $3`;
-      params.push(quadrant);
-    }
-
-    impactQuery += ` GROUP BY q.id, q.name, q.weightage ORDER BY q.display_order`;
-
-    const impactResult = await query(impactQuery, params);
-
+    // Convert unified scores to the expected format
     const quadrantScores = [];
 
-    for (const quadrantData of impactResult.rows) {
-      // Get interventions for this quadrant
-      const interventionsQuery = `
-        SELECT 
-          i.id,
-          i.name,
-          ie.current_score * (iq.weightage / 100) as contribution
-        FROM interventions i
-        JOIN intervention_enrollments ie ON i.id = ie.intervention_id
-        JOIN intervention_quadrants iq ON i.id = iq.intervention_id
-        WHERE ie.student_id = $1 AND iq.quadrant_id = $2
-      `;
+    if (unifiedScores.quadrantScores) {
+      for (const [quadrantId, quadrantData] of Object.entries(unifiedScores.quadrantScores)) {
+        // Skip if filtering by specific quadrant
+        if (quadrant && quadrantId !== quadrant) {
+          continue;
+        }
 
-      const interventionsResult = await query(interventionsQuery, [studentId, quadrantData.quadrant_id]);
+        quadrantScores.push({
+          quadrantId: quadrantData.id,
+          quadrantName: quadrantData.name,
+          baseScore: quadrantData.traditionalScore || 0,
+          interventionContribution: quadrantData.interventionScore || 0,
+          totalScore: quadrantData.finalScore,
+          maxScore: 100, // Percentage-based scoring
+          interventions: [] // Will be populated below
+        });
+      }
+    }
 
-      quadrantScores.push({
-        quadrantId: quadrantData.quadrant_id,
-        quadrantName: quadrantData.quadrant_name,
-        baseScore: parseFloat(quadrantData.base_score),
-        interventionContribution: parseFloat(quadrantData.intervention_contribution),
-        totalScore: parseFloat(quadrantData.total_score),
-        maxScore: parseFloat(quadrantData.max_score),
-        interventions: interventionsResult.rows.map(int => ({
-          interventionId: int.id,
-          interventionName: int.name,
-          contribution: parseFloat(int.contribution)
-        }))
+    // If no unified scores available, return empty result
+    if (quadrantScores.length === 0) {
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          quadrantScores: [],
+          totalScore: 0,
+          studentId: studentId,
+          termId: currentTermId
+        },
+        message: 'No scores available for this student and term',
+        timestamp: new Date().toISOString()
       });
+    }
+
+    // Get interventions for each quadrant
+    for (let i = 0; i < quadrantScores.length; i++) {
+      const quadrantScore = quadrantScores[i];
+
+      // Get interventions for this student in this term
+      const interventionsResult = await query(
+        supabase
+          .from('intervention_enrollments')
+          .select(`
+            interventions:intervention_id(
+              id,
+              name,
+              term_id
+            )
+          `)
+          .eq('student_id', studentId)
+          .eq('enrollment_status', 'Enrolled')
+      );
+
+      // Filter interventions for the current term and add contribution info
+      const termInterventions = interventionsResult.rows
+        .filter(enrollment => enrollment.interventions.term_id === currentTermId)
+        .map(enrollment => ({
+          interventionId: enrollment.interventions.id,
+          interventionName: enrollment.interventions.name,
+          contribution: quadrantScore.interventionContribution / interventionsResult.rows.length || 0
+        }));
+
+      quadrantScores[i].interventions = termInterventions;
     }
 
     res.status(200).json({
@@ -4327,6 +4737,7 @@ const getInterventionQuadrantImpact = async (req, res) => {
 const getStudentInterventionPerformance = async (req, res) => {
   try {
     const { studentId } = req.params;
+    const { termId } = req.query;
 
     // Authorization check: Students can only access their own data, teachers/admins can access any
     if (req.user.role === 'student') {
@@ -4373,28 +4784,49 @@ const getStudentInterventionPerformance = async (req, res) => {
       });
     }
 
-    // Get student's intervention enrollments
-    const enrollmentsResult = await query(
-      supabase
-        .from('intervention_enrollments')
-        .select(`
+    // Get current term if not specified
+    let currentTermId = termId;
+    if (!currentTermId) {
+      const termResult = await query(
+        supabase
+          .from('terms')
+          .select('id')
+          .eq('is_current', true)
+          .limit(1)
+      );
+      if (termResult.rows && termResult.rows.length > 0) {
+        currentTermId = termResult.rows[0].id;
+      }
+    }
+
+    // Get student's intervention enrollments for the specified term
+    let enrollmentsQuery = supabase
+      .from('intervention_enrollments')
+      .select(`
+        id,
+        enrollment_date,
+        enrollment_status,
+        current_score,
+        completion_percentage,
+        progress_data,
+        interventions:intervention_id(
           id,
-          enrollment_date,
-          enrollment_status,
-          current_score,
-          completion_percentage,
-          progress_data,
-          interventions:intervention_id(
-            id,
-            name,
-            status,
-            start_date,
-            end_date
-          )
-        `)
-        .eq('student_id', studentId)
-        .eq('enrollment_status', 'Enrolled')
-    );
+          name,
+          status,
+          start_date,
+          end_date,
+          term_id
+        )
+      `)
+      .eq('student_id', studentId)
+      .eq('enrollment_status', 'Enrolled');
+
+    // Filter by term if specified
+    if (currentTermId) {
+      enrollmentsQuery = enrollmentsQuery.eq('interventions.term_id', currentTermId);
+    }
+
+    const enrollmentsResult = await query(enrollmentsQuery);
 
     const interventions = [];
     let totalInterventions = 0;
@@ -4534,3 +4966,84 @@ module.exports = {
   getInterventionQuadrantImpact,
   getStudentInterventionPerformance
 };
+
+// Helper function to build hierarchical structure from historical scores
+async function buildHistoricalHierarchy(historicalScores, quadrants) {
+  const hierarchy = {};
+
+  // Group scores by quadrant
+  quadrants.forEach(quadrant => {
+    hierarchy[quadrant.id] = {
+      id: quadrant.id,
+      name: quadrant.name,
+      sub_categories: {},
+      components: [],
+      totalObtained: 0,
+      totalMax: 0
+    };
+  });
+
+  // Process each historical score
+  historicalScores.forEach(score => {
+    if (score.components) {
+      const component = score.components;
+      const subCategory = component.sub_categories;
+      const quadrant = subCategory?.quadrants;
+
+      if (quadrant && hierarchy[quadrant.id]) {
+        // Add to quadrant totals
+        hierarchy[quadrant.id].totalObtained += parseFloat(score.obtained_score) || 0;
+        hierarchy[quadrant.id].totalMax += parseFloat(score.max_score) || 0;
+
+        // Initialize sub-category if not exists
+        if (!hierarchy[quadrant.id].sub_categories[subCategory.id]) {
+          hierarchy[quadrant.id].sub_categories[subCategory.id] = {
+            id: subCategory.id,
+            name: subCategory.name,
+            components: [],
+            totalObtained: 0,
+            totalMax: 0
+          };
+        }
+
+        // Add to sub-category totals
+        hierarchy[quadrant.id].sub_categories[subCategory.id].totalObtained += parseFloat(score.obtained_score) || 0;
+        hierarchy[quadrant.id].sub_categories[subCategory.id].totalMax += parseFloat(score.max_score) || 0;
+
+        // Add component to sub-category
+        hierarchy[quadrant.id].sub_categories[subCategory.id].components.push({
+          id: component.id,
+          name: component.name,
+          obtained_score: parseFloat(score.obtained_score) || 0,
+          max_score: parseFloat(score.max_score) || 0,
+          percentage: parseFloat(score.percentage) || 0,
+          assessment_date: score.assessment_date,
+          microcompetencies: [] // Historical terms don't have microcompetency data
+        });
+
+        // Also add to quadrant components list
+        hierarchy[quadrant.id].components.push({
+          id: component.id,
+          name: component.name,
+          sub_category: subCategory.name,
+          obtained_score: parseFloat(score.obtained_score) || 0,
+          max_score: parseFloat(score.max_score) || 0,
+          percentage: parseFloat(score.percentage) || 0
+        });
+      }
+    }
+  });
+
+  // Convert sub_categories object to array and calculate percentages
+  Object.keys(hierarchy).forEach(quadrantId => {
+    const quadrant = hierarchy[quadrantId];
+    quadrant.percentage = quadrant.totalMax > 0 ? (quadrant.totalObtained / quadrant.totalMax) * 100 : 0;
+
+    quadrant.sub_categories = Object.values(quadrant.sub_categories).map(subCat => ({
+      ...subCat,
+      percentage: subCat.totalMax > 0 ? (subCat.totalObtained / subCat.totalMax) * 100 : 0
+    }));
+  });
+
+  return hierarchy;
+}

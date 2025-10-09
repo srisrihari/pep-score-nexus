@@ -367,9 +367,9 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
           </TabsList>
 
           {/* Individual Selection Tab */}
-          <TabsContent value="individual" className="flex-1 flex flex-col space-y-4 mt-4">
+          <TabsContent value="individual" className="flex-1 flex flex-col space-y-4 mt-4 min-h-0">
             {/* Advanced Filters */}
-            <Card className="p-4">
+            <Card className="p-4 flex-shrink-0">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {/* Batch Filter */}
                 <div>
@@ -492,7 +492,7 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
             </Card>
 
             {/* Search and Controls */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 flex-shrink-0">
               <div className="relative flex-1">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -527,7 +527,7 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
 
             {/* Selected Students Summary */}
             {tempSelectedStudents.length > 0 && (
-              <Card className="bg-blue-50 border-blue-200">
+              <Card className="bg-blue-50 border-blue-200 flex-shrink-0">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -550,69 +550,71 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
             )}
 
             {/* Students List */}
-            <div className="flex-1 overflow-y-auto border rounded-lg">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <p className="text-gray-500">Loading students...</p>
+            <div className="flex-1 min-h-0 flex flex-col">
+              <div className="flex-1 overflow-y-auto border rounded-lg max-h-[400px]">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                      <p className="text-gray-500">Loading students...</p>
+                    </div>
                   </div>
-                </div>
-              ) : students.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Users className="h-8 w-8 mx-auto mb-2" />
-                  <p>No students found matching your criteria.</p>
-                </div>
-              ) : (
-                <div className="p-4 space-y-2">
-                  {students.map((student) => {
-                    const isSelected = tempSelectedStudents.includes(student.id);
-                    const isDisabled = !isSelected && tempSelectedStudents.length >= maxStudents;
+                ) : students.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Users className="h-8 w-8 mx-auto mb-2" />
+                    <p>No students found matching your criteria.</p>
+                  </div>
+                ) : (
+                  <div className="p-4 space-y-2">
+                    {students.map((student) => {
+                      const isSelected = tempSelectedStudents.includes(student.id);
+                      const isDisabled = !isSelected && tempSelectedStudents.length >= maxStudents;
 
-                    return (
-                      <div
-                        key={student.id}
-                        className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors ${
-                          isSelected
-                            ? 'bg-blue-50 border-blue-200'
-                            : isDisabled
-                            ? 'bg-gray-50 border-gray-200 opacity-50'
-                            : 'hover:bg-gray-50 border-gray-200'
-                        }`}
-                      >
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handleStudentToggle(student.id)}
-                          disabled={isDisabled}
-                        />
-                        <div className="flex-1">
-                          <div className="font-medium">{student.name}</div>
-                          <div className="text-sm text-gray-600 flex items-center gap-4">
-                            <span>Reg: {student.registration_no}</span>
-                            <span>Course: {student.course}</span>
-                            {student.batch_name && <span>Batch: {student.batch_name} ({student.batch_year})</span>}
-                            {student.section_name && <span>Section: {student.section_name}</span>}
-                            {student.house_name && (
-                              <span className="flex items-center gap-1">
-                                <div
-                                  className="w-2 h-2 rounded-full"
-                                  style={{ backgroundColor: student.house_color }}
-                                />
-                                {student.house_name}
-                              </span>
-                            )}
+                      return (
+                        <div
+                          key={student.id}
+                          className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors ${
+                            isSelected
+                              ? 'bg-blue-50 border-blue-200'
+                              : isDisabled
+                              ? 'bg-gray-50 border-gray-200 opacity-50'
+                              : 'hover:bg-gray-50 border-gray-200'
+                          }`}
+                        >
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => handleStudentToggle(student.id)}
+                            disabled={isDisabled}
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium">{student.name}</div>
+                            <div className="text-sm text-gray-600 flex items-center gap-4">
+                              <span>Reg: {student.registration_no}</span>
+                              <span>Course: {student.course}</span>
+                              {student.batch_name && <span>Batch: {student.batch_name} ({student.batch_year})</span>}
+                              {student.section_name && <span>Section: {student.section_name}</span>}
+                              {student.house_name && (
+                                <span className="flex items-center gap-1">
+                                  <div
+                                    className="w-2 h-2 rounded-full"
+                                    style={{ backgroundColor: student.house_color }}
+                                  />
+                                  {student.house_name}
+                                </span>
+                              )}
+                            </div>
                           </div>
+                          {isSelected && (
+                            <Badge variant="secondary" className="text-xs">
+                              Selected
+                            </Badge>
+                          )}
                         </div>
-                        {isSelected && (
-                          <Badge variant="secondary" className="text-xs">
-                            Selected
-                          </Badge>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Pagination */}

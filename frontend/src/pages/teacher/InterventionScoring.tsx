@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,81 +12,169 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { 
-  ArrowLeft, 
-  Save, 
-  Send, 
-  User, 
-  Calendar, 
-  Clock, 
+import {
+  ArrowLeft,
+  Save,
+  Send,
+  User,
+  Calendar,
+  Clock,
   FileText,
   CheckCircle,
   AlertCircle,
   Info,
   HelpCircle,
-  Paperclip
+  Paperclip,
+  Loader2
 } from "lucide-react";
-import { studentData, studentList } from "@/data/mockData";
+import { componentAPI, interventionAPI, shlCompetencyAPI, termAPI } from "@/lib/api";
+import { Component, Student, Term } from "@/types/api";
 
-// Mock data for the wellness components
-const wellnessComponents = [
-  { id: "push-ups", name: "Push Ups", maxScore: 5, description: "Upper body strength assessment" },
-  { id: "sit-ups", name: "Sit Ups", maxScore: 5, description: "Core strength assessment" },
-  { id: "sit-reach", name: "Sit & Reach", maxScore: 5, description: "Flexibility assessment" },
-  { id: "beep-test", name: "Beep Test", maxScore: 5, description: "Cardiovascular endurance assessment" },
-  { id: "bca", name: "Body Composition Analysis", maxScore: 5, description: "Body fat percentage and muscle mass assessment" },
-  { id: "run", name: "3KM Run", maxScore: 5, description: "Endurance assessment" }
-];
+interface ComponentScore {
+  componentId: string;
+  obtainedScore: number;
+  feedback: string;
+}
+
+interface ScoringState {
+  [componentId: string]: ComponentScore;
+}
 
 const InterventionScoring: React.FC = () => {
   const navigate = useNavigate();
   const { studentId } = useParams<{ studentId: string }>();
-  const [selectedTerm, setSelectedTerm] = useState("Term1");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDraft, setIsDraft] = useState(false);
+  const [searchParams] = useSearchParams();
+  const interventionId = searchParams.get('interventionId');
+  const microcompetencyId = searchParams.get('microcompetencyId');
+
+  // State management
+  const [loading, setLoading] = useState(true);
+  const [student, setStudent] = useState<Student | null>(null);
+  const [components, setComponents] = useState<Component[]>([]);
+  const [terms, setTerms] = useState<Term[]>([]);
+  const [selectedTermId, setSelectedTermId] = useState<string>("");
+  const [scores, setScores] = useState<ScoringState>({});
   const [overallFeedback, setOverallFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  // Find student data
-  const student = studentList.find(s => s.id === studentId) || studentData;
-  
-  // Initialize scores state
-  const [scores, setScores] = useState<{
-    [key: string]: {
-      score: number;
-      feedback: string;
-    };
-  }>({});
-  
-  // Initialize scores on component mount
+  // Fetch initial data
   useEffect(() => {
-    const initialScores: { [key: string]: { score: number; feedback: string } } = {};
-    wellnessComponents.forEach(component => {
-      // Get existing score from student data if available
-      const existingComponent = student.quadrants.find(q => q.id === "wellness")?.components.find(c => c.id === component.id);
-      initialScores[component.id] = {
-        score: existingComponent?.score || 0,
-        feedback: ""
-      };
-    });
-    setScores(initialScores);
-  }, [student, studentId]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Validate required parameters
+        if (!studentId) {
+          throw new Error('Student ID is required');
+        }
+
+        // Fetch student data, terms, and components in parallel
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+        const [studentResponse, termsResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/v1/students/${studentId}`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+          }),
+          termAPI.getAllTerms()
+        ]);
+
+        if (!studentResponse.ok) {
+          throw new Error('Failed to fetch student data');
+        }
+
+        const studentData = await studentResponse.json();
+        setStudent(studentData.data);
+
+        const termsData = termsResponse.data;
+        setTerms(termsData);
+
+        // Set current term as default
+        const currentTerm = termsData.find(t => t.is_current) || termsData[0];
+        if (currentTerm) {
+          setSelectedTermId(currentTerm.id);
+        }
+
+        // Fetch components based on the scoring context
+        await fetchComponents();
+
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+        toast.error('Failed to load student data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [studentId]);
   
+  // Fetch components based on context (SHL, Physical, etc.)
+  const fetchComponents = async () => {
+    try {
+      let componentsData: Component[] = [];
+
+      if (microcompetencyId) {
+        // If we have a specific microcompetency, get its component
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+        const microcompetencyResponse = await fetch(`${API_BASE_URL}/api/v1/microcompetencies/${microcompetencyId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        });
+
+        if (microcompetencyResponse.ok) {
+          const microcompetencyData = await microcompetencyResponse.json();
+          const componentId = microcompetencyData.data.component_id;
+
+          const componentResponse = await componentAPI.getComponentById(componentId);
+          componentsData = [componentResponse.data];
+        }
+      } else {
+        // Default to Physical components (wellness assessment)
+        const physicalComponentsResponse = await componentAPI.getAllComponents({
+          quadrant_id: undefined, // We'll filter by category instead
+          include_inactive: false
+        });
+
+        // Filter for Physical category components
+        componentsData = physicalComponentsResponse.data.filter(c => c.category === 'Physical');
+      }
+
+      setComponents(componentsData);
+
+      // Initialize scores state
+      const initialScores: ScoringState = {};
+      componentsData.forEach(component => {
+        initialScores[component.id] = {
+          componentId: component.id,
+          obtainedScore: 0,
+          feedback: ""
+        };
+      });
+      setScores(initialScores);
+
+    } catch (err) {
+      console.error('Error fetching components:', err);
+      toast.error('Failed to load components');
+    }
+  };
+
   // Calculate total score
-  const totalScore = Object.values(scores).reduce((sum, item) => sum + item.score, 0);
-  const maxPossibleScore = wellnessComponents.reduce((sum, component) => sum + component.maxScore, 0);
-  const scorePercentage = (totalScore / maxPossibleScore) * 100;
-  
+  const totalScore = Object.values(scores).reduce((sum, score) => sum + score.obtainedScore, 0);
+  const maxPossibleScore = components.reduce((sum, component) => sum + component.max_score, 0);
+  const scorePercentage = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+
   // Handle score change
   const handleScoreChange = (componentId: string, value: number[]) => {
     setScores(prev => ({
       ...prev,
       [componentId]: {
         ...prev[componentId],
-        score: value[0]
+        obtainedScore: value[0]
       }
     }));
   };
-  
+
   // Handle feedback change
   const handleFeedbackChange = (componentId: string, feedback: string) => {
     setScores(prev => ({
@@ -99,37 +187,175 @@ const InterventionScoring: React.FC = () => {
   };
   
   // Handle save as draft
-  const handleSaveDraft = () => {
-    setIsSubmitting(true);
-    setIsDraft(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      toast.success("Assessment saved as draft");
-      setIsSubmitting(false);
-    }, 1000);
-  };
-  
-  // Handle submit
-  const handleSubmit = () => {
-    setIsSubmitting(true);
-    
-    // Validate if all components have scores
-    const hasAllScores = Object.keys(scores).every(key => scores[key].score > 0);
-    
-    if (!hasAllScores) {
-      toast.error("Please provide scores for all components");
-      setIsSubmitting(false);
+  const handleSaveDraft = async () => {
+    if (!student || !selectedTermId) {
+      toast.error("Missing required data");
       return;
     }
-    
-    // Simulate API call
-    setTimeout(() => {
-      toast.success("Assessment submitted successfully");
+
+    setIsSubmitting(true);
+
+    try {
+      // Save scores for each component
+      const savePromises = Object.values(scores).map(async (score) => {
+        const component = components.find(c => c.id === score.componentId);
+        if (!component || score.obtainedScore === 0) return;
+
+        // Use SHL competency API for SHL components, regular scoring for others
+        if (component.category === 'SHL') {
+          return shlCompetencyAPI.submitSHLCompetencyScore(
+            student.id,
+            component.id,
+            {
+              obtainedScore: score.obtainedScore,
+              maxScore: component.max_score,
+              termId: selectedTermId,
+              notes: score.feedback
+            }
+          );
+        } else {
+          // Use regular component scoring API
+          return const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+          fetch(`${API_BASE_URL}/api/v1/scores/submit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({
+              student_id: student.id,
+              component_id: component.id,
+              obtained_score: score.obtainedScore,
+              max_score: component.max_score,
+              term_id: selectedTermId,
+              notes: score.feedback,
+              is_draft: true
+            })
+          });
+        }
+      });
+
+      await Promise.all(savePromises.filter(Boolean));
+      toast.success("Assessment saved as draft");
+
+    } catch (err) {
+      console.error('Error saving draft:', err);
+      toast.error("Failed to save draft");
+    } finally {
       setIsSubmitting(false);
-      navigate("/teacher/students");
-    }, 1500);
+    }
   };
+
+  // Handle submit
+  const handleSubmit = async () => {
+    if (!student || !selectedTermId) {
+      toast.error("Missing required data");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Validate if all components have scores
+      const hasAllScores = Object.values(scores).every(score => score.obtainedScore > 0);
+
+      if (!hasAllScores) {
+        toast.error("Please provide scores for all components");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Submit scores for each component
+      const submitPromises = Object.values(scores).map(async (score) => {
+        const component = components.find(c => c.id === score.componentId);
+        if (!component) return;
+
+        // Use SHL competency API for SHL components, regular scoring for others
+        if (component.category === 'SHL') {
+          return shlCompetencyAPI.submitSHLCompetencyScore(
+            student.id,
+            component.id,
+            {
+              obtainedScore: score.obtainedScore,
+              maxScore: component.max_score,
+              termId: selectedTermId,
+              notes: score.feedback
+            }
+          );
+        } else {
+          // Use regular component scoring API
+          return const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+          fetch(`${API_BASE_URL}/api/v1/scores/submit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({
+              student_id: student.id,
+              component_id: component.id,
+              obtained_score: score.obtainedScore,
+              max_score: component.max_score,
+              term_id: selectedTermId,
+              notes: score.feedback,
+              is_draft: false
+            })
+          });
+        }
+      });
+
+      await Promise.all(submitPromises);
+      toast.success("Assessment submitted successfully");
+      navigate("/teacher/students");
+
+    } catch (err) {
+      console.error('Error submitting scores:', err);
+      toast.error("Failed to submit assessment");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading assessment data...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !student) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/teacher/students")}
+            className="mr-2"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Assessment Error</h1>
+          </div>
+        </div>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-2 text-red-600">
+              <AlertCircle className="h-5 w-5" />
+              <span>{error || 'Student not found'}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -143,9 +369,13 @@ const InterventionScoring: React.FC = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Wellness Assessment</h1>
+          <h1 className="text-2xl font-bold">
+            {components.length > 0 && components[0].category === 'SHL'
+              ? 'SHL Competency Assessment'
+              : 'Component Assessment'}
+          </h1>
           <p className="text-muted-foreground">
-            Score and provide feedback for {student.name}
+            Score and provide feedback for {student.name} ({student.registration_no})
           </p>
         </div>
       </div>
@@ -161,36 +391,36 @@ const InterventionScoring: React.FC = () => {
                 <User className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">{student.name}</p>
-                  <p className="text-sm text-muted-foreground">Registration: {student.registrationNo}</p>
+                  <p className="text-sm text-muted-foreground">Registration: {student.registration_no}</p>
+                  <p className="text-sm text-muted-foreground">Course: {student.course}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-3">
                 <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium">Current Term</p>
-                  <Select value={selectedTerm} onValueChange={setSelectedTerm}>
+                  <p className="font-medium">Assessment Term</p>
+                  <Select value={selectedTermId} onValueChange={setSelectedTermId}>
                     <SelectTrigger className="w-full mt-1">
                       <SelectValue placeholder="Select Term" />
                     </SelectTrigger>
                     <SelectContent>
-                      {student.terms.map(term => (
-                        <SelectItem key={term.termId} value={term.termId}>
-                          {term.termName}
+                      {terms.map(term => (
+                        <SelectItem key={term.id} value={term.id}>
+                          {term.name} ({term.academic_year})
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium">Previous Score</p>
+                  <p className="font-medium">Components to Score</p>
                   <p className="text-sm text-muted-foreground">
-                    {student.quadrants.find(q => q.id === "wellness")?.obtained || 0}/
-                    {student.quadrants.find(q => q.id === "wellness")?.weightage || 30}
+                    {components.length} component{components.length !== 1 ? 's' : ''} available
                   </p>
                 </div>
               </div>
@@ -219,11 +449,11 @@ const InterventionScoring: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                {wellnessComponents.map(component => (
+                {components.map(component => (
                   <div key={component.id} className="flex justify-between items-center">
                     <span className="text-sm">{component.name}</span>
-                    <Badge variant={scores[component.id]?.score > 0 ? "outline" : "secondary"}>
-                      {scores[component.id]?.score || 0}/{component.maxScore}
+                    <Badge variant={scores[component.id]?.obtainedScore > 0 ? "outline" : "secondary"}>
+                      {scores[component.id]?.obtainedScore || 0}/{component.max_score}
                     </Badge>
                   </div>
                 ))}
@@ -242,7 +472,7 @@ const InterventionScoring: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {wellnessComponents.map(component => (
+                {components.map(component => (
                   <div key={component.id} className="space-y-3">
                     <div className="flex justify-between items-center">
                       <div className="space-y-1">
@@ -250,28 +480,31 @@ const InterventionScoring: React.FC = () => {
                           {component.name}
                         </Label>
                         <p className="text-sm text-muted-foreground">{component.description}</p>
+                        <Badge variant="secondary" className="text-xs">
+                          {component.category} • Max: {component.max_score}
+                        </Badge>
                       </div>
                       <Badge variant="outline" className="ml-2">
-                        {scores[component.id]?.score || 0}/{component.maxScore}
+                        {scores[component.id]?.obtainedScore || 0}/{component.max_score}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
                         <Slider
                           id={`score-${component.id}`}
-                          defaultValue={[scores[component.id]?.score || 0]}
-                          max={component.maxScore}
+                          value={[scores[component.id]?.obtainedScore || 0]}
+                          max={component.max_score}
                           step={0.5}
                           onValueChange={(value) => handleScoreChange(component.id, value)}
                         />
                       </div>
-                      <div className="w-12 text-center">
+                      <div className="w-16 text-center">
                         <Input
                           type="number"
-                          value={scores[component.id]?.score || 0}
+                          value={scores[component.id]?.obtainedScore || 0}
                           min={0}
-                          max={component.maxScore}
+                          max={component.max_score}
                           step={0.5}
                           onChange={(e) => handleScoreChange(component.id, [parseFloat(e.target.value) || 0])}
                           className="h-8"

@@ -111,9 +111,11 @@ const AdminDashboard: React.FC = () => {
 
         // Calculate completion rate from performance data
         if (dashboardResponse.data.performanceMetrics && dashboardResponse.data.performanceMetrics.length > 0) {
-          const avgCompletion = dashboardResponse.data.performanceMetrics.reduce((acc: number, metric: any) =>
-            acc + (metric.completionRate || 0), 0) / dashboardResponse.data.performanceMetrics.length;
-          setCompletionRate(Math.round(avgCompletion));
+          // Backend returns quadrant data with weightage, not completion rate
+          // Use weightage as a proxy for completion rate or calculate from other data
+          const avgWeightage = dashboardResponse.data.performanceMetrics.reduce((acc: number, metric: any) =>
+            acc + (metric.weightage || 0), 0) / dashboardResponse.data.performanceMetrics.length;
+          setCompletionRate(Math.round(avgWeightage));
         } else {
           // Calculate from interventions if no performance metrics
           setCompletionRate(75); // Default fallback

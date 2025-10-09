@@ -22,7 +22,7 @@ const QuadrantCard: React.FC<QuadrantCardProps> = ({
   gradientClass = "card-gradient-primary",
 }) => {
   const navigate = useNavigate();
-  const percentage = Math.round((quadrant.obtained / quadrant.weightage) * 100);
+  const percentage = Math.round((quadrant.obtained / quadrant.maxScore) * 100);
 
   const handleClick = () => {
     navigate(`/student/quadrant/${quadrant.id}`);
@@ -43,7 +43,7 @@ const QuadrantCard: React.FC<QuadrantCardProps> = ({
       <CardContent className="pt-4">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium">Your Score</span>
-          <span className="text-xl font-bold">{quadrant.obtained.toFixed(1)}/{quadrant.weightage}</span>
+          <span className="text-xl font-bold">{quadrant.obtained.toFixed(1)}/{quadrant.maxScore}</span>
         </div>
         <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
           <div 
@@ -75,11 +75,11 @@ const QuadrantCard: React.FC<QuadrantCardProps> = ({
         <div className="mt-4 grid grid-cols-2 gap-2">
           <div className="text-sm">
             <p className="text-muted-foreground">Batch Avg</p>
-            <p className="font-medium">{batchAvg.toFixed(1)}/{quadrant.weightage}</p>
+            <p className="font-medium">{batchAvg.toFixed(1)}/{quadrant.maxScore}</p>
           </div>
           <div className="text-sm">
             <p className="text-muted-foreground">Batch Best</p>
-            <p className="font-medium">{batchBest.toFixed(1)}/{quadrant.weightage}</p>
+            <p className="font-medium">{batchBest.toFixed(1)}/{quadrant.maxScore}</p>
           </div>
         </div>
       </CardContent>

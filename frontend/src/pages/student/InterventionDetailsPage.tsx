@@ -27,7 +27,7 @@ import {
   Award,
   TrendingUp,
 } from 'lucide-react';
-import { studentAPI } from '@/lib/api';
+import { studentAPI, studentInterventionAPI } from '@/lib/api';
 import { InterventionDetails, InterventionMicrocompetency } from '@/types/intervention';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTerm } from '@/contexts/TermContext';
@@ -39,6 +39,8 @@ const InterventionDetailsPage: React.FC = () => {
   const { selectedTerm } = useTerm();
   const [intervention, setIntervention] = useState<any>(null);
   const [studentScore, setStudentScore] = useState<any>(null);
+  const [microcompetencyData, setMicrocompetencyData] = useState<any>(null);
+  const [currentStudentId, setCurrentStudentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
@@ -61,6 +63,7 @@ const InterventionDetailsPage: React.FC = () => {
       // Get current student profile to get student ID
       const currentStudentResponse = await studentAPI.getCurrentStudent();
       const studentId = currentStudentResponse.data.id;
+      setCurrentStudentId(studentId);
 
       // Use student-specific endpoint that doesn't require admin privileges
       const interventionResponse = await studentAPI.getStudentInterventionDetails(studentId, id!);
@@ -68,6 +71,15 @@ const InterventionDetailsPage: React.FC = () => {
       setIntervention(interventionResponse.data.intervention);
       if (interventionResponse.data.progress) {
         setStudentScore(interventionResponse.data.progress);
+      }
+
+      // Get microcompetency breakdown for enrolled students
+      try {
+        const microcompetencyResponse = await studentInterventionAPI.getStudentInterventionBreakdown(studentId, id!);
+        setMicrocompetencyData(microcompetencyResponse.data);
+      } catch (microError) {
+        console.warn('Could not fetch microcompetency data:', microError);
+        // Don't set error state for this - it's optional data
       }
     } catch (err) {
       console.error('Error fetching intervention details:', err);
@@ -185,7 +197,7 @@ const InterventionDetailsPage: React.FC = () => {
 
   const progress = calculateProgress(intervention.start_date, intervention.end_date);
   const daysRemaining = getDaysRemaining(intervention.end_date);
-  const isEnrolled = intervention.enrolled_students.some(student => student.id === user?.id);
+  const isEnrolled = currentStudentId && intervention.enrolled_students.some(student => student.id === currentStudentId);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -431,15 +443,86 @@ const InterventionDetailsPage: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="microcompetencies" className="space-y-4">
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Target className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Microcompetencies</h3>
-                  <p className="text-gray-600 text-center">
-                    Detailed microcompetency information will be available here.
-                  </p>
-                </CardContent>
-              </Card>
+              {isEnrolled && microcompetencyData?.breakdown ? (
+                <div className="space-y-4">
+                  {microcompetencyData.breakdown.map((quadrant: any) => (
+                    <Card key={quadrant.quadrant_id}>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Target className="h-5 w-5" />
+                          {quadrant.quadrant_name}
+                        </CardTitle>
+                        <CardDescription>
+                          Score: {quadrant.quadrant_total_obtained}/{quadrant.quadrant_total_max}
+                          ({quadrant.quadrant_percentage.toFixed(1)}%)
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {quadrant.components.map((component: any) => (
+                            <div key={component.component_id} className="border-l-4 border-l-blue-200 pl-4">
+                              <h4 className="font-medium text-gray-900">{component.component_name}</h4>
+                              <p className="text-sm text-gray-600 mb-2">
+                                Score: {component.component_total_obtained}/{component.component_total_max}
+                                ({component.component_percentage.toFixed(1)}%)
+                              </p>
+                              <div className="space-y-2">
+                                {component.microcompetencies.map((micro: any) => (
+                                  <div key={micro.id} className="bg-gray-50 p-3 rounded-lg">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex-1">
+                                        <h5 className="font-medium text-sm">{micro.name}</h5>
+                                        <p className="text-xs text-gray-600">{micro.description}</p>
+                                      </div>
+                                      <div className="text-right">
+                                        <div className="text-sm font-medium">
+                                          {micro.score.obtained_score}/{micro.score.max_score}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                          {micro.score.percentage.toFixed(1)}%
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {micro.score.feedback && (
+                                      <div className="mt-2 text-xs text-gray-600 bg-blue-50 p-2 rounded">
+                                        <strong>Feedback:</strong> {micro.score.feedback}
+                                      </div>
+                                    )}
+                                    <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                                      <span>Weightage: {micro.intervention_weightage}%</span>
+                                      <span>Scored: {new Date(micro.score.scored_at).toLocaleDateString()}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : isEnrolled ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-12">
+                    <Target className="h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Microcompetencies</h3>
+                    <p className="text-gray-600 text-center">
+                      Loading your microcompetency progress...
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-12">
+                    <Target className="h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Microcompetencies</h3>
+                    <p className="text-gray-600 text-center">
+                      Enroll in this intervention to view microcompetency details.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             <TabsContent value="teachers" className="space-y-4">

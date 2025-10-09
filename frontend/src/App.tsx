@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
 import AuthCallback from "./pages/AuthCallback";
+import SSOCallback from "./pages/SSOCallback";
 
 // Student pages
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -57,6 +58,18 @@ import QuadrantManagement from "./pages/admin/QuadrantManagement";
 import InterventionStudents from "./pages/admin/InterventionStudents";
 import InterventionSettings from "./pages/admin/InterventionSettings";
 import InterventionAnalytics from "./pages/admin/InterventionAnalytics";
+import UserRoleManagement from "./pages/admin/UserRoleManagement";
+import AdminAuditLog from "./pages/admin/AdminAuditLog";
+import ProfileUpdate from "./pages/student/ProfileUpdate";
+import ProfileApproval from "./pages/admin/ProfileApproval";
+import BatchTermWeightageManagement from "./pages/admin/BatchTermWeightageManagement";
+import HierarchyTest from "./pages/admin/HierarchyTest";
+
+// Batch Progression Components
+import BatchProgressionManagement from "./components/admin/BatchProgressionManagement";
+import SmartBatchProgressionDashboard from "./components/SmartBatchProgressionDashboard";
+import LevelProgressionDashboard from "./components/LevelProgressionDashboard";
+import StudentLevelProgressionDashboard from "./components/student/StudentLevelProgressionDashboard";
 
 const queryClient = new QueryClient();
 
@@ -90,6 +103,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/auth/sso-callback" element={<SSOCallback />} />
       <Route path="/index" element={<Index />} />
 
       {/* Student Routes */}
@@ -343,6 +357,71 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="admin">
           <Layout>
             <InterventionSettings />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/role-management" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <UserRoleManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/audit-log" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <AdminAuditLog />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/profile-approval" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <ProfileApproval />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/batch-term-weightages" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <BatchTermWeightageManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/hierarchy-test" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <HierarchyTest />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/batch-progression" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <BatchProgressionManagement />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/level-progression" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <LevelProgressionDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/smart-batch-dashboard" element={
+        <ProtectedRoute requiredRole="admin">
+          <Layout>
+            <SmartBatchProgressionDashboard />
+          </Layout>
+        </ProtectedRoute>
+      } />
+
+      {/* Student Routes */}
+      <Route path="/student/profile-update" element={
+        <ProtectedRoute requiredRole="student">
+          <Layout>
+            <ProfileUpdate />
           </Layout>
         </ProtectedRoute>
       } />

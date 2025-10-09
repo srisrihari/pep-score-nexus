@@ -7,43 +7,66 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Upload, FileSpreadsheet, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { uploadAPI } from '@/lib/api';
+import { ErrorHandler } from '@/utils/errorHandling';
 
 const ExcelImport: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importType, setImportType] = useState('students');
   const [importStatus, setImportStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const [importResults, setImportResults] = useState<any>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+      if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
           file.type === 'application/vnd.ms-excel') {
         setSelectedFile(file);
         setImportStatus('idle');
         setStatusMessage('');
       } else {
-        toast.error('Please select a valid Excel file (.xlsx or .xls)');
+        ErrorHandler.handleFileUploadError(
+          { message: 'Invalid file type. Only Excel files (.xlsx or .xls) are allowed.' },
+          file.name
+        );
         setSelectedFile(null);
       }
     }
   };
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!selectedFile) {
-      toast.error('Please select a file to import');
+      ErrorHandler.showWarning('Please select a file to import');
       return;
     }
 
     setImportStatus('processing');
     setStatusMessage('Processing your Excel file...');
+    setImportResults(null);
 
-    // Simulate processing
-    setTimeout(() => {
-      setImportStatus('success');
-      setStatusMessage('Data imported successfully!');
-      toast.success('Excel data imported successfully');
-    }, 2000);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('importType', importType);
+
+      const response = await uploadAPI.importExcelData(formData);
+
+      if (response.success) {
+        setImportStatus('success');
+        setStatusMessage(response.message);
+        setImportResults(response.data);
+        ErrorHandler.showSuccess('Excel data imported successfully');
+      } else {
+        setImportStatus('error');
+        setStatusMessage(response.message || 'Import failed');
+        ErrorHandler.handleApiError(response, 'Excel import');
+      }
+    } catch (error) {
+      setImportStatus('error');
+      setStatusMessage('Failed to import Excel data. Please try again.');
+      ErrorHandler.handleFileUploadError(error, selectedFile.name);
+    }
   };
 
   return (
@@ -108,7 +131,29 @@ const ExcelImport: React.FC = () => {
             <Alert className="bg-green-50 text-green-800 border-green-200">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertTitle>Success</AlertTitle>
-              <AlertDescription>{statusMessage}</AlertDescription>
+              <AlertDescription>
+                {statusMessage}
+                {importResults && (
+                  <div className="mt-2 text-sm">
+                    <p>Total rows: {importResults.totalRows}</p>
+                    <p>Successfully imported: {importResults.successCount}</p>
+                    <p>Errors: {importResults.errorCount}</p>
+                    {importResults.errors && importResults.errors.length > 0 && (
+                      <div className="mt-2">
+                        <p className="font-medium">Errors:</p>
+                        <ul className="list-disc list-inside">
+                          {importResults.errors.slice(0, 5).map((error: string, index: number) => (
+                            <li key={index} className="text-xs">{error}</li>
+                          ))}
+                          {importResults.errors.length > 5 && (
+                            <li className="text-xs">... and {importResults.errors.length - 5} more errors</li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </AlertDescription>
             </Alert>
           )}
 

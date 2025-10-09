@@ -3282,6 +3282,25 @@ const gradeSubmission = async (req, res) => {
     const submission = submissionResult.rows[0];
     const task = submission.tasks;
 
+    // Get intervention details to get term_id
+    const interventionResult = await query(
+      supabase
+        .from('interventions')
+        .select('term_id')
+        .eq('id', task.intervention_id)
+        .limit(1)
+    );
+
+    if (!interventionResult.rows || interventionResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Intervention not found',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const intervention = interventionResult.rows[0];
+
     // Verify teacher is assigned to all microcompetencies of this task
     const microcompetencyIds = task.task_microcompetencies.map(tm => tm.microcompetency_id);
     const teacherAssignmentCheck = await query(
@@ -3418,7 +3437,8 @@ const gradeSubmission = async (req, res) => {
                 percentage: (obtainedScore / microcompetency.max_score) * 100,
                 scored_at: new Date().toISOString(),
                 scored_by: teacher.id,
-                status: 'Submitted'
+                status: 'Submitted',
+                term_id: intervention.term_id
               })
               .select('id, obtained_score, percentage')
           );
@@ -3545,6 +3565,25 @@ const createDirectAssessment = async (req, res) => {
     }
 
     const task = taskResult.rows[0];
+
+    // Get intervention details to get term_id
+    const interventionDetailsResult = await query(
+      supabase
+        .from('interventions')
+        .select('term_id')
+        .eq('id', task.interventions.id)
+        .limit(1)
+    );
+
+    if (!interventionDetailsResult.rows || interventionDetailsResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Intervention not found',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const interventionDetails = interventionDetailsResult.rows[0];
 
     // Validate score range
     if (score < 0 || score > task.max_score) {
@@ -3697,7 +3736,8 @@ const createDirectAssessment = async (req, res) => {
               obtained_score: obtainedScore,
               scored_at: new Date().toISOString(),
               scored_by: teacher.id,
-              status: 'Submitted'
+              status: 'Submitted',
+              term_id: interventionDetails.term_id
             })
             .select('*')
         );

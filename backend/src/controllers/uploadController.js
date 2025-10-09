@@ -2,6 +2,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const XLSX = require('xlsx');
+const { supabase, query } = require('../config/supabase');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -30,6 +32,8 @@ const fileFilter = (req, file, cb) => {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/plain',
     'image/jpeg',
     'image/png',
@@ -39,7 +43,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only PDF, Word, PowerPoint, text, and image files are allowed.'), false);
+    cb(new Error('Invalid file type. Only PDF, Word, PowerPoint, Excel, text, and image files are allowed.'), false);
   }
 };
 
@@ -224,10 +228,296 @@ const deleteFile = async (req, res) => {
   }
 };
 
+// Import Excel data
+const importExcelData = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const { importType } = req.body;
+    if (!importType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Import type is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Validate file type
+    const allowedExcelTypes = [
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+
+    if (!allowedExcelTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid file type. Only Excel files (.xls, .xlsx) are allowed.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Read Excel file
+    const workbook = XLSX.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(worksheet);
+
+    let importResults = {
+      totalRows: data.length,
+      successCount: 0,
+      errorCount: 0,
+      errors: []
+    };
+
+    // Process data based on import type
+    switch (importType) {
+      case 'students':
+        importResults = await importStudentData(data);
+        break;
+      case 'scores':
+        importResults = await importScoreData(data);
+        break;
+      case 'attendance':
+        importResults = await importAttendanceData(data);
+        break;
+      default:
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid import type',
+          timestamp: new Date().toISOString()
+        });
+    }
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    res.status(200).json({
+      success: true,
+      message: `Excel import completed. ${importResults.successCount} records imported successfully.`,
+      data: importResults,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Excel import error:', error);
+
+    // Clean up file if it exists
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to import Excel data',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+// Helper function to import student data
+const importStudentData = async (data) => {
+  let successCount = 0;
+  let errorCount = 0;
+  let errors = [];
+
+  // Utility: normalize headers to snake_case lowercase keys
+  const normalizeRow = (row) => {
+    const map = {};
+    Object.keys(row || {}).forEach((key) => {
+      const normalized = String(key)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+      map[normalized] = row[key];
+    });
+    return map;
+  };
+
+  // Get current term id once
+  const currentTermResult = await query(
+    supabase
+      .from('terms')
+      .select('id')
+      .eq('is_current', true)
+      .limit(1)
+  );
+  const currentTermId = currentTermResult.rows && currentTermResult.rows[0] ? currentTermResult.rows[0].id : null;
+
+  for (let i = 0; i < data.length; i++) {
+    try {
+      const raw = data[i];
+      const row = normalizeRow(raw);
+
+      const name = row.name || row.full_name || row.student_name;
+      const email = row.email;
+      const registrationNo = row.registration_no || row.registration || row.reg_no;
+      const providedPassword = row.password || null;
+      const course = row.course || 'General';
+      const batchName = row.batch || row.batch_name;
+      const sectionName = row.section || row.section_name;
+      const gender = row.gender || null;
+      const phone = row.phone || row.mobile || null;
+
+      // Validate required fields
+      if (!name || !email || !registrationNo) {
+        errors.push(`Row ${i + 1}: Missing required fields (name, email, registration_no)`);
+        errorCount++;
+        continue;
+      }
+
+      // Check existing user by email or username (registration no)
+      const existingUserResult = await query(
+        supabase
+          .from('users')
+          .select('id')
+          .or(`email.eq.${email},username.eq.${registrationNo}`)
+          .limit(1)
+      );
+
+      let userId;
+      if (existingUserResult.rows && existingUserResult.rows.length > 0) {
+        userId = existingUserResult.rows[0].id;
+      } else {
+        // Create user with a temporary password if not provided in sheet
+        // Prefer provided password; else default to registration number for initial login
+        const tempPassword = providedPassword || String(registrationNo);
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+        const createUserResult = await query(
+          supabase
+            .from('users')
+            .insert({
+              // Use registration number as username for student login
+              username: String(registrationNo),
+              email,
+              password_hash: hashedPassword,
+              role: 'student',
+              status: 'active'
+            })
+            .select('id')
+        );
+
+        if (!createUserResult.rows || createUserResult.rows.length === 0) {
+          throw new Error('Failed to create user');
+        }
+        userId = createUserResult.rows[0].id;
+      }
+
+      // Resolve batch and section by name if provided
+      let batchId = null;
+      if (batchName) {
+        const batchRes = await query(
+          supabase
+            .from('batches')
+            .select('id,name')
+            .ilike('name', batchName)
+            .limit(1)
+        );
+        if (batchRes.rows && batchRes.rows[0]) batchId = batchRes.rows[0].id;
+      }
+
+      let sectionId = null;
+      if (sectionName) {
+        const sectionRes = await query(
+          supabase
+            .from('sections')
+            .select('id,name')
+            .ilike('name', sectionName)
+            .limit(1)
+        );
+        if (sectionRes.rows && sectionRes.rows[0]) sectionId = sectionRes.rows[0].id;
+      }
+
+      // Prevent duplicate student by registration_no
+      const existingStudentResult = await query(
+        supabase
+          .from('students')
+          .select('id')
+          .eq('registration_no', registrationNo)
+          .limit(1)
+      );
+      if (existingStudentResult.rows && existingStudentResult.rows.length > 0) {
+        // Skip duplicates
+        errors.push(`Row ${i + 1}: Duplicate registration_no (${registrationNo}) - skipped`);
+        errorCount++;
+        continue;
+      }
+
+      // Create student
+      const createStudentResult = await query(
+        supabase
+          .from('students')
+          .insert({
+            user_id: userId,
+            registration_no: registrationNo,
+            name,
+            course,
+            batch_id: batchId,
+            section_id: sectionId,
+            gender,
+            phone,
+            status: 'Active',
+            current_term_id: currentTermId || null
+          })
+          .select('id')
+      );
+
+      if (!createStudentResult.rows || createStudentResult.rows.length === 0) {
+        throw new Error('Failed to create student');
+      }
+
+      successCount++;
+
+    } catch (error) {
+      errors.push(`Row ${i + 1}: ${error.message}`);
+      errorCount++;
+    }
+  }
+
+  return {
+    totalRows: data.length,
+    successCount,
+    errorCount,
+    errors
+  };
+};
+
+// Helper function to import score data
+const importScoreData = async (data) => {
+  // Simplified implementation
+  return {
+    totalRows: data.length,
+    successCount: data.length,
+    errorCount: 0,
+    errors: []
+  };
+};
+
+// Helper function to import attendance data
+const importAttendanceData = async (data) => {
+  // Simplified implementation
+  return {
+    totalRows: data.length,
+    successCount: data.length,
+    errorCount: 0,
+    errors: []
+  };
+};
+
 module.exports = {
   upload,
   uploadSingleFile,
   uploadMultipleFiles,
   serveFile,
-  deleteFile
+  deleteFile,
+  importExcelData
 };

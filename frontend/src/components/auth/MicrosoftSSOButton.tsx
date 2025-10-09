@@ -21,13 +21,24 @@ const MicrosoftSSOButton: React.FC<MicrosoftSSOButtonProps> = ({
   const handleMicrosoftLogin = async () => {
     try {
       setIsLoading(true);
-      console.log('🚀 Microsoft SSO: Redirecting to backend login...');
+      console.log('🚀 KOS-Core SSO: Redirecting to college SSO system...');
 
-      // Redirect to backend Microsoft SSO endpoint
-      window.location.href = 'http://localhost:3001/api/v1/auth/microsoft/login';
+      // Based on the KOS response, it expects redirect to SSORedirect endpoint
+      // The KOS system shows: REDIRECT_URL = "https://kos.vijaybhoumi.edu.in/SSORedirect?name=Microsoft%20SSO"
+      // But we need to use our callback URL
+
+      // The KOS system is showing the Microsoft OAuth URL directly, let's use that
+      // From the response: redirect_url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=1c36d723-8bc0-42b5-9d35-ddc2528dcf52&response_type=code&redirect_uri=http://localhost:8080/auth/sso-callback&responsemode=query&scope=User.Read"
+
+      // Let's redirect directly to Microsoft OAuth with the correct parameters
+      const microsoftOAuthURL = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=1c36d723-8bc0-42b5-9d35-ddc2528dcf52&response_type=code&redirect_uri=${encodeURIComponent('http://localhost:8080/auth/sso-callback')}&response_mode=query&scope=User.Read&prompt=select_account`;
+
+      console.log('🔗 Direct Microsoft OAuth URL:', microsoftOAuthURL);
+
+      window.location.href = microsoftOAuthURL;
 
     } catch (error: any) {
-      console.error('❌ Microsoft SSO Error:', error);
+      console.error('❌ KOS-Core SSO Error:', error);
 
       toast.error('Failed to initiate Microsoft SSO login');
 
