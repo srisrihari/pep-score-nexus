@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "::",
       port,
-      allowedHosts: allowedUrls
+      allowedHosts: allowedUrls,
 
       },
     },
