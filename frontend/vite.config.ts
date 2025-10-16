@@ -14,8 +14,10 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "::",
       port,
-      cors: {
-        origin: allowedUrls,
+      allowedHosts: [
+      allowedUrls
+      ]
+
       },
     },
     plugins: [
