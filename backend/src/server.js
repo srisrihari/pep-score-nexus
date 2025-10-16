@@ -90,6 +90,7 @@ app.use(cors({
       'https://8hbdz2rs-8080.inc1.devtunnels.ms',
       'https://uat.pep.vijaybhoomi.edu.in',
       'https://api.uat.pep.vijaybhoomi.edu.in',
+      '*',
       process.env.CORS_ORIGIN
     ].filter(Boolean);
 
