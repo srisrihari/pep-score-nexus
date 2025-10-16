@@ -25,6 +25,7 @@ const {
 
 const { testConnection } = require('./config/supabase');
 const superAdminService = require('./services/superAdminService');
+const hpsBackgroundService = require('./services/hpsBackgroundService');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -53,6 +54,7 @@ const shlCompetencyRoutes = require('./routes/shlCompetencies');
 const attendanceRoutes = require('./routes/attendance');
 const levelProgressionRoutes = require('./routes/levelProgressionRoutes');
 const batchTermWeightageRoutes = require('./routes/batchTermWeightages');
+const hpsManagementRoutes = require('./routes/hpsManagement');
 const bulkTeacherAssignmentController = require('./controllers/bulkTeacherAssignmentController');
 const taskMicrocompetencyController = require('./controllers/taskMicrocompetencyController');
 const termTransitionService = require('./services/termTransitionService');
@@ -86,6 +88,8 @@ app.use(cors({
       'http://10.80.60.105:8082',
       'https://8hbdz2rs-3001.inc1.devtunnels.ms',
       'https://8hbdz2rs-8080.inc1.devtunnels.ms',
+      'https://uat.pep.vijaybhoomi.edu.in',
+      'https://api.uat.pep.vijaybhoomi.edu.in',
       process.env.CORS_ORIGIN
     ].filter(Boolean);
 
@@ -214,6 +218,7 @@ app.use(`${baseRoute}/shl-competencies`, shlCompetencyRoutes);
 app.use(`${baseRoute}/attendance`, attendanceRoutes);
 app.use(`${baseRoute}/level-progression`, levelProgressionRoutes);
 app.use(`${baseRoute}/admin/batch-term-weightages`, batchTermWeightageRoutes);
+app.use(`${baseRoute}/admin/hps`, hpsManagementRoutes);
 
 // Bulk Teacher Assignment Routes
 app.post(`${baseRoute}/admin/bulk-teacher-assignment`, authenticateToken, requireRole('admin'), bulkTeacherAssignmentController.bulkAssignTeachers);
@@ -293,6 +298,10 @@ const startServer = async () => {
     console.log('⏰ Initializing term transition scheduler...');
     termTransitionService.initializeScheduler();
 
+    // Initialize HPS Background Service
+    console.log('🚀 Initializing HPS background service...');
+    hpsBackgroundService.initializeScheduler();
+
     // Start listening and return server instance
     const server = app.listen(PORT, () => {
       console.log(`🚀 PEP Score Nexus API Server running on port ${PORT}`);
@@ -320,7 +329,29 @@ startServer().then(server => {
   // Setup graceful shutdown
   gracefulShutdown(server);
 
+  // Setup graceful shutdown for background services
+  process.on('SIGTERM', () => {
+    console.log('🛑 SIGTERM received, shutting down gracefully...');
+    hpsBackgroundService.stopScheduler();
+    termTransitionService.stopScheduler();
+    server.close(() => {
+      console.log('✅ HTTP server closed');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    console.log('🛑 SIGINT received, shutting down gracefully...');
+    hpsBackgroundService.stopScheduler();
+    termTransitionService.stopScheduler();
+    server.close(() => {
+      console.log('✅ HTTP server closed');
+      process.exit(0);
+    });
+  });
+
   console.log('🚀 Server started successfully with enhanced error handling and logging');
+  console.log('🚀 HPS background service active');
 }).catch(error => {
   console.error('❌ Failed to start server:', error);
   process.exit(1);

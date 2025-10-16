@@ -239,26 +239,6 @@ const Login: React.FC = () => {
             </>
           )}
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>Demo Credentials:</p>
-            <div className="grid grid-cols-3 gap-2 mt-2">
-              <div className="bg-muted p-2 rounded-md">
-                <p className="font-medium">Student</p>
-                <p>Username: student1</p>
-                <p>Password: password123</p>
-              </div>
-              <div className="bg-muted p-2 rounded-md">
-                <p className="font-medium">Teacher</p>
-                <p>Username: teacher1</p>
-                <p>Password: password123</p>
-              </div>
-              <div className="bg-muted p-2 rounded-md">
-                <p className="font-medium">Admin</p>
-                <p>Username: admin1</p>
-                <p>Password: password123</p>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -599,7 +599,19 @@ class EnhancedUnifiedScoreCalculationServiceV2 {
           })
       );
 
-      console.log(`✅ Student score summary updated successfully`);
+      // Also update the main students table with the latest HPS score and grade
+      await query(
+        supabase
+          .from('students')
+          .update({
+            overall_score: totalHPS,
+            grade: this.calculateGrade(totalHPS),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', studentId)
+      );
+
+      console.log(`✅ Student score summary and main student record updated successfully`);
 
     } catch (error) {
       console.error('❌ Update student score summary error:', error);
@@ -610,17 +622,16 @@ class EnhancedUnifiedScoreCalculationServiceV2 {
   /**
    * Calculate grade based on HPS score
    * @param {number} score - HPS score (0-100)
-   * @returns {string} Grade (A+, A, B+, B, C+, C, D, F)
+   * @returns {string} Grade (A+, A, B, C, D, E, IC) - valid database enum values
    */
   calculateGrade(score) {
     if (score >= 95) return 'A+';
     if (score >= 90) return 'A';
-    if (score >= 85) return 'B+';
     if (score >= 80) return 'B';
-    if (score >= 75) return 'C+';
     if (score >= 70) return 'C';
     if (score >= 60) return 'D';
-    return 'F';
+    if (score >= 40) return 'E';
+    return 'IC'; // Incomplete for scores < 40
   }
 
   /**

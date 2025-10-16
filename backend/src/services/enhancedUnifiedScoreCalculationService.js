@@ -372,18 +372,17 @@ class EnhancedUnifiedScoreCalculationService {
 
   /**
    * Calculate grade based on HPS score
-   * @param {number} score - HPS score
-   * @returns {string} Grade
+   * @param {number} score - HPS score (0-100)
+   * @returns {string} Grade (A+, A, B, C, D, E, IC) - valid database enum values
    */
   calculateGrade(score) {
-    if (score >= 90) return 'A+';
-    if (score >= 80) return 'A';
-    if (score >= 70) return 'B+';
-    if (score >= 60) return 'B';
-    if (score >= 50) return 'C+';
-    if (score >= 40) return 'C';
-    if (score >= 30) return 'D';
-    return 'F';
+    if (score >= 95) return 'A+';
+    if (score >= 90) return 'A';
+    if (score >= 80) return 'B';
+    if (score >= 70) return 'C';
+    if (score >= 60) return 'D';
+    if (score >= 40) return 'E';
+    return 'IC'; // Incomplete for scores < 40
   }
 
   /**
@@ -433,7 +432,19 @@ class EnhancedUnifiedScoreCalculationService {
           .upsert(summaryData, { onConflict: 'student_id,term_id' })
       );
 
-      console.log(`✅ Student score summary updated for student ${studentId} in term ${termId}`);
+      // Also update the main students table with the latest HPS score and grade
+      await query(
+        supabase
+          .from('students')
+          .update({
+            overall_score: Math.round(totalHPS * 100) / 100,
+            grade: this.calculateGrade(totalHPS),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', studentId)
+      );
+
+      console.log(`✅ Student score summary and main student record updated for student ${studentId} in term ${termId}`);
 
     } catch (error) {
       console.error('❌ Update student score summary error:', error);

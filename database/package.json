@@ -11,6 +11,7 @@
     "setup": "npm install && echo 'Dependencies installed. Please configure .env file with your Supabase credentials.'"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.75.0",
     "pg": "^8.11.3"
   },
   "devDependencies": {

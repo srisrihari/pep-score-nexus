@@ -339,7 +339,19 @@ class UnifiedScoreCalculationService {
           .upsert(summaryData, { onConflict: 'student_id,term_id' })
       );
 
-      console.log(`✅ Student score summary updated for student ${studentId} in term ${termId}`);
+      // Also update the main students table with the latest HPS score and grade
+      await query(
+        supabase
+          .from('students')
+          .update({
+            overall_score: Math.round(totalHPS * 100) / 100,
+            grade: this.calculateGrade(totalHPS),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', studentId)
+      );
+
+      console.log(`✅ Student score summary and main student record updated for student ${studentId} in term ${termId}`);
 
     } catch (error) {
       console.error('❌ Update student score summary error:', error);
@@ -350,25 +362,17 @@ class UnifiedScoreCalculationService {
   /**
    * Calculate grade based on score percentage (Excel system requirements)
    * @param {number} score - Score percentage (0-100)
-   * @returns {string} Grade (A+, A, B, C, D, E, IC, NC)
+   * @returns {string} Grade (A+, A, B, C, D, E, IC) - valid database enum values
    */
   calculateGrade(score) {
-    // Excel system grading scale:
-    // A+: Above 80 (Excellent)
-    // A: 66-79 (Good)
-    // B: 50-65 (Average)
-    // C: 34-49 (Marginal)
-    // D: Below 34 (Poor)
-    // E: Incomplete/Failed
-    // IC: Incomplete
-    // NC: Not Cleared
-
-    if (score >= 80) return 'A+';
-    if (score >= 66) return 'A';
-    if (score >= 50) return 'B';
-    if (score >= 34) return 'C';
-    if (score > 0) return 'D';
-    return 'E'; // For 0 or null scores
+    // Updated to match database enum values
+    if (score >= 95) return 'A+';
+    if (score >= 90) return 'A';
+    if (score >= 80) return 'B';
+    if (score >= 70) return 'C';
+    if (score >= 60) return 'D';
+    if (score >= 40) return 'E';
+    return 'IC'; // Incomplete for scores < 40
   }
 
   /**
