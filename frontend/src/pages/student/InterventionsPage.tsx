@@ -63,11 +63,16 @@ const InterventionsPage: React.FC = () => {
       const currentStudentResponse = await studentAPI.getCurrentStudent();
       const studentId = currentStudentResponse.data.id;
 
+      // Ensure we have a term selected
+      if (!selectedTerm?.id) {
+        throw new Error('No active term selected. Please select a term to view interventions.');
+      }
+
       const [interventionsResponse, scoresResponse] = await Promise.all([
         // Use student-specific interventions endpoint with term filtering
-        studentAPI.getStudentInterventions(studentId, selectedTerm?.id),
+        studentAPI.getStudentInterventions(studentId, selectedTerm.id),
         // Get student intervention scores
-        studentInterventionAPI.getStudentScores(studentId)
+        studentInterventionAPI.getStudentScores(studentId, selectedTerm.id)
       ]);
 
       // Transform the interventions data to match the expected Intervention type

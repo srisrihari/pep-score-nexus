@@ -33,6 +33,7 @@ const {
 const { authenticateToken, requireRole } = require('../middleware/auth');
 const { validateInput, validationSchemas } = require('../middleware/weightageValidation');
 const { authorizeStudentAccess } = require('../middleware/resourceAuthorization');
+const { validateTermId } = require('../middleware/termValidation');
 const { paginateSearchFilter } = require('../middleware/pagination');
 const { successResponse, paginatedResponse } = require('../utils/responseFormatter');
 
@@ -73,13 +74,13 @@ router.get('/eligibility-rules', authenticateToken, getEligibilityRules);
 // @desc    Get student performance data for dashboard
 // @access  Students (own data), Teachers, Admins
 // @query   termId, includeHistory
-router.get('/:studentId/performance', authenticateToken, authorizeStudentAccess, getStudentPerformance);
+router.get('/:studentId/performance', authenticateToken, authorizeStudentAccess, validateTermId, getStudentPerformance);
 
 // @route   GET /api/v1/students/:studentId/leaderboard
 // @desc    Get student leaderboard and rankings
 // @access  Students (own data), Teachers, Admins
 // @query   termId, quadrantId
-router.get('/:studentId/leaderboard', authenticateToken, getStudentLeaderboard);
+router.get('/:studentId/leaderboard', authenticateToken, validateTermId, getStudentLeaderboard);
 
 // @route   GET /api/v1/students/:studentId/quadrants/:quadrantId
 // @desc    Get detailed quadrant information for a student
@@ -142,7 +143,7 @@ router.post('/:studentId/improvement-goals', authenticateToken, setImprovementGo
 // @desc    Get student attendance records
 // @access  Students (own data), Teachers, Admins
 // @query   termId, quadrant
-router.get('/:studentId/attendance', authenticateToken, getStudentAttendance);
+router.get('/:studentId/attendance', authenticateToken, validateTermId, getStudentAttendance);
 
 // Detailed Analytics
 

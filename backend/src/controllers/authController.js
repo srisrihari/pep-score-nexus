@@ -751,7 +751,7 @@ const findOrCreateKOSUser = async (kosUserDetails, kosData) => {
             course: 'General',
             batch_id: defaultBatch.rows?.[0]?.id || '00000000-0000-0000-0000-000000000000',
             section_id: defaultSection.rows?.[0]?.id || '00000000-0000-0000-0000-000000000000',
-            gender: 'other',
+            gender: 'Other',
             status: 'active'
           })
       );

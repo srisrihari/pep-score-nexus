@@ -2558,6 +2558,8 @@ export const interventionAPI = {
     scoreData: {
       obtained_score: number;
       feedback?: string;
+      status?: 'Draft' | 'Submitted' | 'Reviewed';
+      term_id: string;
     }
   ) => {
     return apiRequest<{

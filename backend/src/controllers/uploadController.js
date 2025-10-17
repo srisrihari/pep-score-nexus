@@ -4,6 +4,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const XLSX = require('xlsx');
 const { supabase, query } = require('../config/supabase');
+const { normalizeGender } = require('../utils/genderNormalizer');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -363,7 +364,13 @@ const importStudentData = async (data) => {
       const course = row.course || 'General';
       const batchName = row.batch || row.batch_name;
       const sectionName = row.section || row.section_name;
-      const gender = row.gender || null;
+      // Normalize gender value
+      let gender;
+      try {
+        gender = normalizeGender(row.gender);
+      } catch (error) {
+        throw new Error(`Row ${i + 1}: ${error.message}`);
+      }
       const phone = row.phone || row.mobile || null;
 
       // Validate required fields

@@ -1,4 +1,5 @@
 const { supabase, query } = require('../config/supabase');
+const { normalizeGender } = require('../utils/genderNormalizer');
 const { validateStudentData, validateTeacherData } = require('../utils/validators');
 const bcrypt = require('bcrypt');
 
@@ -377,7 +378,7 @@ const addStudent = async (req, res) => {
         course,
         batch_id: batchId,
         section_id: sectionId,
-        gender,
+        gender: normalizeGender(gender),
         phone: phone || '',
         preferences: {},
         overall_score: 0,

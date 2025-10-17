@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, requireRole } = require('../middleware/auth');
+const { validateTermId } = require('../middleware/termValidation');
 const {
   getStudentInterventionScores,
   getInterventionScoreBreakdown
@@ -20,6 +21,7 @@ const {
 router.get('/:studentId/scores',
   authenticateToken,
   requireRole('student', 'teacher', 'admin'),
+  validateTermId,
   getStudentInterventionScores
 );
 

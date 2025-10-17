@@ -48,9 +48,20 @@ const StudentDashboard: React.FC = () => {
         const studentId = currentStudentResponse.data.id;
         console.log('✅ Student ID:', studentId);
 
-        // Use selected term ID for data fetching
-        const termId = selectedTerm?.id;
-        console.log('📅 Selected term ID:', termId);
+        // Ensure we have a term selected
+        if (!selectedTerm?.id) {
+          // If no term is selected, try to get current term from available terms
+          const currentTerm = availableTerms?.find(term => term.is_current);
+          if (!currentTerm) {
+            throw new Error('No active term found. Please contact your administrator.');
+          }
+          // Update selected term in context
+          // This will trigger a re-render, but that's what we want
+          setSelectedTerm(currentTerm);
+          return;
+        }
+
+        console.log('📅 Selected term ID:', selectedTerm.id);
 
         // Fetch all required data using both legacy and new unified APIs
         const [
@@ -60,7 +71,7 @@ const StudentDashboard: React.FC = () => {
           interventionResponse,
           unifiedScoreResponse
         ] = await Promise.all([
-          studentAPI.getStudentPerformance(studentId, termId, true).catch((error) => {
+          studentAPI.getStudentPerformance(studentId, selectedTerm.id, true).catch((error) => {
             console.error('Performance API failed:', error);
             // Show user-friendly error for critical data
             if (error.message.includes('401') || error.message.includes('unauthorized')) {
@@ -68,27 +79,27 @@ const StudentDashboard: React.FC = () => {
             }
             throw new Error('Unable to load performance data. Please try refreshing the page.');
           }),
-          studentAPI.getStudentLeaderboard(studentId, termId).catch((error) => {
+          studentAPI.getStudentLeaderboard(studentId, selectedTerm.id).catch((error) => {
             console.warn('Leaderboard API failed (non-critical):', error);
             return null;
           }),
-          studentAPI.getStudentAttendance(studentId, termId).catch((error) => {
+          studentAPI.getStudentAttendance(studentId, selectedTerm.id).catch((error) => {
             console.warn('Attendance API failed (non-critical):', error);
             return null;
           }),
-          studentAPI.getStudentInterventionPerformance(studentId, termId).catch((error) => {
+          studentAPI.getStudentInterventionPerformance(studentId, selectedTerm.id).catch((error) => {
             console.warn('Intervention API failed (non-critical):', error);
             return null;
           }),
           // Try to get unified score data (new system)
-          termId ? unifiedScoreAPI.getStudentScoreSummary(studentId, termId).catch((error) => {
+          unifiedScoreAPI.getStudentScoreSummary(studentId, selectedTerm.id).catch((error) => {
             console.warn('Unified score API failed, using legacy data:', error);
             // Check for authentication errors
             if (error.message.includes('401') || error.message.includes('unauthorized')) {
               console.warn('Authentication issue with unified scores, will use legacy data');
             }
             return null;
-          }) : Promise.resolve(null)
+          })
         ]);
 
         // Check if we have the minimum required data

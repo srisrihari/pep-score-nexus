@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { interventionAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTerm } from '@/contexts/TermContext';
 
 interface MicrocompetencyDetails {
   id: string;
@@ -61,19 +62,18 @@ const MicrocompetencyScoringPage: React.FC = () => {
   }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { selectedTerm } = useTerm();
   
   const [microcompetencyDetails, setMicrocompetencyDetails] = useState<MicrocompetencyDetails | null>(null);
   const [students, setStudents] = useState<StudentScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showScoringDialog, setShowScoringDialog] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<StudentScore | null>(null);
-  const [scoreForm, setScoreForm] = useState({
-    obtained_score: 0,
-    feedback: '',
-    status: 'Submitted' as 'Draft' | 'Submitted' | 'Reviewed'
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localScores, setLocalScores] = useState<Record<string, {
+    obtained_score: number;
+    feedback: string;
+    status: 'Draft' | 'Submitted' | 'Reviewed';
+  }>>({});
 
   useEffect(() => {
     if (interventionId && microcompetencyId && user?.id) {
@@ -114,7 +114,19 @@ const MicrocompetencyScoringPage: React.FC = () => {
         intervention: microcompetenciesResponse.data.intervention
       });
 
-      setStudents(studentsResponse.data.students);
+      const newStudents = studentsResponse.data.students;
+      setStudents(newStudents);
+      
+      // Initialize local scores
+      const initialScores: Record<string, { obtained_score: number; feedback: string; status: 'Draft' | 'Submitted' | 'Reviewed' }> = {};
+      newStudents.forEach(student => {
+        initialScores[student.id] = {
+          obtained_score: student.score?.obtained_score || 0,
+          feedback: student.score?.feedback || '',
+          status: (student.score?.status as 'Draft' | 'Submitted' | 'Reviewed') || 'Submitted'
+        };
+      });
+      setLocalScores(initialScores);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch data');
     } finally {
@@ -122,40 +134,6 @@ const MicrocompetencyScoringPage: React.FC = () => {
     }
   };
 
-  const handleScoreStudent = (student: StudentScore) => {
-    setSelectedStudent(student);
-    setScoreForm({
-      obtained_score: student.score?.obtained_score || 0,
-      feedback: student.score?.feedback || '',
-      status: (student.score?.status as any) || 'Submitted'
-    });
-    setShowScoringDialog(true);
-  };
-
-  const handleSubmitScore = async () => {
-    if (!selectedStudent || !user?.id || !microcompetencyDetails) return;
-
-    try {
-      setIsSubmitting(true);
-      
-      await interventionAPI.scoreStudentMicrocompetency(
-        user.id,
-        interventionId!,
-        selectedStudent.id,
-        microcompetencyId!,
-        scoreForm
-      );
-
-      toast.success('Score submitted successfully');
-      setShowScoringDialog(false);
-      setSelectedStudent(null);
-      fetchData(); // Refresh data
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to submit score');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -294,9 +272,9 @@ const MicrocompetencyScoringPage: React.FC = () => {
                 <TableRow>
                   <TableHead>Student</TableHead>
                   <TableHead>Registration No</TableHead>
-                  <TableHead>Score</TableHead>
+                  <TableHead>Score (out of {microcompetencyDetails?.max_score})</TableHead>
+                  <TableHead>Feedback</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Last Updated</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -313,48 +291,111 @@ const MicrocompetencyScoringPage: React.FC = () => {
                       <span className="text-sm text-gray-600">{student.registration_no}</span>
                     </TableCell>
                     <TableCell>
-                      {student.score ? (
-                        <div className="flex items-center gap-2">
-                          <span className={`font-bold ${getScoreColor(student.score.percentage)}`}>
-                            {student.score.obtained_score}/{student.score.max_score}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            ({student.score.percentage.toFixed(1)}%)
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">Not scored</span>
-                      )}
+                      <Input
+                        type="number"
+                        min={0}
+                        max={microcompetencyDetails?.max_score}
+                        step={0.5}
+                        value={localScores[student.id]?.obtained_score}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          if (!isNaN(value)) {
+                            setLocalScores(prev => ({
+                              ...prev,
+                              [student.id]: {
+                                ...prev[student.id],
+                                obtained_score: value
+                              }
+                            }));
+                          }
+                        }}
+                        className="w-24"
+                      />
                     </TableCell>
                     <TableCell>
-                      {student.score ? (
-                        <Badge
-                          variant={student.score.status === 'Submitted' ? 'default' : 'secondary'}
-                        >
-                          {student.score.status}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">Pending</Badge>
-                      )}
+                      <Input
+                        type="text"
+                        placeholder="Add feedback..."
+                        value={localScores[student.id]?.feedback}
+                        onChange={(e) => {
+                          setLocalScores(prev => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              feedback: e.target.value
+                            }
+                          }));
+                        }}
+                        className="w-full"
+                      />
                     </TableCell>
                     <TableCell>
-                      {student.score?.scored_at ? (
-                        <span className="text-sm text-gray-600">
-                          {formatDate(student.score.scored_at)}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
+                      <Select
+                        value={localScores[student.id]?.status}
+                        onValueChange={(value: 'Draft' | 'Submitted' | 'Reviewed') => {
+                          setLocalScores(prev => ({
+                            ...prev,
+                            [student.id]: {
+                              ...prev[student.id],
+                              status: value
+                            }
+                          }));
+                        }}
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Draft">Draft</SelectItem>
+                          <SelectItem value="Submitted">Submitted</SelectItem>
+                          <SelectItem value="Reviewed">Reviewed</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
-                        onClick={() => handleScoreStudent(student)}
-                        disabled={!microcompetencyDetails?.intervention.is_scoring_open}
+                        onClick={async () => {
+                          if (!user?.id || !microcompetencyDetails || !selectedTerm?.id) {
+                            toast.error('Missing required data. Please ensure a term is selected.');
+                            return;
+                          }
+                          try {
+                            setIsSubmitting(true);
+                            await interventionAPI.scoreStudentMicrocompetency(
+                              user.id,
+                              interventionId!,
+                              student.id,
+                              microcompetencyId!,
+                              {
+                                obtained_score: localScores[student.id].obtained_score,
+                                feedback: localScores[student.id].feedback,
+                                status: localScores[student.id].status,
+                                term_id: selectedTerm.id
+                              }
+                            );
+                            toast.success('Score saved successfully');
+                            fetchData(); // Refresh data
+                          } catch (err) {
+                            toast.error(err instanceof Error ? err.message : 'Failed to save score');
+                          } finally {
+                            setIsSubmitting(false);
+                          }
+                        }}
+                        disabled={!microcompetencyDetails?.intervention.is_scoring_open || isSubmitting}
                       >
-                        <Edit className="h-4 w-4 mr-2" />
-                        {student.score ? 'Edit Score' : 'Score'}
+                        {isSubmitting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save
+                          </>
+                        )}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -365,85 +406,6 @@ const MicrocompetencyScoringPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Scoring Dialog */}
-      <Dialog open={showScoringDialog} onOpenChange={setShowScoringDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Score Student</DialogTitle>
-            <DialogDescription>
-              Score {selectedStudent?.name} on {microcompetencyDetails?.name}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="score">Score (out of {microcompetencyDetails?.max_score})</Label>
-              <Input
-                id="score"
-                type="number"
-                min="0"
-                max={microcompetencyDetails?.max_score}
-                value={scoreForm.obtained_score}
-                onChange={(e) => setScoreForm(prev => ({ 
-                  ...prev, 
-                  obtained_score: parseFloat(e.target.value) || 0 
-                }))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="feedback">Feedback (Optional)</Label>
-              <Textarea
-                id="feedback"
-                placeholder="Provide feedback for the student..."
-                value={scoreForm.feedback}
-                onChange={(e) => setScoreForm(prev => ({ ...prev, feedback: e.target.value }))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={scoreForm.status}
-                onValueChange={(value: 'Draft' | 'Submitted' | 'Reviewed') => 
-                  setScoreForm(prev => ({ ...prev, status: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Submitted">Submitted</SelectItem>
-                  <SelectItem value="Reviewed">Reviewed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowScoringDialog(false)}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmitScore}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Score
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

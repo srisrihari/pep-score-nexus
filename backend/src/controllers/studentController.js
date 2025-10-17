@@ -1,4 +1,5 @@
 const { supabase, query } = require('../config/supabase');
+const { normalizeGender } = require('../utils/genderNormalizer');
 const scoreCalculationService = require('../services/scoreCalculationService');
 const unifiedScoreService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
 
@@ -816,7 +817,7 @@ const createStudentForExistingUser = async (req, res) => {
       batch_id: batchId,
       section_id: sectionId,
       house_id: houseId,
-      gender: gender || 'Male',
+      gender: normalizeGender(gender) || 'Male',
       phone: phone || '+1234567890',
       preferences: {
         address: address || '123 Test Street',
