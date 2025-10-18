@@ -9,8 +9,8 @@ const {
   getScoreBreakdown
 } = require('../controllers/unifiedScoreController');
 
-// Import enhanced score calculation service
-const enhancedScoreService = require('../services/enhancedUnifiedScoreCalculationService');
+// Import enhanced score calculation service V2 (STANDARDIZED)
+const enhancedScoreService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
 
 /**
  * Unified Score API Routes

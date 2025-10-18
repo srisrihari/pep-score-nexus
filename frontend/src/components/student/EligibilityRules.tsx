@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { GRADING_SCALE, QUADRANT_WEIGHTAGE } from '@/utils/gradeUtils';
+import { GRADING_SCALE, QUADRANT_WEIGHTAGE } from '@/utils/hpsUtils';
 
 const EligibilityRules: React.FC = () => {
   const eligibilityRules = [

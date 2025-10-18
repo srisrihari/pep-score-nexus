@@ -70,7 +70,7 @@ const FormField: React.FC<FormFieldProps> = ({
             </SelectTrigger>
             <SelectContent>
               {placeholder && (
-                <SelectItem value="">
+                <SelectItem value="placeholder" disabled>
                   {placeholder}
                 </SelectItem>
               )}

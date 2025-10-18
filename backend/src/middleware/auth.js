@@ -20,18 +20,58 @@ const authenticateToken = async (req, res, next) => {
 
     // Verify JWT token
     const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('🔐 Token decoded, userId:', decoded.userId, 'role:', decoded.role);
     
-    // Check if user still exists and is active
-    const userResult = await query(
-      supabase
-        .from('users')
-        .select('id, username, email, role, status')
-        .eq('id', decoded.userId)
-        .eq('status', 'active')
-        .limit(1)
-    );
+    // Check if user still exists and is active - Use direct Supabase query with retry logic
+    console.log('🔍 Querying user with ID:', decoded.userId);
+    
+    let userData = null;
+    let userError = null;
+    let retryCount = 0;
+    const maxRetries = 2;
+    
+    // Retry logic for intermittent connection issues
+    while (retryCount <= maxRetries) {
+      try {
+        const result = await supabase
+          .from('users')
+          .select('id, username, email, role, status')
+          .eq('id', decoded.userId)
+          .eq('status', 'active')
+          .limit(1);
+        
+        userData = result.data;
+        userError = result.error;
+        
+        if (!userError) {
+          break; // Success, exit retry loop
+        }
+        
+        if (retryCount < maxRetries) {
+          console.log(`🔄 User query failed, retrying... (${retryCount + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+        }
+      } catch (error) {
+        userError = error;
+        if (retryCount < maxRetries) {
+          console.log(`🔄 User query exception, retrying... (${retryCount + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+        }
+      }
+      retryCount++;
+    }
 
-    if (!userResult.rows || userResult.rows.length === 0) {
+    if (userError) {
+      console.error('❌ User query failed after retries:', userError);
+      return res.status(500).json({
+        success: false,
+        message: 'Authentication failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (!userData || userData.length === 0) {
+      console.log('❌ User not found or inactive for ID:', decoded.userId);
       return res.status(401).json({
         success: false,
         message: 'Invalid or expired token',
@@ -39,11 +79,13 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
+    console.log('✅ User authenticated:', userData[0].username, 'role:', userData[0].role);
+    
     // Add user info to request object
     req.user = {
       userId: decoded.userId,
       role: decoded.role,
-      userDetails: userResult.rows[0]
+      userDetails: userData[0]
     };
 
     next();

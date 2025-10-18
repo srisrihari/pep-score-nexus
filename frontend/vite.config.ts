@@ -14,7 +14,15 @@ export default defineConfig(({ mode }) => {
     server: {
       host: "::",
       port,
-      allowedHosts: allowedUrls, // ✅ no extra []
+      allowedHosts: allowedUrls,
+      hmr: mode === 'production' ? false : {
+        port: 24678, // Use a different port for HMR in development
+      },
+    },
+    build: {
+      outDir: 'dist',
+      sourcemap: mode !== 'production',
+      minify: mode === 'production' ? 'terser' : false,
     },
     plugins: [
       react(),
@@ -24,6 +32,9 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
+    },
+    define: {
+      global: 'globalThis',
     },
   };
 });

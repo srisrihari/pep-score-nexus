@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHPSScore } from '../hooks/useHPS';
-import { formatHPSScore, getGradeColor, getStatusColor, getDisplayConfig, getPartialScoreWarning } from '../utils/hpsUtils';
+import { formatHPSScore, getGradeColor, getStatusColor, getDisplayConfig, getPartialScoreWarning, calculateGrade, calculateStatus } from '../utils/hpsUtils';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
@@ -48,10 +48,30 @@ export const HPSScore: React.FC<HPSScoreProps> = ({ studentId, termId, userRole 
         );
     }
 
-    const { totalHPS, quadrantScores, isPartial } = data.data;
+    // Handle the new unified API response structure
+    const breakdown = data?.data?.breakdown;
+    if (!breakdown) {
+        return (
+            <Alert variant="destructive">
+                <AlertDescription>
+                    No HPS data available. Please check if calculations have been run.
+                </AlertDescription>
+            </Alert>
+        );
+    }
+
+    const { totalHPS, quadrants } = breakdown;
     const grade = calculateGrade(totalHPS);
     const status = calculateStatus(totalHPS);
-    const partialWarning = getPartialScoreWarning(data.data);
+    
+    // Transform quadrants array to object for compatibility
+    const quadrantScores = quadrants.reduce((acc, quadrant) => {
+        acc[quadrant.name] = { score: quadrant.finalScore };
+        return acc;
+    }, {} as Record<string, { score: number }>);
+    
+    const isPartial = quadrants.length < 4 || quadrants.some(q => q.finalScore === 0);
+    const partialWarning = isPartial ? `Partial score: Some quadrants may be missing data` : null;
 
     return (
         <Card>

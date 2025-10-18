@@ -387,11 +387,13 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Batches</SelectItem>
-                      {filterOptions?.batches?.map(batch => (
-                        <SelectItem key={batch.id} value={batch.id}>
-                          {batch.name} - {batch.year}
-                        </SelectItem>
-                      ))}
+                      {filterOptions?.batches
+                        ?.filter(batch => batch.id && batch.id.trim() !== '')
+                        .map(batch => (
+                          <SelectItem key={batch.id} value={batch.id}>
+                            {batch.name} - {batch.year}
+                          </SelectItem>
+                        ))}
                       {!filterOptions?.batches && (
                         <SelectItem value="loading" disabled>Loading...</SelectItem>
                       )}
@@ -443,11 +445,13 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Sections</SelectItem>
-                      {filterOptions?.sections?.map(section => (
-                        <SelectItem key={section.id} value={section.id}>
-                          {section.name} ({section.batch_name})
-                        </SelectItem>
-                      ))}
+                      {filterOptions?.sections
+                        ?.filter(section => section.id && section.id.trim() !== '')
+                        .map(section => (
+                          <SelectItem key={section.id} value={section.id}>
+                            {section.name} ({section.batch_name})
+                          </SelectItem>
+                        ))}
                       {!filterOptions?.sections && (
                         <SelectItem value="loading" disabled>Loading...</SelectItem>
                       )}
@@ -471,12 +475,14 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Houses</SelectItem>
-                      {filterOptions?.houses?.map(house => (
-                        <SelectItem key={house.id} value={house.id}>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-3 h-3 rounded-full"
-                              style={{ backgroundColor: house.color }}
+                      {filterOptions?.houses
+                        ?.filter(house => house.id && house.id.trim() !== '')
+                        .map(house => (
+                          <SelectItem key={house.id} value={house.id}>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: house.color }}
                             />
                             {house.name}
                           </div>

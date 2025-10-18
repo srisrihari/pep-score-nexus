@@ -68,7 +68,7 @@ const BulkTeacherAssignment: React.FC = () => {
   const [assignmentRole, setAssignmentRole] = useState('Assistant');
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
   const [showAssignmentDialog, setShowAssignmentDialog] = useState(false);
   const [assignmentProgress, setAssignmentProgress] = useState(0);
   const [assignmentResults, setAssignmentResults] = useState<any>(null);
@@ -108,7 +108,7 @@ const BulkTeacherAssignment: React.FC = () => {
   const filteredTeachers = teachers.filter(teacher => {
     const matchesSearch = teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          teacher.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = !departmentFilter || teacher.department === departmentFilter;
+    const matchesDepartment = !departmentFilter || departmentFilter === 'all' || teacher.department === departmentFilter;
     return matchesSearch && matchesDepartment && teacher.is_active;
   });
 
@@ -288,7 +288,7 @@ const BulkTeacherAssignment: React.FC = () => {
                   <SelectValue placeholder="All Departments" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Departments</SelectItem>
+                  <SelectItem value="all">All Departments</SelectItem>
                   {departments.map(dept => (
                     <SelectItem key={dept} value={dept}>{dept}</SelectItem>
                   ))}

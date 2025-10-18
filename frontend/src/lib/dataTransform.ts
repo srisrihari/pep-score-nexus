@@ -237,7 +237,7 @@ export const transformStudentData = (
     tests: [],
     totalScore: actualOverallScore,
     grade: actualGrade as Grade,
-    overallStatus: summary.overall_status as StatusType || calculateStatus(actualOverallScore, 75) as StatusType
+    overallStatus: summary.overall_status as StatusType || calculateStatusWithThreshold(actualOverallScore, 75) as StatusType
   };
 
   return {

@@ -1,4 +1,4 @@
-const enhancedHPSCalculationService = require('../services/enhancedHPSCalculationService');
+const enhancedHPSCalculationService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
 const { supabase } = require('../config/supabaseClient');
 const { query } = require('../utils/queryWrapper');
 

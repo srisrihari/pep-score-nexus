@@ -14,16 +14,23 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import StatusBadge, { StatusType } from "@/components/common/StatusBadge";
-import { adminAPI, uploadAPI } from "@/lib/api";
+import { adminAPI, uploadAPI, apiRequest } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, ArrowUpDown, Eye, Edit, Trash2, Plus, UserPlus, Upload, Download } from "lucide-react";
+import { Search, ArrowUpDown, Eye, Edit, Trash2, Plus, UserPlus, Upload, Download, BookOpen, Building, GraduationCap, Settings, Calendar } from "lucide-react";
 import { ErrorHandler, FormErrors } from "@/utils/errorHandling";
 import { FormValidator } from "@/utils/formValidation";
 import StudentTable from "@/components/admin/StudentTable";
 import StudentForm from "@/components/admin/StudentForm";
 import StudentFilters from "@/components/admin/StudentFilters";
+import BatchManagementDialog from "@/components/admin/BatchManagementDialog";
+import SectionManagementDialog from "@/components/admin/SectionManagementDialog";
+import CourseManagementDialog from "@/components/admin/CourseManagementDialog";
+import AttendanceManagementDialog from "@/components/admin/AttendanceManagementDialog";
+import StudentSelectionDialog from "@/components/admin/StudentSelectionDialog";
+import BulkTeacherAssignment from "@/components/admin/BulkTeacherAssignment";
+import EnhancedStudentImport from "@/components/admin/EnhancedStudentImport";
 
 // Student interface
 interface Student {
@@ -57,7 +64,7 @@ interface Student {
 }
 
 const ManageStudents: React.FC = () => {
-  const { selectedTerm } = useTerm();
+  const { currentTerm, selectedTerm } = useTerm();
   const [searchQuery, setSearchQuery] = useState("");
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,11 +111,13 @@ const ManageStudents: React.FC = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeletingStudent, setIsDeletingStudent] = useState(false);
 
+  // Attendance management state
+  const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
+  const [selectedStudentForAttendance, setSelectedStudentForAttendance] = useState<Student | null>(null);
+
   // Bulk operations state
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
-  const [showBulkImportDialog, setShowBulkImportDialog] = useState(false);
-  const [bulkImportFile, setBulkImportFile] = useState<File | null>(null);
-  const [isBulkImporting, setIsBulkImporting] = useState(false);
+  const [showEnhancedImportDialog, setShowEnhancedImportDialog] = useState(false);
 
   // Filter options state
   const [filterOptions, setFilterOptions] = useState<{
@@ -312,19 +321,31 @@ const ManageStudents: React.FC = () => {
     setShowDeleteDialog(true);
   };
 
+  const handleOpenAttendance = (student: Student) => {
+    setSelectedStudentForAttendance(student);
+    setShowAttendanceDialog(true);
+  };
+
   const confirmDeleteStudent = async () => {
     if (!deletingStudent) return;
 
     setIsDeletingStudent(true);
     try {
-      // Note: This would need a proper delete API endpoint
-      toast.success("Student deleted successfully");
-      setShowDeleteDialog(false);
-      setDeletingStudent(null);
-      fetchStudents(); // Refresh the list
+      const response = await apiRequest(`/api/v1/admin/students/${deletingStudent.id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.success) {
+        toast.success("Student deleted successfully");
+        setShowDeleteDialog(false);
+        setDeletingStudent(null);
+        fetchStudents(); // Refresh the list
+      } else {
+        throw new Error(response.message || 'Delete failed');
+      }
     } catch (error) {
       console.error('Error deleting student:', error);
-      toast.error("Failed to delete student");
+      toast.error("Failed to delete student: " + (error.message || 'Unknown error'));
     } finally {
       setIsDeletingStudent(false);
     }
@@ -367,41 +388,9 @@ const ManageStudents: React.FC = () => {
     }
   };
 
-  const handleBulkImport = async () => {
-    if (!bulkImportFile) {
-      toast.error('Please select a file to import');
-      return;
-    }
-
-    setIsBulkImporting(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', bulkImportFile);
-      formData.append('importType', 'students');
-
-      const resp = await uploadAPI.importExcelData(formData);
-
-      if (resp?.success) {
-        const results = resp.data;
-        toast.success(
-          `Imported ${results?.successCount ?? 0}/${results?.totalRows ?? 0} rows`+
-          (results?.errorCount ? `, errors: ${results.errorCount}` : '')
-        );
-        if (results?.errors && results.errors.length) {
-          console.warn('Student import errors:', results.errors);
-        }
-        setShowBulkImportDialog(false);
-        setBulkImportFile(null);
-        await fetchStudents();
-      } else {
-        toast.error(resp?.message || 'Failed to import students');
-      }
-    } catch (error: any) {
-      console.error('Error importing students:', error);
-      toast.error(error?.message || 'Failed to import students');
-    } finally {
-      setIsBulkImporting(false);
-    }
+  const handleImportComplete = async () => {
+    // Refresh the student list after successful import
+    await fetchStudents();
   };
 
   return (
@@ -419,14 +408,43 @@ const ManageStudents: React.FC = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleBulkExport} className="gap-2">
+          {/* Data Management Buttons */}
+          <CourseManagementDialog
+            trigger={
+              <Button variant="outline" className="gap-2" size="sm">
+                <GraduationCap className="h-4 w-4" />
+                Courses
+              </Button>
+            }
+          />
+          <BatchManagementDialog
+            trigger={
+              <Button variant="outline" className="gap-2" size="sm">
+                <BookOpen className="h-4 w-4" />
+                Batches
+              </Button>
+            }
+          />
+          <SectionManagementDialog
+            trigger={
+              <Button variant="outline" className="gap-2" size="sm">
+                <Building className="h-4 w-4" />
+                Sections
+              </Button>
+            }
+          />
+          
+          {/* Student Data Operations */}
+          <Button variant="outline" onClick={handleBulkExport} className="gap-2" size="sm">
             <Download className="h-4 w-4" />
             Export CSV
           </Button>
-          <Button variant="outline" onClick={() => setShowBulkImportDialog(true)} className="gap-2">
+          <Button variant="outline" onClick={() => setShowEnhancedImportDialog(true)} className="gap-2" size="sm">
             <Upload className="h-4 w-4" />
-            Import CSV
+            Import Excel
           </Button>
+          
+          {/* Add Student */}
           <Dialog open={isAddStudentDialogOpen} onOpenChange={setIsAddStudentDialogOpen}>
             <Button onClick={() => setIsAddStudentDialogOpen(true)} className="gap-2">
               <UserPlus className="h-4 w-4" />
@@ -525,6 +543,15 @@ const ManageStudents: React.FC = () => {
                           >
                             <Edit className="h-3 w-3 mr-1" />
                             Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => handleOpenAttendance(student)}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Calendar className="h-3 w-3 mr-1" />
+                            Attendance
                           </Button>
                           <Button
                             size="sm"
@@ -814,7 +841,7 @@ const ManageStudents: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {loadingFilterOptions ? (
-                      <SelectItem value="" disabled>Loading courses...</SelectItem>
+                      <SelectItem value="loading-courses" disabled>Loading courses...</SelectItem>
                     ) : filterOptions?.courses.length ? (
                       filterOptions.courses.map((course) => (
                         <SelectItem key={course} value={course}>
@@ -822,7 +849,7 @@ const ManageStudents: React.FC = () => {
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="" disabled>No courses available</SelectItem>
+                      <SelectItem value="no-courses" disabled>No courses available</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -838,15 +865,17 @@ const ManageStudents: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {loadingFilterOptions ? (
-                      <SelectItem value="" disabled>Loading batches...</SelectItem>
+                      <SelectItem value="loading-batches" disabled>Loading batches...</SelectItem>
                     ) : filterOptions?.batches.length ? (
-                      filterOptions.batches.map((batch) => (
-                        <SelectItem key={batch.id} value={batch.id}>
-                          {batch.name} ({batch.year})
-                        </SelectItem>
-                      ))
+                      filterOptions.batches
+                        .filter(batch => batch.id && batch.id.trim() !== '')
+                        .map((batch) => (
+                          <SelectItem key={batch.id} value={batch.id}>
+                            {batch.name} ({batch.year})
+                          </SelectItem>
+                        ))
                     ) : (
-                      <SelectItem value="" disabled>No batches available</SelectItem>
+                      <SelectItem value="no-batches" disabled>No batches available</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -859,15 +888,17 @@ const ManageStudents: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {loadingFilterOptions ? (
-                      <SelectItem value="" disabled>Loading sections...</SelectItem>
+                      <SelectItem value="loading-sections" disabled>Loading sections...</SelectItem>
                     ) : filterOptions?.sections.length ? (
-                      filterOptions.sections.map((section) => (
-                        <SelectItem key={section.id} value={section.id}>
-                          {section.name} ({section.batch_name} {section.batch_year})
-                        </SelectItem>
-                      ))
+                      filterOptions.sections
+                        .filter(section => section.id && section.id.trim() !== '')
+                        .map((section) => (
+                          <SelectItem key={section.id} value={section.id}>
+                            {section.name} ({section.batch_name} {section.batch_year})
+                          </SelectItem>
+                        ))
                     ) : (
-                      <SelectItem value="" disabled>No sections available</SelectItem>
+                      <SelectItem value="no-sections" disabled>No sections available</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -956,11 +987,13 @@ const ManageStudents: React.FC = () => {
                     <SelectValue placeholder="Select batch" />
                   </SelectTrigger>
                   <SelectContent>
-                    {filterOptions?.batches.map((batch) => (
-                      <SelectItem key={batch.id} value={batch.id}>
-                        {batch.name} ({batch.year})
-                      </SelectItem>
-                    ))}
+                    {filterOptions?.batches
+                      .filter(batch => batch.id && batch.id.trim() !== '')
+                      .map((batch) => (
+                        <SelectItem key={batch.id} value={batch.id}>
+                          {batch.name} ({batch.year})
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -971,11 +1004,13 @@ const ManageStudents: React.FC = () => {
                     <SelectValue placeholder="Select section" />
                   </SelectTrigger>
                   <SelectContent>
-                    {filterOptions?.sections.map((section) => (
-                      <SelectItem key={section.id} value={section.id}>
-                        {section.name} ({section.batch_name} {section.batch_year})
-                      </SelectItem>
-                    ))}
+                    {filterOptions?.sections
+                      .filter(section => section.id && section.id.trim() !== '')
+                      .map((section) => (
+                        <SelectItem key={section.id} value={section.id}>
+                          {section.name} ({section.batch_name} {section.batch_year})
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -1057,52 +1092,20 @@ const ManageStudents: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Import Dialog */}
-      <Dialog open={showBulkImportDialog} onOpenChange={setShowBulkImportDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Import Students</DialogTitle>
-            <DialogDescription>
-              Upload a CSV file to import multiple students at once
-            </DialogDescription>
-          </DialogHeader>
+      {/* Enhanced Student Import */}
+      <EnhancedStudentImport
+        open={showEnhancedImportDialog}
+        onOpenChange={setShowEnhancedImportDialog}
+        onImportComplete={handleImportComplete}
+      />
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="csvFile">Excel File (.xlsx or .xls)</Label>
-              <Input
-                id="csvFile"
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={(e) => setBulkImportFile(e.target.files?.[0] || null)}
-              />
-              <p className="text-sm text-muted-foreground">
-                Template columns: name, email, registration_no, password (optional), course, batch, section, gender, phone
-              </p>
-            </div>
-
-            {bulkImportFile && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <p className="text-green-800 text-sm">
-                  <strong>Selected file:</strong> {bulkImportFile.name}
-                </p>
-                <p className="text-green-600 text-xs">
-                  Size: {(bulkImportFile.size / 1024).toFixed(1)} KB
-                </p>
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBulkImportDialog(false)} disabled={isBulkImporting}>
-              Cancel
-            </Button>
-            <Button onClick={handleBulkImport} disabled={isBulkImporting || !bulkImportFile}>
-              {isBulkImporting ? 'Importing...' : 'Import Students'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Attendance Management Dialog */}
+      <AttendanceManagementDialog
+        open={showAttendanceDialog}
+        onOpenChange={setShowAttendanceDialog}
+        student={selectedStudentForAttendance}
+        selectedTerm={currentTerm}
+      />
     </div>
   );
 };

@@ -49,13 +49,17 @@ const termRoutes = require('./routes/terms');
 const userManagementRoutes = require('./routes/userManagement');
 const studentProfileRoutes = require('./routes/studentProfile');
 const weightageValidationRoutes = require('./routes/weightageValidation');
-const unifiedScoreRoutes = require('./routes/unifiedScores');
+const unifiedScoresRoutes = require('./routes/unifiedScores');
 const shlCompetencyRoutes = require('./routes/shlCompetencies');
 const attendanceRoutes = require('./routes/attendance');
+const attendanceManagementRoutes = require('./routes/attendanceManagement');
 const levelProgressionRoutes = require('./routes/levelProgressionRoutes');
 const batchTermWeightageRoutes = require('./routes/batchTermWeightages');
 const hpsManagementRoutes = require('./routes/hpsManagement');
-const hpsRoutes = require('./routes/hps');
+// Removed legacy hps routes - using only unified-scores
+const batchManagementRoutes = require('./routes/batchManagement');
+const sectionManagementRoutes = require('./routes/sectionManagement');
+const courseManagementRoutes = require('./routes/courseManagement');
 const bulkTeacherAssignmentController = require('./controllers/bulkTeacherAssignmentController');
 const taskMicrocompetencyController = require('./controllers/taskMicrocompetencyController');
 const termTransitionService = require('./services/termTransitionService');
@@ -64,8 +68,14 @@ const { authenticateToken, requireRole } = require('./middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Trust proxy for dev tunnels and load balancers
-app.set('trust proxy', true);
+// Trust proxy configuration for production
+if (process.env.NODE_ENV === 'production') {
+  // In production, trust specific proxy IPs (configure based on your setup)
+  app.set('trust proxy', 1); // Trust first proxy
+} else {
+  // In development, trust first proxy only to avoid rate limiting warnings
+  app.set('trust proxy', 1);
+}
 
 // Security middleware
 app.use(helmet());
@@ -91,9 +101,24 @@ app.use(cors({
       'https://8hbdz2rs-8080.inc1.devtunnels.ms',
       'https://uat.pep.vijaybhoomi.edu.in',
       'https://api.uat.pep.vijaybhoomi.edu.in',
-      '*',
-      process.env.CORS_ORIGIN
+      process.env.CORS_ORIGIN,
+      process.env.FRONTEND_URL
     ].filter(Boolean);
+
+    // In production, be more restrictive
+    if (process.env.NODE_ENV === 'production') {
+      const productionOrigins = [
+        'https://uat.pep.vijaybhoomi.edu.in',
+        process.env.CORS_ORIGIN,
+        process.env.FRONTEND_URL
+      ].filter(Boolean);
+      
+      if (productionOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS - Production mode'));
+      return;
+    }
 
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -215,13 +240,17 @@ app.use(`${baseRoute}/terms`, termRoutes);
 app.use(`${baseRoute}/admin/user-management`, userManagementRoutes);
 app.use(`${baseRoute}/student/profile`, studentProfileRoutes);
 app.use(`${baseRoute}/admin/weightage-validation`, weightageValidationRoutes);
-app.use(`${baseRoute}/unified-scores`, unifiedScoreRoutes);
+app.use(`${baseRoute}/unified-scores`, unifiedScoresRoutes);
 app.use(`${baseRoute}/shl-competencies`, shlCompetencyRoutes);
 app.use(`${baseRoute}/attendance`, attendanceRoutes);
+app.use(`${baseRoute}/attendance-management`, attendanceManagementRoutes);
 app.use(`${baseRoute}/level-progression`, levelProgressionRoutes);
 app.use(`${baseRoute}/admin/batch-term-weightages`, batchTermWeightageRoutes);
 app.use(`${baseRoute}/admin/hps`, hpsManagementRoutes);
-app.use(`${baseRoute}/hps`, hpsRoutes);
+// Removed legacy hps route registration - using only unified-scores
+app.use(`${baseRoute}/admin/batch-management`, batchManagementRoutes);
+app.use(`${baseRoute}/admin/section-management`, sectionManagementRoutes);
+app.use(`${baseRoute}/admin/course-management`, courseManagementRoutes);
 
 // Bulk Teacher Assignment Routes
 app.post(`${baseRoute}/admin/bulk-teacher-assignment`, authenticateToken, requireRole('admin'), bulkTeacherAssignmentController.bulkAssignTeachers);

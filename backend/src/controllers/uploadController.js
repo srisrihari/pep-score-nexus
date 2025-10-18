@@ -229,8 +229,8 @@ const deleteFile = async (req, res) => {
   }
 };
 
-// Import Excel data
-const importExcelData = async (req, res) => {
+// Preview Excel data before import (Step 1)
+const previewExcelData = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -269,44 +269,42 @@ const importExcelData = async (req, res) => {
     const worksheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(worksheet);
 
-    let importResults = {
+    let previewResults = {
       totalRows: data.length,
-      successCount: 0,
-      errorCount: 0,
-      errors: []
+      validRows: 0,
+      invalidRows: 0,
+      errors: [],
+      students: []
     };
 
-    // Process data based on import type
-    switch (importType) {
-      case 'students':
-        importResults = await importStudentData(data);
-        break;
-      case 'scores':
-        importResults = await importScoreData(data);
-        break;
-      case 'attendance':
-        importResults = await importAttendanceData(data);
-        break;
-      default:
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid import type',
-          timestamp: new Date().toISOString()
-        });
+    // Process data based on import type - for now just students
+    if (importType === 'students') {
+      previewResults = await previewStudentData(data);
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Only student import is supported in preview mode',
+        timestamp: new Date().toISOString()
+      });
     }
 
-    // Clean up uploaded file
-    fs.unlinkSync(req.file.path);
+    // Store file temporarily with unique identifier
+    const tempId = require('crypto').randomBytes(16).toString('hex');
+    const tempPath = `${req.file.path}_${tempId}`;
+    fs.renameSync(req.file.path, tempPath);
 
     res.status(200).json({
       success: true,
-      message: `Excel import completed. ${importResults.successCount} records imported successfully.`,
-      data: importResults,
+      message: 'Excel preview generated successfully',
+      data: {
+        ...previewResults,
+        tempFileId: tempId
+      },
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error('❌ Excel import error:', error);
+    console.error('❌ Excel preview error:', error);
 
     // Clean up file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
@@ -315,11 +313,323 @@ const importExcelData = async (req, res) => {
 
     res.status(500).json({
       success: false,
+      message: 'Failed to preview Excel data',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+// Import Excel data with batch assignment (Step 2)
+const importExcelData = async (req, res) => {
+  try {
+    const { tempFileId, batchAssignment } = req.body;
+    
+    if (!tempFileId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Temporary file ID is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (!batchAssignment) {
+      return res.status(400).json({
+        success: false,
+        message: 'Batch assignment data is required',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Find the temporary file
+    const uploadsDir = process.env.UPLOADS_DIR || './uploads';
+    const tempFiles = fs.readdirSync(uploadsDir).filter(file => file.includes(`_${tempFileId}`));
+    
+    if (tempFiles.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Temporary file not found or expired',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const tempFilePath = `${uploadsDir}/${tempFiles[0]}`;
+
+    // Read Excel file
+    const workbook = XLSX.readFile(tempFilePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(worksheet);
+
+    let importResults = {
+      totalRows: data.length,
+      successCount: 0,
+      errorCount: 0,
+      errors: []
+    };
+
+    // Process student data with batch assignment
+    importResults = await importStudentDataWithAssignment(data, batchAssignment);
+
+    // Clean up temporary file
+    fs.unlinkSync(tempFilePath);
+
+    res.status(200).json({
+      success: true,
+      message: `Student import completed. ${importResults.successCount} students imported successfully.`,
+      data: importResults,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('❌ Excel import error:', error);
+
+    res.status(500).json({
+      success: false,
       message: 'Failed to import Excel data',
       error: error.message,
       timestamp: new Date().toISOString()
     });
   }
+};
+
+// Helper function to preview student data
+const previewStudentData = async (data) => {
+  let validRows = 0;
+  let invalidRows = 0;
+  let errors = [];
+  let students = [];
+
+  // Utility: normalize headers to snake_case lowercase keys
+  const normalizeRow = (row) => {
+    const map = {};
+    Object.keys(row || {}).forEach((key) => {
+      const normalized = String(key)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+      map[normalized] = row[key];
+    });
+    return map;
+  };
+
+  for (let i = 0; i < data.length; i++) {
+    try {
+      const raw = data[i];
+      const row = normalizeRow(raw);
+
+      const name = row.name || row.full_name || row.student_name;
+      const email = row.email;
+      const registrationNo = row.registration_no || row.registration || row.reg_no;
+      const phone = row.phone || row.mobile || null;
+      
+      // Normalize gender value
+      let gender;
+      try {
+        gender = normalizeGender(row.gender);
+      } catch (error) {
+        throw new Error(`Invalid gender value: ${row.gender}`);
+      }
+
+      // Validate required fields for preview (only basic fields)
+      if (!name || !email || !registrationNo) {
+        errors.push(`Row ${i + 1}: Missing required fields (name, email, registration_no)`);
+        invalidRows++;
+        continue;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errors.push(`Row ${i + 1}: Invalid email format (${email})`);
+        invalidRows++;
+        continue;
+      }
+
+      // Check for duplicates within the file
+      const isDuplicate = students.some(s => 
+        s.email === email || s.registration_no === registrationNo
+      );
+      
+      if (isDuplicate) {
+        errors.push(`Row ${i + 1}: Duplicate email or registration number in file`);
+        invalidRows++;
+        continue;
+      }
+
+      students.push({
+        rowNumber: i + 1,
+        name: name.trim(),
+        email: email.trim(),
+        registration_no: registrationNo.trim(),
+        phone: phone ? phone.trim() : null,
+        gender
+      });
+
+      validRows++;
+
+    } catch (error) {
+      errors.push(`Row ${i + 1}: ${error.message}`);
+      invalidRows++;
+    }
+  }
+
+  return {
+    totalRows: data.length,
+    validRows,
+    invalidRows,
+    errors,
+    students
+  };
+};
+
+// Helper function to import student data with batch assignment
+const importStudentDataWithAssignment = async (data, batchAssignment) => {
+  let successCount = 0;
+  let errorCount = 0;
+  let errors = [];
+
+  console.log('🔧 Importing students with batch assignment:', batchAssignment);
+
+  // Utility: normalize headers to snake_case lowercase keys
+  const normalizeRow = (row) => {
+    const map = {};
+    Object.keys(row || {}).forEach((key) => {
+      const normalized = String(key)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+      map[normalized] = row[key];
+    });
+    return map;
+  };
+
+  // Get current term id once
+  const currentTermResult = await query(
+    supabase
+      .from('terms')
+      .select('id')
+      .eq('is_current', true)
+      .limit(1)
+  );
+  const currentTermId = currentTermResult.rows && currentTermResult.rows[0] ? currentTermResult.rows[0].id : null;
+
+  // Get batch and section IDs from assignment
+  const { batchId, sectionId, course } = batchAssignment;
+
+  for (let i = 0; i < data.length; i++) {
+    try {
+      const raw = data[i];
+      const row = normalizeRow(raw);
+
+      const name = row.name || row.full_name || row.student_name;
+      const email = row.email;
+      const registrationNo = row.registration_no || row.registration || row.reg_no;
+      const phone = row.phone || row.mobile || null;
+      
+      // Normalize gender value
+      let gender;
+      try {
+        gender = normalizeGender(row.gender);
+      } catch (error) {
+        throw new Error(`Invalid gender value: ${row.gender}`);
+      }
+
+      // Validate required fields
+      if (!name || !email || !registrationNo) {
+        errors.push(`Row ${i + 1}: Missing required fields (name, email, registration_no)`);
+        errorCount++;
+        continue;
+      }
+
+      // Check existing user by email or username (registration no)
+      const existingUserResult = await query(
+        supabase
+          .from('users')
+          .select('id')
+          .or(`email.eq.${email},username.eq.${registrationNo}`)
+          .limit(1)
+      );
+
+      let userId;
+      if (existingUserResult.rows && existingUserResult.rows.length > 0) {
+        userId = existingUserResult.rows[0].id;
+      } else {
+        // Create new user with password = registration_no
+        const createUserResult = await query(
+          supabase
+            .from('users')
+            .insert({
+              username: registrationNo,
+              email,
+              password: registrationNo, // Password defaults to registration number
+              role: 'student',
+              status: 'active'
+            })
+            .select('id')
+        );
+
+        if (!createUserResult.rows || createUserResult.rows.length === 0) {
+          throw new Error('Failed to create user');
+        }
+        userId = createUserResult.rows[0].id;
+      }
+
+      // Check for existing student with same registration number
+      const existingStudentResult = await query(
+        supabase
+          .from('students')
+          .select('id')
+          .eq('registration_no', registrationNo)
+          .limit(1)
+      );
+      
+      if (existingStudentResult.rows && existingStudentResult.rows.length > 0) {
+        errors.push(`Row ${i + 1}: Student with registration number ${registrationNo} already exists`);
+        errorCount++;
+        continue;
+      }
+
+      // Create student with assigned batch/section/course
+      const createStudentResult = await query(
+        supabase
+          .from('students')
+          .insert({
+            user_id: userId,
+            registration_no: registrationNo,
+            name,
+            course: course || 'General',
+            batch_id: batchId,
+            section_id: sectionId,
+            gender,
+            phone,
+            status: 'Active',
+            current_term_id: currentTermId || null
+          })
+          .select('id')
+      );
+
+      if (!createStudentResult.rows || createStudentResult.rows.length === 0) {
+        throw new Error('Failed to create student');
+      }
+
+      successCount++;
+
+    } catch (error) {
+      console.error(`❌ Error importing student row ${i + 1}:`, error);
+      errors.push(`Row ${i + 1}: ${error.message}`);
+      errorCount++;
+    }
+  }
+
+  return {
+    totalRows: data.length,
+    successCount,
+    errorCount,
+    errors
+  };
 };
 
 // Helper function to import student data
@@ -526,5 +836,6 @@ module.exports = {
   uploadMultipleFiles,
   serveFile,
   deleteFile,
+  previewExcelData,
   importExcelData
 };

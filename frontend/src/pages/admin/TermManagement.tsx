@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Plus, Settings, Users, CheckCircle } from 'lucide-react';
+import { Calendar, Plus, Settings, Users, CheckCircle, Edit, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { termAPI } from '@/lib/api';
 import { useTerm } from '@/contexts/TermContext';
 import { toast } from 'sonner';
@@ -35,6 +36,23 @@ const TermManagement: React.FC = () => {
     is_active: true,
     is_current: false
   });
+
+  // Edit state
+  const [editingTerm, setEditingTerm] = useState<Term | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    description: '',
+    start_date: '',
+    end_date: '',
+    academic_year: '',
+    is_active: true
+  });
+
+  // Delete state
+  const [deletingTerm, setDeletingTerm] = useState<Term | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeletingTerm, setIsDeletingTerm] = useState(false);
 
   const handleCreateTerm = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,6 +132,96 @@ const TermManagement: React.FC = () => {
       toast.error('Failed to reset scores');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleEditTerm = (term: Term) => {
+    setEditingTerm(term);
+    setEditFormData({
+      name: term.name,
+      description: term.description || '',
+      start_date: term.start_date,
+      end_date: term.end_date,
+      academic_year: term.academic_year,
+      is_active: term.is_active
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleUpdateTerm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTerm) return;
+
+    setIsLoading(true);
+    try {
+      const response = await termAPI.updateTerm(editingTerm.id, editFormData);
+      if (response.success) {
+        toast.success('Term updated successfully');
+        setShowEditDialog(false);
+        setEditingTerm(null);
+        await refreshTerms();
+      } else {
+        toast.error('Failed to update term');
+      }
+    } catch (error) {
+      console.error('Error updating term:', error);
+      toast.error('Failed to update term');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteTerm = (term: Term) => {
+    setDeletingTerm(term);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteTerm = async (forceCascade = false) => {
+    if (!deletingTerm) return;
+
+    setIsDeletingTerm(true);
+    try {
+      const response = await termAPI.deleteTerm(deletingTerm.id, forceCascade);
+      if (response.success) {
+        toast.success(
+          forceCascade 
+            ? 'Term and all associated data deleted successfully' 
+            : 'Term deleted successfully'
+        );
+        setShowDeleteDialog(false);
+        setDeletingTerm(null);
+        await refreshTerms();
+      } else {
+        // Check if it's a cascade warning
+        if (response.associations && !forceCascade) {
+          const details = response.associations.map(a => `${a.table}: ${a.count} records`).join(', ');
+          const shouldCascade = confirm(
+            `This term has associated data: ${details}\n\nDo you want to permanently delete ALL related data? This cannot be undone.`
+          );
+          
+          if (shouldCascade) {
+            // Retry with force cascade
+            confirmDeleteTerm(true);
+            return;
+          }
+        }
+        toast.error(response.message || 'Failed to delete term');
+      }
+    } catch (error: any) {
+      console.error('Error deleting term:', error);
+      if (error.message?.includes('associated data')) {
+        const shouldCascade = confirm(
+          `${error.message}\n\nDo you want to permanently delete ALL related data? This cannot be undone.`
+        );
+        
+        if (shouldCascade) {
+          confirmDeleteTerm(true);
+          return;
+        }
+      }
+      toast.error('Failed to delete term: ' + (error.message || 'Unknown error'));
+    } finally {
+      setIsDeletingTerm(false);
     }
   };
 
@@ -290,6 +398,16 @@ const TermManagement: React.FC = () => {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={() => handleEditTerm(term)}
+                    disabled={isLoading}
+                    className="flex items-center gap-1"
+                  >
+                    <Edit className="h-3 w-3" />
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => handleTransitionStudents(term.id)}
                     disabled={isLoading}
                     className="flex items-center gap-1"
@@ -307,6 +425,18 @@ const TermManagement: React.FC = () => {
                     <Settings className="h-3 w-3" />
                     Reset Scores
                   </Button>
+                  {!term.is_current && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteTerm(term)}
+                      disabled={isLoading}
+                      className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Delete
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
@@ -318,6 +448,111 @@ const TermManagement: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Term Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Term</DialogTitle>
+            <DialogDescription>
+              Update the term details below.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleUpdateTerm} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Term Name</Label>
+              <Input
+                id="edit-name"
+                value={editFormData.name}
+                onChange={(e) => setEditFormData(prev => ({ ...prev, name: e.target.value }))}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea
+                id="edit-description"
+                value={editFormData.description}
+                onChange={(e) => setEditFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Optional description..."
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-academic-year">Academic Year</Label>
+              <Input
+                id="edit-academic-year"
+                value={editFormData.academic_year}
+                onChange={(e) => setEditFormData(prev => ({ ...prev, academic_year: e.target.value }))}
+                placeholder="e.g., 2024-2025"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-start-date">Start Date</Label>
+                <Input
+                  id="edit-start-date"
+                  type="date"
+                  value={editFormData.start_date}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, start_date: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-end-date">End Date</Label>
+                <Input
+                  id="edit-end-date"
+                  type="date"
+                  value={editFormData.end_date}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, end_date: e.target.value }))}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Updating...' : 'Update Term'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Term Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Term</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{deletingTerm?.name}"? This will permanently delete:
+              <br />• All student scores for this term
+              <br />• All interventions in this term
+              <br />• All term-specific data
+              <br /><br />
+              <strong>This action cannot be undone.</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeletingTerm}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteTerm}
+              disabled={isDeletingTerm}
+            >
+              {isDeletingTerm ? 'Deleting...' : 'Delete Term'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

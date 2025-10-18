@@ -7,6 +7,7 @@ const {
   uploadMultipleFiles,
   serveFile,
   deleteFile,
+  previewExcelData,
   importExcelData
 } = require('../controllers/uploadController');
 
@@ -54,14 +55,25 @@ router.delete('/files/:filename',
 );
 
 /**
- * @route   POST /api/v1/uploads/excel-import
- * @desc    Import data from Excel file
+ * @route   POST /api/v1/uploads/excel-preview
+ * @desc    Preview Excel file before import (Step 1)
  * @access  Admin only
  * @body    FormData with 'file' field and 'importType' field
  */
-router.post('/excel-import',
+router.post('/excel-preview',
   authenticateToken,
   upload.single('file'),
+  previewExcelData
+);
+
+/**
+ * @route   POST /api/v1/uploads/excel-import
+ * @desc    Import data from Excel file with batch assignment (Step 2)
+ * @access  Admin only
+ * @body    JSON with 'tempFileId' and 'batchAssignment' fields
+ */
+router.post('/excel-import',
+  authenticateToken,
   importExcelData
 );
 

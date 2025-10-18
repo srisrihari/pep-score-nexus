@@ -1894,7 +1894,7 @@ const getStudentQuadrantDetails = async (req, res) => {
     const quadrant = quadrantResult.rows[0];
 
     // Use unified scoring service to get accurate scores
-    const unifiedScoreService = require('../services/unifiedScoreCalculationService');
+    const unifiedScoreService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
     const unifiedScores = await unifiedScoreService.calculateUnifiedHPS(studentId, currentTermId);
 
     // Get the specific quadrant data from unified scores

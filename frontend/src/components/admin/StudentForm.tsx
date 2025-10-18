@@ -295,11 +295,13 @@ const StudentForm: React.FC<StudentFormProps> = ({
                   <SelectValue placeholder="Select batch" />
                 </SelectTrigger>
                 <SelectContent>
-                  {referenceData.batches.map((batch) => (
-                    <SelectItem key={batch.id} value={batch.id}>
-                      {batch.name} ({batch.year})
-                    </SelectItem>
-                  ))}
+                  {referenceData.batches
+                    .filter(batch => batch.id && batch.id.trim() !== '')
+                    .map((batch) => (
+                      <SelectItem key={batch.id} value={batch.id}>
+                        {batch.name} ({batch.year})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               {errors.batchId && (
@@ -314,11 +316,13 @@ const StudentForm: React.FC<StudentFormProps> = ({
                   <SelectValue placeholder="Select section" />
                 </SelectTrigger>
                 <SelectContent>
-                  {referenceData.sections.map((section) => (
-                    <SelectItem key={section.id} value={section.id}>
-                      {section.name}
-                    </SelectItem>
-                  ))}
+                  {referenceData.sections
+                    .filter(section => section.id && section.id.trim() !== '')
+                    .map((section) => (
+                      <SelectItem key={section.id} value={section.id}>
+                        {section.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               {errors.sectionId && (
@@ -333,11 +337,13 @@ const StudentForm: React.FC<StudentFormProps> = ({
                   <SelectValue placeholder="Select house (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {referenceData.houses.map((house) => (
-                    <SelectItem key={house.id} value={house.id}>
-                      {house.name}
-                    </SelectItem>
-                  ))}
+                  {referenceData.houses
+                    .filter(house => house.id && house.id.trim() !== '')
+                    .map((house) => (
+                      <SelectItem key={house.id} value={house.id}>
+                        {house.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

@@ -1,5 +1,27 @@
 import { HPSScore, HPSDisplayConfig } from '../types/hps';
 
+// Grade calculation utility functions
+export type Grade = 'A+' | 'A' | 'B' | 'C' | 'D' | 'E' | 'IC';
+export type StatusType = 'Good' | 'Progress' | 'Deteriorate';
+
+// Constants for grading and weightage
+export const GRADING_SCALE = [
+  { grade: 'A+', min: 90, max: 100, color: 'bg-green-500' },
+  { grade: 'A', min: 80, max: 89, color: 'bg-green-400' },
+  { grade: 'B', min: 70, max: 79, color: 'bg-blue-400' },
+  { grade: 'C', min: 60, max: 69, color: 'bg-yellow-400' },
+  { grade: 'D', min: 40, max: 59, color: 'bg-orange-400' },
+  { grade: 'E', min: 30, max: 39, color: 'bg-red-400' },
+  { grade: 'IC', min: 0, max: 29, color: 'bg-red-500' }
+];
+
+export const QUADRANT_WEIGHTAGE = {
+  persona: 50,
+  wellness: 30,
+  behavior: 10,
+  discipline: 10
+};
+
 export const formatHPSScore = (score: number, decimals: number = 2): string => {
     return score.toFixed(decimals);
 };

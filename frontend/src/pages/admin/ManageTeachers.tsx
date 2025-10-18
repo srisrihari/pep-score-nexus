@@ -26,7 +26,7 @@ import {
   MoreHorizontal,
   PenTool
 } from "lucide-react";
-import { adminAPI } from "@/lib/api";
+import { adminAPI, apiRequest } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { ErrorHandler, FormErrors } from "@/utils/errorHandling";
 
@@ -79,6 +79,11 @@ const ManageTeachers: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalTeachers, setTotalTeachers] = useState(0);
+
+  // Delete state
+  const [deletingTeacher, setDeletingTeacher] = useState<Teacher | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeletingTeacher, setIsDeletingTeacher] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
 
   // New teacher form state
@@ -215,6 +220,41 @@ const ManageTeachers: React.FC = () => {
     setSelectedTeacher(teacher);
     setIsAssignDialogOpen(true);
     fetchInterventions();
+  };
+
+  const handleEditTeacher = (teacher: Teacher) => {
+    // For now, show a message that edit functionality needs to be implemented
+    toast.info("Teacher editing functionality will be implemented soon");
+  };
+
+  const handleDeleteTeacher = (teacher: Teacher) => {
+    setDeletingTeacher(teacher);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteTeacher = async () => {
+    if (!deletingTeacher) return;
+
+    setIsDeletingTeacher(true);
+    try {
+      const response = await apiRequest(`/api/v1/admin/teachers/${deletingTeacher.id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.success) {
+        toast.success("Teacher deleted successfully");
+        setShowDeleteDialog(false);
+        setDeletingTeacher(null);
+        fetchTeachers(); // Refresh the list
+      } else {
+        throw new Error(response.message || 'Delete failed');
+      }
+    } catch (error) {
+      console.error('Error deleting teacher:', error);
+      toast.error("Failed to delete teacher: " + (error.message || 'Unknown error'));
+    } finally {
+      setIsDeletingTeacher(false);
+    }
   };
 
   const fetchInterventions = async () => {
@@ -488,11 +528,22 @@ const ManageTeachers: React.FC = () => {
                           <PenTool className="h-3.5 w-3.5" />
                         </Button>
 
-                        <Button variant="outline" size="sm" disabled>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditTeacher(teacher)}
+                          title="Edit Teacher"
+                        >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
 
-                        <Button variant="outline" size="sm" className="text-destructive" disabled>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-destructive"
+                          onClick={() => handleDeleteTeacher(teacher)}
+                          title="Delete Teacher"
+                        >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -687,6 +738,34 @@ const ManageTeachers: React.FC = () => {
               disabled={isAssigning || selectedMicrocompetencies.length === 0}
             >
               {isAssigning ? 'Assigning...' : 'Assign Microcompetencies'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Teacher Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Teacher</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {deletingTeacher?.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeletingTeacher}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteTeacher}
+              disabled={isDeletingTeacher}
+            >
+              {isDeletingTeacher ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>

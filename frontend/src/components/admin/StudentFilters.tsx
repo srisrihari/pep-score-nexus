@@ -80,12 +80,14 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
                 <SelectValue placeholder="All Batches" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Batches</SelectItem>
-                {filterOptions.batches.map((batch) => (
-                  <SelectItem key={batch.id} value={batch.id}>
-                    {batch.name} ({batch.year})
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">All Batches</SelectItem>
+                {filterOptions.batches
+                  .filter(batch => batch.id && batch.id.trim() !== '')
+                  .map((batch) => (
+                    <SelectItem key={batch.id} value={batch.id}>
+                      {batch.name} ({batch.year})
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -97,12 +99,14 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
                 <SelectValue placeholder="All Sections" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Sections</SelectItem>
-                {filterOptions.sections.map((section) => (
-                  <SelectItem key={section.id} value={section.id}>
-                    {section.name}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">All Sections</SelectItem>
+                {filterOptions.sections
+                  .filter(section => section.id && section.id.trim() !== '')
+                  .map((section) => (
+                    <SelectItem key={section.id} value={section.id}>
+                      {section.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -114,7 +118,7 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
                 <SelectValue placeholder="All Courses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Courses</SelectItem>
+                <SelectItem value="all">All Courses</SelectItem>
                 {filterOptions.courses.map((course) => (
                   <SelectItem key={course} value={course}>
                     {course}
@@ -131,7 +135,7 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 {filterOptions.statuses.map((status) => (
                   <SelectItem key={status} value={status}>
                     {status}
@@ -148,7 +152,7 @@ const StudentFilters: React.FC<StudentFiltersProps> = ({
                 <SelectValue placeholder="All Grades" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Grades</SelectItem>
+                <SelectItem value="all">All Grades</SelectItem>
                 {filterOptions.grades.map((grade) => (
                   <SelectItem key={grade} value={grade}>
                     {grade}

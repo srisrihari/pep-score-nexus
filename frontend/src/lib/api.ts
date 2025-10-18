@@ -42,12 +42,17 @@ const refreshToken = async (): Promise<string | null> => {
     if (response.ok) {
       const data = await response.json();
       if (data.success && data.data.token) {
+        console.log('🔄 Token refresh successful, storing new token');
         localStorage.setItem('authToken', data.data.token);
         if (data.data.refreshToken) {
           localStorage.setItem('refreshToken', data.data.refreshToken);
         }
         return data.data.token;
+      } else {
+        console.log('❌ Token refresh response missing token:', data);
       }
+    } else {
+      console.log('❌ Token refresh failed with status:', response.status);
     }
     return null;
   } catch (error) {
@@ -65,9 +70,13 @@ const apiRequest = async <T>(
 
   const makeRequest = async (headers: HeadersInit): Promise<Response> => {
     const config: RequestInit = {
-      headers,
       ...options,
+      headers: {
+        ...headers,
+        ...(options.headers || {}),
+      },
     };
+    console.log('🌐 Making request to:', endpoint, 'with headers:', Object.keys(config.headers || {}));
     return await fetch(url, config);
   };
 
@@ -77,14 +86,17 @@ const apiRequest = async <T>(
 
     // If unauthorized and we have a refresh token, try to refresh
     if (response.status === 401) {
+      console.log('🔄 Got 401, attempting token refresh...');
       const newToken = await refreshToken();
       if (newToken) {
+        console.log('✅ Token refreshed successfully, retrying request...');
         // Retry with new token
         const newHeaders = {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${newToken}`,
         };
         response = await makeRequest(newHeaders);
+        console.log('🔄 Retry response status:', response.status);
       } else {
         // Refresh failed, redirect to login
         localStorage.removeItem('authToken');
@@ -4205,22 +4217,72 @@ export const uploadAPI = {
     });
   },
 
-  // Import Excel data
-  importExcelData: async (formData: FormData) => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/uploads/excel-import`, {
-      method: 'POST',
-      headers: {
+  // Step 1: Preview Excel data before import
+  previewExcelData: async (formData: FormData) => {
+    const url = `${API_BASE_URL}/api/v1/uploads/excel-preview`;
+
+    const makeRequest = async (headers: HeadersInit): Promise<Response> => {
+      return await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+    };
+
+    try {
+      // First attempt with current token
+      let response = await makeRequest({
         'Authorization': `Bearer ${getAuthToken()}`,
-      },
-      body: formData,
-    });
+        // Don't set Content-Type for FormData - let browser handle it
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      // If unauthorized and we have a refresh token, try to refresh
+      if (response.status === 401) {
+        const newToken = await refreshToken();
+        if (newToken) {
+          // Retry with new token
+          response = await makeRequest({
+            'Authorization': `Bearer ${newToken}`,
+          });
+        } else {
+          throw new Error('Token expired');
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('❌ Preview Excel error:', error);
+      throw error;
     }
+  },
 
-    return await response.json();
+  // Step 2: Import students with batch assignment
+  importExcelData: async (importData: {
+    tempFileId: string;
+    batchAssignment: {
+      batchId: string;
+      sectionId: string;
+      course: string;
+    };
+  }) => {
+    return apiRequest<{
+      success: boolean;
+      data: {
+        totalRows: number;
+        successCount: number;
+        errorCount: number;
+        errors: string[];
+      };
+      message: string;
+    }>('/api/v1/uploads/excel-import', {
+      method: 'POST',
+      body: JSON.stringify(importData),
+    });
   },
 };
 
@@ -4326,11 +4388,13 @@ export const termAPI = {
     });
   },
 
-  deleteTerm: async (termId: string) => {
+  deleteTerm: async (termId: string, force: boolean = false) => {
     return apiRequest<{
       success: boolean;
       message: string;
-    }>(`/api/v1/terms/${termId}`, {
+      associations?: Array<{table: string, count: number}>;
+      deletedAssociations?: Array<{table: string, count: number}>;
+    }>(`/api/v1/terms/${termId}${force ? '?force=true' : ''}`, {
       method: 'DELETE',
     });
   },
@@ -4343,6 +4407,115 @@ export const teacherMicrocompetencyAPI = {
   getTeacherInterventionStudents: interventionAPI.getTeacherInterventionStudents,
   scoreStudentMicrocompetency: interventionAPI.scoreStudentMicrocompetency,
   batchScoreStudents: interventionAPI.batchScoreStudents,
+};
+
+// Attendance Management API
+export const attendanceAPI = {
+  // Get student attendance summary
+  getStudentAttendanceSummary: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: {
+        summary: Array<{
+          id: string;
+          student_id: string;
+          term_id: string;
+          quadrant_id: string;
+          total_sessions: number;
+          attended_sessions: number;
+          percentage: number;
+          last_updated: string;
+          quadrants: {
+            id: string;
+            name: string;
+            description: string;
+          };
+        }>;
+        recentAttendance: Array<{
+          id: string;
+          student_id: string;
+          term_id: string;
+          quadrant_id: string;
+          attendance_date: string;
+          is_present: boolean;
+          reason?: string;
+          marked_by: string;
+          created_at: string;
+          quadrants: {
+            id: string;
+            name: string;
+          };
+          users: {
+            username: string;
+          };
+        }>;
+      };
+    }>(`/api/v1/attendance-management/student/${studentId}/summary?termId=${termId}`);
+  },
+
+  // Get attendance statistics
+  getStudentAttendanceStats: async (studentId: string, termId: string) => {
+    return apiRequest<{
+      success: boolean;
+      data: Array<{
+        quadrant_id: string;
+        quadrant_name: string;
+        total_marked_days: number;
+        present_days: number;
+        absent_days: number;
+        attendance_percentage: number;
+        first_marked_date: string;
+        last_marked_date: string;
+      }>;
+    }>(`/api/v1/attendance-management/student/${studentId}/stats?termId=${termId}`);
+  },
+
+  // Bulk mark attendance for a student
+  bulkMarkStudentAttendance: async (
+    studentId: string,
+    data: {
+      termId: string;
+      quadrantId: string;
+      attendanceRecords: Array<{
+        attendanceDate: string;
+        isPresent: boolean;
+        reason?: string;
+      }>;
+    }
+  ) => {
+    return apiRequest<{
+      success: boolean;
+      data: {
+        successful: any[];
+        errors: Array<{ date: string; error: string }>;
+        totalProcessed: number;
+        successCount: number;
+        errorCount: number;
+      };
+      message: string;
+    }>(`/api/v1/attendance-management/student/${studentId}/bulk-mark`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  // Update attendance record
+  updateAttendanceRecord: async (
+    attendanceId: string,
+    data: {
+      isPresent: boolean;
+      reason?: string;
+    }
+  ) => {
+    return apiRequest<{
+      success: boolean;
+      data: any;
+      message: string;
+    }>(`/api/v1/attendance-management/record/${attendanceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
 };
 
 // SHL Competency API calls
@@ -4510,6 +4683,9 @@ export const shlCompetencyAPI = {
     });
   },
 };
+
+// Export apiRequest for direct use
+export { apiRequest };
 
 export default {
   auth: authAPI,

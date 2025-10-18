@@ -494,31 +494,118 @@ const resetTermScores = async (req, res) => {
 const deleteTerm = async (req, res) => {
   try {
     const { id } = req.params;
+    const { force = false } = req.query;
 
-    // Check if term has associated data
-    const { rows: scores } = await query(
-      supabase
-        .from('scores')
-        .select('id', { count: 'exact', head: true })
-        .eq('term_id', id)
-    );
+    console.log(`🗑️ Attempting to delete term: ${id}, force: ${force}`);
 
-    const { rows: studentTerms } = await query(
-      supabase
-        .from('student_terms')
-        .select('id', { count: 'exact', head: true })
-        .eq('term_id', id)
-    );
+    // Check if term has associated data in all related tables
+    const relatedTables = [
+      { table: 'scores', field: 'term_id' },
+      { table: 'student_terms', field: 'term_id' },
+      { table: 'microcompetency_scores', field: 'term_id' },
+      { table: 'interventions', field: 'term_id' },
+      { table: 'direct_assessments', field: 'term_id' },
+      { table: 'attendance', field: 'term_id' },
+      { table: 'attendance_summary', field: 'term_id' },
+      { table: 'attendance_eligibility', field: 'term_id' },
+      { table: 'student_score_summary', field: 'term_id' },
+      { table: 'student_rankings', field: 'term_id' },
+      { table: 'hps_recalculation_queue', field: 'term_id' },
+      { table: 'students', field: 'current_term_id' }
+    ];
 
-    if (scores.count > 0 || studentTerms.count > 0) {
+    const associations = [];
+    for (const { table, field } of relatedTables) {
+      try {
+        const countResult = await query(
+          supabase
+            .from(table)
+            .select('id', { count: 'exact', head: true })
+            .eq(field, id)
+        );
+        
+        const count = countResult.count || 0;
+        if (count > 0) {
+          associations.push({ table, count });
+        }
+      } catch (err) {
+        console.warn(`⚠️ Could not check ${table}: ${err.message}`);
+      }
+    }
+
+    if (associations.length > 0 && force !== 'true') {
+      const details = associations.map(a => `${a.table}: ${a.count} records`).join(', ');
       return res.status(400).json({
         success: false,
-        message: 'Cannot delete term with associated data. Please archive instead.',
+        message: `Cannot delete term with associated data. Found: ${details}. Use force=true for cascading deletion.`,
+        associations,
         timestamp: new Date().toISOString()
       });
     }
 
-    const { rows: deletedTerm } = await query(
+    if (force === 'true' && associations.length > 0) {
+      console.log(`🔄 Force delete enabled, removing ${associations.length} associations...`);
+      
+      // Delete associated data in reverse dependency order
+      const deletionOrder = [
+        'hps_recalculation_queue',
+        'student_rankings', 
+        'student_score_summary',
+        'attendance_eligibility',
+        'attendance_summary',
+        'attendance',
+        'direct_assessments',
+        'microcompetency_scores',
+        'scores',
+        'student_terms'
+      ];
+
+      for (const table of deletionOrder) {
+        try {
+          const field = relatedTables.find(t => t.table === table)?.field;
+          if (field) {
+            await query(
+              supabase
+                .from(table)
+                .delete()
+                .eq(field, id)
+            );
+            console.log(`✅ Deleted records from ${table}`);
+          }
+        } catch (err) {
+          console.error(`❌ Error deleting from ${table}:`, err.message);
+        }
+      }
+
+      // Update students current_term_id to null
+      try {
+        await query(
+          supabase
+            .from('students')
+            .update({ current_term_id: null })
+            .eq('current_term_id', id)
+        );
+        console.log('✅ Updated student current_term_id references');
+      } catch (err) {
+        console.error('❌ Error updating students:', err.message);
+      }
+
+      // Delete interventions (which may have their own cascade)
+      try {
+        await query(
+          supabase
+            .from('interventions')
+            .delete()
+            .eq('term_id', id)
+        );
+        console.log('✅ Deleted interventions');
+      } catch (err) {
+        console.error('❌ Error deleting interventions:', err.message);
+      }
+    }
+
+    // Finally delete the term
+    const deleteResult = await query(
       supabase
         .from('terms')
         .delete()
@@ -526,7 +613,7 @@ const deleteTerm = async (req, res) => {
         .select()
     );
 
-    if (!deletedTerm || deletedTerm.length === 0) {
+    if (!deleteResult.rows || deleteResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Term not found',
@@ -534,9 +621,13 @@ const deleteTerm = async (req, res) => {
       });
     }
 
+    console.log(`✅ Term ${id} deleted successfully`);
     res.status(200).json({
       success: true,
-      message: 'Term deleted successfully',
+      message: force === 'true' ? 
+        'Term and all associated data deleted successfully (cascading delete)' : 
+        'Term deleted successfully',
+      deletedAssociations: force === 'true' ? associations : [],
       timestamp: new Date().toISOString()
     });
   } catch (error) {

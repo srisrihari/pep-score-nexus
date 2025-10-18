@@ -1,6 +1,6 @@
 const { supabase, query } = require('../config/supabase');
 const enhancedWeightageService = require('../services/enhancedWeightageValidationService');
-const enhancedScoreService = require('../services/enhancedUnifiedScoreCalculationService');
+const enhancedScoreService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
 
 /**
  * Batch Term Weightage Controller
