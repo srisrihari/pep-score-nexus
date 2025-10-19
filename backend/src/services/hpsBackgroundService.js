@@ -1,6 +1,5 @@
 const cron = require('node-cron');
-const { supabase } = require('../config/supabaseClient');
-const { query } = require('../utils/queryWrapper');
+const { supabase, query } = require('../config/supabase');
 const enhancedHPSCalculationService = require('./enhancedUnifiedScoreCalculationServiceV2');
 
 class HPSBackgroundService {

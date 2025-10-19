@@ -1,6 +1,5 @@
 const enhancedHPSCalculationService = require('../services/enhancedUnifiedScoreCalculationServiceV2');
-const { supabase } = require('../config/supabaseClient');
-const { query } = require('../utils/queryWrapper');
+const { supabase, query } = require('../config/supabase');
 
 class HPSController {
     async calculateStudentHPS(req, res) {

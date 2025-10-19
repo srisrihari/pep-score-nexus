@@ -41,3 +41,4 @@ Both backend and frontend should now be running without errors:
 
 ---
 **✨ The HPS system is now completely fixed and ready for production use!**
+

@@ -23,7 +23,7 @@ const {
   performanceMonitor
 } = require('./middleware/performanceOptimization');
 
-const { testConnection } = require('./config/supabase');
+const { testConnection, getConnectionHealth, resetCircuitBreaker } = require('./config/supabase');
 const superAdminService = require('./services/superAdminService');
 const hpsBackgroundService = require('./services/hpsBackgroundService');
 
@@ -171,15 +171,23 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check endpoint
+// Health check endpoint with enhanced connection monitoring
 app.get('/health', async (req, res) => {
   try {
     const dbStatus = await testConnection();
+    const connectionHealth = getConnectionHealth();
+    
     res.status(200).json({
       status: 'OK',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       database: dbStatus ? 'Connected' : 'Disconnected',
+      connection: {
+        status: connectionHealth.status,
+        failureCount: connectionHealth.failureCount,
+        circuitOpen: connectionHealth.circuitOpen,
+        lastFailure: connectionHealth.lastFailure
+      },
       version: '1.0.0',
       environment: process.env.NODE_ENV || 'development'
     });
@@ -187,7 +195,28 @@ app.get('/health', async (req, res) => {
     res.status(503).json({
       status: 'Service Unavailable',
       timestamp: new Date().toISOString(),
-      error: error.message
+      error: error.message,
+      connection: getConnectionHealth()
+    });
+  }
+});
+
+// Admin endpoint to reset circuit breaker
+app.post('/admin/reset-circuit-breaker', authenticateToken, requireRole('admin'), (req, res) => {
+  try {
+    resetCircuitBreaker();
+    res.status(200).json({
+      success: true,
+      message: 'Circuit breaker reset successfully',
+      connectionHealth: getConnectionHealth(),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset circuit breaker',
+      error: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });

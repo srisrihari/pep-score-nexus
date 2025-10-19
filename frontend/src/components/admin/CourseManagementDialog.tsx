@@ -435,3 +435,4 @@ const CourseManagementDialog: React.FC<CourseManagementDialogProps> = ({ trigger
 
 export default CourseManagementDialog;
 
+

@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { supabase } = require('../config/supabase');
-const { query } = require('../utils/query');
+const { supabase, query } = require('../config/supabase');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
 
@@ -27,38 +26,22 @@ const authenticateToken = async (req, res, next) => {
     
     let userData = null;
     let userError = null;
-    let retryCount = 0;
-    const maxRetries = 2;
     
-    // Retry logic for intermittent connection issues
-    while (retryCount <= maxRetries) {
-      try {
-        const result = await supabase
+    // Use the enhanced query function with built-in retry logic
+    try {
+      const result = await query(
+        supabase
           .from('users')
           .select('id, username, email, role, status')
           .eq('id', decoded.userId)
           .eq('status', 'active')
-          .limit(1);
-        
-        userData = result.data;
-        userError = result.error;
-        
-        if (!userError) {
-          break; // Success, exit retry loop
-        }
-        
-        if (retryCount < maxRetries) {
-          console.log(`🔄 User query failed, retrying... (${retryCount + 1}/${maxRetries})`);
-          await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-        }
-      } catch (error) {
-        userError = error;
-        if (retryCount < maxRetries) {
-          console.log(`🔄 User query exception, retrying... (${retryCount + 1}/${maxRetries})`);
-          await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
-        }
-      }
-      retryCount++;
+          .limit(1)
+      );
+      
+      userData = result.rows;
+      userError = null;
+    } catch (error) {
+      userError = error;
     }
 
     if (userError) {
