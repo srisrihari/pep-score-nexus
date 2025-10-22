@@ -557,14 +557,14 @@ const importStudentDataWithAssignment = async (data, batchAssignment) => {
       if (existingUserResult.rows && existingUserResult.rows.length > 0) {
         userId = existingUserResult.rows[0].id;
       } else {
-        // Create new user with password = registration_no
+        // Create new user with password_hash = registration_no
         const createUserResult = await query(
           supabase
             .from('users')
             .insert({
               username: registrationNo,
               email,
-              password: registrationNo, // Password defaults to registration number
+              password_hash: registrationNo, // Password hash defaults to registration number
               role: 'student',
               status: 'active'
             })
