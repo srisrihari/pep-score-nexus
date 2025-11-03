@@ -25,7 +25,7 @@ import {
 // Import all necessary types
 
 const StudentDashboard: React.FC = () => {
-  const { selectedTerm, availableTerms } = useTerm();
+  const { selectedTerm, availableTerms, setSelectedTerm } = useTerm();
   const [studentData, setStudentData] = useState<Student | null>(null);
   const [leaderboardData, setLeaderboardData] = useState<Leaderboard | null>(null);
   const [timeSeriesData, setTimeSeriesData] = useState<any>(null);
@@ -42,26 +42,43 @@ const StudentDashboard: React.FC = () => {
         setLoading(true);
         setError(null);
 
+        // Wait for terms to be loaded if still loading
+        if (!availableTerms || availableTerms.length === 0) {
+          console.log('⏳ Waiting for terms to load...');
+          return;
+        }
+
         // First get current student to get their ID
         console.log('🔄 Loading student data...');
         const currentStudentResponse = await studentAPI.getCurrentStudent();
         const studentId = currentStudentResponse.data.id;
         console.log('✅ Student ID:', studentId);
 
-        // Ensure we have a term selected
-        if (!selectedTerm?.id) {
-          // If no term is selected, try to get current term from available terms
-          const currentTerm = availableTerms?.find(term => term.is_current);
-          if (!currentTerm) {
-            throw new Error('No active term found. Please contact your administrator.');
-          }
-          // Update selected term in context
-          // This will trigger a re-render, but that's what we want
-          setSelectedTerm(currentTerm);
+        // Determine which term to use - prioritize selectedTerm, fallback to currentTerm, then first available
+        let termToUse = selectedTerm;
+        
+        if (!termToUse?.id) {
+          // Try to get current term from available terms
+          termToUse = availableTerms.find(term => term.is_current) || null;
+        }
+        
+        if (!termToUse?.id) {
+          // Fallback to first available term
+          termToUse = availableTerms[0] || null;
+        }
+        
+        if (!termToUse?.id) {
+          throw new Error('No active term found. Please contact your administrator.');
+        }
+
+        // Update selected term if it wasn't already set
+        if (selectedTerm?.id !== termToUse.id) {
+          setSelectedTerm(termToUse);
+          // Return early to let the effect re-run with the updated term
           return;
         }
 
-        console.log('📅 Selected term ID:', selectedTerm.id);
+        console.log('📅 Selected term ID:', termToUse.id);
 
         // Fetch all required data using both legacy and new unified APIs
         const [
@@ -71,7 +88,7 @@ const StudentDashboard: React.FC = () => {
           interventionResponse,
           unifiedScoreResponse
         ] = await Promise.all([
-          studentAPI.getStudentPerformance(studentId, selectedTerm.id, true).catch((error) => {
+          studentAPI.getStudentPerformance(studentId, termToUse.id, true).catch((error) => {
             console.error('Performance API failed:', error);
             // Show user-friendly error for critical data
             if (error.message.includes('401') || error.message.includes('unauthorized')) {
@@ -79,20 +96,21 @@ const StudentDashboard: React.FC = () => {
             }
             throw new Error('Unable to load performance data. Please try refreshing the page.');
           }),
-          studentAPI.getStudentLeaderboard(studentId, selectedTerm.id).catch((error) => {
+          // Leaderboard doesn't need a termId param; fetch overall/current context
+          studentAPI.getStudentLeaderboard(studentId).catch((error) => {
             console.warn('Leaderboard API failed (non-critical):', error);
             return null;
           }),
-          studentAPI.getStudentAttendance(studentId, selectedTerm.id).catch((error) => {
+          studentAPI.getStudentAttendance(studentId, termToUse.id).catch((error) => {
             console.warn('Attendance API failed (non-critical):', error);
             return null;
           }),
-          studentAPI.getStudentInterventionPerformance(studentId, selectedTerm.id).catch((error) => {
+          studentAPI.getStudentInterventionPerformance(studentId, termToUse.id).catch((error) => {
             console.warn('Intervention API failed (non-critical):', error);
             return null;
           }),
           // Try to get unified score data (new system)
-          unifiedScoreAPI.getStudentScoreSummary(studentId, selectedTerm.id).catch((error) => {
+          unifiedScoreAPI.getStudentScoreSummary(studentId, termToUse.id).catch((error) => {
             console.warn('Unified score API failed, using legacy data:', error);
             // Check for authentication errors
             if (error.message.includes('401') || error.message.includes('unauthorized')) {
@@ -168,7 +186,7 @@ const StudentDashboard: React.FC = () => {
 
         // Generate time series and term comparison from current term only
         // Note: Using only current term data to avoid showing incorrect historical data
-        const currentTerm = transformedStudent.terms.find(term => term.termId === termId) || transformedStudent.terms[0];
+        const currentTerm = transformedStudent.terms.find(term => term.termId === termToUse.id) || transformedStudent.terms[0];
         const timeSeries = currentTerm
           ? {
               overall: [{
@@ -221,7 +239,7 @@ const StudentDashboard: React.FC = () => {
     };
 
     loadStudentData();
-  }, [selectedTerm]); // Reload when selected term changes
+  }, [selectedTerm, availableTerms]); // Reload when selected term or available terms change
 
   // Show loading state
   if (loading) {

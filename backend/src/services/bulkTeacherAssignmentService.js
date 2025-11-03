@@ -10,8 +10,8 @@ class BulkTeacherAssignmentService {
   }
 
   /**
-   * Assign multiple teachers to multiple interventions
-   * @param {Array} assignments - Array of {interventionId, teacherIds, role, microcompetencyIds}
+   * Assign multiple teachers to multiple interventions (NEW: intervention-level, no microcompetencyIds)
+   * @param {Array} assignments - Array of {interventionId, teacherIds, role}
    * @param {string} assignedBy - Admin user ID
    * @returns {Promise<Object>} Assignment result
    */
@@ -28,8 +28,7 @@ class BulkTeacherAssignmentService {
             assignment.interventionId,
             assignment.teacherIds,
             assignedBy,
-            assignment.role || 'Assistant',
-            assignment.microcompetencyIds || []
+            assignment.role || 'Assistant'
           );
 
           if (result.success) {
@@ -79,15 +78,14 @@ class BulkTeacherAssignmentService {
   }
 
   /**
-   * Assign teachers to a single intervention
+   * Assign teachers to a single intervention (NEW: intervention-level, no microcompetencyIds)
    * @param {string} interventionId - Intervention ID
    * @param {Array} teacherIds - Array of teacher IDs
    * @param {string} assignedBy - Admin user ID
-   * @param {string} role - Teacher role (Lead, Assistant, Observer)
-   * @param {Array} microcompetencyIds - Array of microcompetency IDs
+   * @param {string} role - Teacher role (for reference, stored in intervention_teachers if needed)
    * @returns {Promise<Object>} Assignment result
    */
-  async assignTeachersToIntervention(interventionId, teacherIds, assignedBy, role = 'Assistant', microcompetencyIds = []) {
+  async assignTeachersToIntervention(interventionId, teacherIds, assignedBy, role = 'Assistant') {
     try {
       // Validate intervention exists
       const interventionCheck = await query(
@@ -108,10 +106,10 @@ class BulkTeacherAssignmentService {
 
       const intervention = interventionCheck.rows[0];
 
-      // Check current teacher count
+      // NEW: Check current teacher count using teacher_microcompetency_assignments
       const currentTeachersResult = await query(
         supabase
-          .from('intervention_teachers')
+          .from('teacher_microcompetency_assignments')
           .select('teacher_id')
           .eq('intervention_id', interventionId)
           .eq('is_active', true)
@@ -149,10 +147,10 @@ class BulkTeacherAssignmentService {
         };
       }
 
-      // Check for existing assignments
+      // NEW: Check for existing assignments using teacher_microcompetency_assignments
       const existingAssignmentsResult = await query(
         supabase
-          .from('intervention_teachers')
+          .from('teacher_microcompetency_assignments')
           .select('teacher_id')
           .eq('intervention_id', interventionId)
           .in('teacher_id', teacherIds)
@@ -173,12 +171,13 @@ class BulkTeacherAssignmentService {
         };
       }
 
-      // Create assignments
+      // NEW: Create assignments using teacher_microcompetency_assignments (intervention-level, no microcompetency_id)
       const assignments = newTeacherIds.map(teacherId => ({
         intervention_id: interventionId,
         teacher_id: teacherId,
-        role: role,
-        microcompetency_ids: microcompetencyIds,
+        // REMOVED: microcompetency_id (teachers now assigned to intervention, not per microcompetency)
+        can_score: true,
+        can_create_tasks: true,
         assigned_by: assignedBy,
         assigned_at: new Date().toISOString(),
         is_active: true
@@ -186,10 +185,10 @@ class BulkTeacherAssignmentService {
 
       const assignmentResult = await query(
         supabase
-          .from('intervention_teachers')
+          .from('teacher_microcompetency_assignments')
           .insert(assignments)
           .select(`
-            id, teacher_id, role,
+            id, teacher_id, can_score, can_create_tasks,
             teachers:teacher_id(id, name)
           `)
       );
@@ -261,13 +260,12 @@ class BulkTeacherAssignmentService {
 
       const teacherIds = eligibleTeachers.map(t => t.id);
 
-      // Assign the teachers
+      // NEW: Assign the teachers (intervention-level, no microcompetencyIds)
       const result = await this.assignTeachersToIntervention(
         interventionId,
         teacherIds,
         assignedBy,
-        criteria.role || 'Assistant',
-        criteria.microcompetencyIds || []
+        criteria.role || 'Assistant'
       );
 
       return {
@@ -362,14 +360,14 @@ class BulkTeacherAssignmentService {
    */
   async removeTeachersFromIntervention(interventionId, teacherIds, removedBy) {
     try {
-      // Deactivate assignments
+      // NEW: Deactivate assignments using teacher_microcompetency_assignments
+      // Note: We can't delete if students are enrolled (FK constraint prevents this)
       const removalResult = await query(
         supabase
-          .from('intervention_teachers')
+          .from('teacher_microcompetency_assignments')
           .update({
-            is_active: false,
-            removed_by: removedBy,
-            removed_at: new Date().toISOString()
+            is_active: false
+            // Note: removed_by and removed_at columns don't exist in this table
           })
           .eq('intervention_id', interventionId)
           .in('teacher_id', teacherIds)
@@ -413,9 +411,10 @@ class BulkTeacherAssignmentService {
         assignmentsResult
       ] = await Promise.all([
         query(supabase.from('teachers').select('id').eq('is_active', true)),
-        query(supabase.from('intervention_teachers').select('teacher_id').eq('is_active', true)),
+        // NEW: Use teacher_microcompetency_assignments instead of intervention_teachers
+        query(supabase.from('teacher_microcompetency_assignments').select('teacher_id').eq('is_active', true)),
         query(supabase.from('interventions').select('id').eq('status', 'Active')),
-        query(supabase.from('intervention_teachers').select('*').eq('is_active', true))
+        query(supabase.from('teacher_microcompetency_assignments').select('*').eq('is_active', true))
       ]);
 
       const totalTeachers = totalTeachersResult.rows ? totalTeachersResult.rows.length : 0;

@@ -111,10 +111,22 @@ const ManageInterventions: React.FC = () => {
     description: string;
     weightage: number;
     maxScore: number;
-    assignedTeacher: string | null;
     quadrant: { id: string; name: string; };
   }>>([]);
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  // NEW: Teacher assignment state (intervention-level, not per microcompetency)
+  const [selectedTeachers, setSelectedTeachers] = useState<Array<{
+    teacher_id: string;
+    teacher: { id: string; name: string; employee_id: string };
+    can_score: boolean;
+    can_create_tasks: boolean;
+  }>>([]);
+  // NEW: Teacher-student group assignments
+  const [teacherStudentGroups, setTeacherStudentGroups] = useState<Array<{
+    teacher_assignment_id?: string; // Will be set after teacher assignment
+    teacher_id: string;
+    teacher_name: string;
+    studentIds: string[];
+  }>>([]);
   const [availableMicrocompetencies, setAvailableMicrocompetencies] = useState<any[]>([]);
   const [availableTeachers, setAvailableTeachers] = useState<any[]>([]);
   const [availableStudents, setAvailableStudents] = useState<any[]>([]);
@@ -347,43 +359,54 @@ const ManageInterventions: React.FC = () => {
         // Small delay to ensure database consistency
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Step 3: Assign teachers to microcompetencies (single API call for all assignments)
-        const teacherAssignments = selectedMicrocompetencies
-          .filter(mc => mc.assignedTeacher)
-          .map(mc => ({
-            teacher_id: mc.assignedTeacher!,
-            microcompetency_id: mc.id,
-            can_score: true,
-            can_create_tasks: true
-          }));
-
-        if (teacherAssignments.length > 0) {
-          console.log('Assigning teachers to microcompetencies:', { interventionId, assignments: teacherAssignments });
+        // Step 3: Assign teachers to intervention (NEW: intervention-level, not per microcompetency)
+        if (selectedTeachers.length > 0) {
+          console.log('Assigning teachers to intervention:', { interventionId, teachers: selectedTeachers });
 
           try {
             const assignTeachersResponse = await interventionAPI.assignTeachersToMicrocompetencies(interventionId, {
-              assignments: teacherAssignments
+              teachers: selectedTeachers.map(t => ({
+                teacher_id: t.teacher_id,
+                can_score: t.can_score,
+                can_create_tasks: t.can_create_tasks
+              }))
             });
             console.log('✅ Teachers assigned successfully:', assignTeachersResponse);
+
+            // Store teacher assignment IDs for student enrollment
+            const teacherAssignments = assignTeachersResponse.data.assignments || [];
+            const updatedTeacherGroups = teacherStudentGroups.map(group => {
+              const assignment = teacherAssignments.find((a: any) => a.teacher_id === group.teacher_id);
+              return {
+                ...group,
+                teacher_assignment_id: assignment?.id
+              };
+            });
+            setTeacherStudentGroups(updatedTeacherGroups);
+
+            // Step 4: Enroll student groups per teacher (NEW: per-teacher enrollment)
+            for (const group of updatedTeacherGroups) {
+              if (group.teacher_assignment_id && group.studentIds.length > 0) {
+                try {
+                  await interventionAPI.enrollStudents(interventionId, {
+                    intervention_teacher_id: group.teacher_assignment_id,
+                    studentIds: group.studentIds,
+                    enrollmentType: 'Mandatory'
+                  });
+                  console.log(`✅ ${group.studentIds.length} students enrolled for teacher ${group.teacher_name}`);
+                } catch (enrollError) {
+                  console.error(`❌ Failed to enroll students for teacher ${group.teacher_name}:`, enrollError);
+                  toast.warning(`Students could not be enrolled for ${group.teacher_name}. Please enroll manually.`);
+                }
+              }
+            }
           } catch (assignError) {
             console.error('❌ Failed to assign teachers:', assignError);
-            throw new Error(`Failed to assign teachers to microcompetencies: ${assignError instanceof Error ? assignError.message : 'Unknown error'}`);
+            throw new Error(`Failed to assign teachers to intervention: ${assignError instanceof Error ? assignError.message : 'Unknown error'}`);
           }
+        } else {
+          console.warn('⚠️ No teachers selected - intervention will have no teacher assignments');
         }
-      }
-
-      // Step 4: Enroll students if any selected with validation
-      if (selectedStudents.length > 0) {
-        try {
-          await interventionAPI.enrollStudents(interventionId, selectedStudents, 'Mandatory');
-          console.log(`✅ ${selectedStudents.length} students enrolled successfully`);
-        } catch (enrollError) {
-          console.error('❌ Failed to enroll students:', enrollError);
-          // Continue with intervention creation but warn about enrollment failure
-          toast.warning('Students could not be enrolled automatically. Please enroll them manually.');
-        }
-      } else {
-        console.warn('⚠️ No students selected for enrollment - intervention will have no students');
       }
 
       // Step 5: Update intervention status to Active with validation
@@ -424,12 +447,13 @@ const ManageInterventions: React.FC = () => {
     setFormErrors({});
     setCurrentStep(1);
     setSelectedMicrocompetencies([]);
-    setSelectedStudents([]);
+    setSelectedTeachers([]); // NEW
+    setTeacherStudentGroups([]); // NEW
   };
 
   // Step navigation functions
   const nextStep = () => {
-    if (currentStep < 4) {
+    if (currentStep < 5) { // NEW: 5 steps total (was 4)
       setCurrentStep(currentStep + 1);
       if (currentStep === 1) {
         fetchFormData(); // Fetch data when moving to step 2
@@ -452,20 +476,43 @@ const ManageInterventions: React.FC = () => {
 
   // Microcompetency selection functions
   const addMicrocompetency = (microcompetency: any) => {
+    // Calculate equal weightage for all microcompetencies
+    const currentCount = selectedMicrocompetencies.length;
+    const newCount = currentCount + 1;
+    const equalWeightage = Math.round(100 / newCount); // Equal distribution
+    
+    // Update existing microcompetencies with new equal weightage
+    const updatedMicrocompetencies = selectedMicrocompetencies.map(mc => ({
+      ...mc,
+      weightage: equalWeightage
+    }));
+
     const newMc = {
       id: microcompetency.id,
       name: microcompetency.name,
       description: microcompetency.description,
-      weightage: 10, // Default weightage
-      maxScore: microcompetency.max_score || 100,
-      assignedTeacher: null,
+      weightage: equalWeightage, // Equal weightage for all
+      maxScore: 5, // Default max score of 5
       quadrant: microcompetency.quadrant
     };
-    setSelectedMicrocompetencies(prev => [...prev, newMc]);
+    
+    setSelectedMicrocompetencies([...updatedMicrocompetencies, newMc]);
   };
 
   const removeMicrocompetency = (id: string) => {
-    setSelectedMicrocompetencies(prev => prev.filter(mc => mc.id !== id));
+    const filteredMicrocompetencies = selectedMicrocompetencies.filter(mc => mc.id !== id);
+    
+    // Recalculate equal weightage for remaining microcompetencies
+    if (filteredMicrocompetencies.length > 0) {
+      const equalWeightage = Math.round(100 / filteredMicrocompetencies.length);
+      const updatedMicrocompetencies = filteredMicrocompetencies.map(mc => ({
+        ...mc,
+        weightage: equalWeightage
+      }));
+      setSelectedMicrocompetencies(updatedMicrocompetencies);
+    } else {
+      setSelectedMicrocompetencies(filteredMicrocompetencies);
+    }
   };
 
   const updateMicrocompetencyWeightage = (id: string, weightage: number) => {
@@ -480,9 +527,48 @@ const ManageInterventions: React.FC = () => {
     );
   };
 
-  const assignTeacherToMicrocompetency = (mcId: string, teacherId: string | null) => {
-    setSelectedMicrocompetencies(prev =>
-      prev.map(mc => mc.id === mcId ? { ...mc, assignedTeacher: teacherId } : mc)
+  // NEW: Teacher management functions (intervention-level assignment)
+  const addTeacher = (teacher: any) => {
+    if (!selectedTeachers.find(t => t.teacher_id === teacher.id)) {
+      setSelectedTeachers(prev => [...prev, {
+        teacher_id: teacher.id,
+        teacher: {
+          id: teacher.id,
+          name: teacher.name,
+          employee_id: teacher.employee_id || ''
+        },
+        can_score: true,
+        can_create_tasks: true
+      }]);
+      // Initialize student group for this teacher
+      setTeacherStudentGroups(prev => [...prev, {
+        teacher_id: teacher.id,
+        teacher_name: teacher.name,
+        studentIds: []
+      }]);
+    }
+  };
+
+  const removeTeacher = (teacherId: string) => {
+    setSelectedTeachers(prev => prev.filter(t => t.teacher_id !== teacherId));
+    setTeacherStudentGroups(prev => prev.filter(g => g.teacher_id !== teacherId));
+  };
+
+  const updateTeacherPermissions = (teacherId: string, permissions: { can_score?: boolean; can_create_tasks?: boolean }) => {
+    setSelectedTeachers(prev =>
+      prev.map(t => t.teacher_id === teacherId
+        ? { ...t, ...permissions }
+        : t
+      )
+    );
+  };
+
+  const assignStudentsToTeacher = (teacherId: string, studentIds: string[]) => {
+    setTeacherStudentGroups(prev =>
+      prev.map(group => group.teacher_id === teacherId
+        ? { ...group, studentIds }
+        : group
+      )
     );
   };
 
@@ -972,7 +1058,7 @@ const ManageInterventions: React.FC = () => {
 
           {/* Step Indicator */}
           <div className="flex items-center justify-between mb-6">
-            {[1, 2, 3, 4].map((step) => (
+            {[1, 2, 3, 4, 5].map((step) => (
               <div key={step} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium cursor-pointer ${
@@ -989,10 +1075,11 @@ const ManageInterventions: React.FC = () => {
                 <div className="ml-2 text-sm">
                   {step === 1 && 'Basic Info'}
                   {step === 2 && 'Microcompetencies'}
-                  {step === 3 && 'Teachers'}
-                  {step === 4 && 'Students'}
+                  {step === 3 && 'Assign Teachers'}
+                  {step === 4 && 'Student Groups'}
+                  {step === 5 && 'Review'}
                 </div>
-                {step < 4 && <div className="w-16 h-0.5 bg-gray-200 mx-4" />}
+                {step < 5 && <div className="w-16 h-0.5 bg-gray-200 mx-4" />}
               </div>
             ))}
           </div>
@@ -1005,8 +1092,10 @@ const ManageInterventions: React.FC = () => {
             setFormErrors={setFormErrors}
             selectedMicrocompetencies={selectedMicrocompetencies}
             setSelectedMicrocompetencies={setSelectedMicrocompetencies}
-            selectedStudents={selectedStudents}
-            setSelectedStudents={setSelectedStudents}
+            selectedTeachers={selectedTeachers}
+            setSelectedTeachers={setSelectedTeachers}
+            teacherStudentGroups={teacherStudentGroups}
+            setTeacherStudentGroups={setTeacherStudentGroups}
             availableMicrocompetencies={availableMicrocompetencies}
             availableTeachers={availableTeachers}
             availableStudents={availableStudents}
@@ -1020,7 +1109,10 @@ const ManageInterventions: React.FC = () => {
             removeMicrocompetency={removeMicrocompetency}
             updateMicrocompetencyWeightage={updateMicrocompetencyWeightage}
             updateMicrocompetencyMaxScore={updateMicrocompetencyMaxScore}
-            assignTeacherToMicrocompetency={assignTeacherToMicrocompetency}
+            addTeacher={addTeacher}
+            removeTeacher={removeTeacher}
+            updateTeacherPermissions={updateTeacherPermissions}
+            assignStudentsToTeacher={assignStudentsToTeacher}
             setShowStudentSelectionDialog={setShowStudentSelectionDialog}
           />
 
@@ -1059,9 +1151,31 @@ const ManageInterventions: React.FC = () => {
       {/* Student Selection Dialog */}
       <StudentSelectionDialog
         open={showStudentSelectionDialog}
-        onOpenChange={setShowStudentSelectionDialog}
-        selectedStudents={selectedStudents}
-        onStudentsSelected={setSelectedStudents}
+        onOpenChange={(open) => {
+          setShowStudentSelectionDialog(open);
+          if (!open) {
+            // Clear teacher context when dialog closes
+            (window as any).__currentTeacherForSelection = undefined;
+          }
+        }}
+        selectedStudents={
+          // Get currently selected students for the teacher being edited
+          (() => {
+            const teacherId = (window as any).__currentTeacherForSelection;
+            if (teacherId) {
+              const group = teacherStudentGroups.find(g => g.teacher_id === teacherId);
+              return group?.studentIds || [];
+            }
+            return [];
+          })()
+        }
+        onStudentsSelected={(studentIds) => {
+          // Assign students to the teacher being edited
+          const teacherId = (window as any).__currentTeacherForSelection;
+          if (teacherId) {
+            assignStudentsToTeacher(teacherId, studentIds);
+          }
+        }}
         maxStudents={createForm.maxStudents}
         interventionId={editingIntervention?.id}
       />

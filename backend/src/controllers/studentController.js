@@ -4201,7 +4201,7 @@ const getStudentInterventionDetails = async (req, res) => {
       }
     }
 
-    // Get intervention details with enrollment info
+    // Get intervention details with enrollment info (NEW: include intervention_teacher_id)
     const enrollmentResult = await query(
       supabase
         .from('intervention_enrollments')
@@ -4210,6 +4210,17 @@ const getStudentInterventionDetails = async (req, res) => {
           completion_percentage,
           current_score,
           enrollment_status,
+          intervention_teacher_id,
+          teacher_microcompetency_assignments:intervention_teacher_id(
+            id,
+            teacher_id,
+            teachers:teacher_id(
+              id,
+              name,
+              employee_id,
+              specialization
+            )
+          ),
           interventions!inner(
             id,
             name,
@@ -4394,6 +4405,13 @@ const getStudentInterventionDetails = async (req, res) => {
           totalStudents: allStudentsResult.rows.length
         },
         quadrantBreakdown: quadrantBreakdown,
+        // NEW: Include assigned teacher from enrollment + all teachers in intervention
+        assignedTeacher: enrollment.teacher_microcompetency_assignments ? {
+          teacherId: enrollment.teacher_microcompetency_assignments.teachers?.id,
+          teacherName: enrollment.teacher_microcompetency_assignments.teachers?.name,
+          employeeId: enrollment.teacher_microcompetency_assignments.teachers?.employee_id,
+          specialization: enrollment.teacher_microcompetency_assignments.teachers?.specialization || ''
+        } : null,
         teachers: teachersResult.rows.map(teacherAssignment => ({
           teacherId: teacherAssignment.teachers.id,
           teacherName: teacherAssignment.teachers.name,

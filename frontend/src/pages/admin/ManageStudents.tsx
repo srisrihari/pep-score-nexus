@@ -14,7 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import StatusBadge, { StatusType } from "@/components/common/StatusBadge";
-import { adminAPI, uploadAPI, apiRequest } from "@/lib/api";
+import { adminAPI, uploadAPI, apiRequest, unifiedScoreAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -170,6 +170,26 @@ const ManageStudents: React.FC = () => {
       if (!pagination?.limit || studentsData.length > pageSize) {
         const start = (currentPage - 1) * pageSize;
         studentsData = studentsData.slice(start, start + pageSize);
+      }
+
+      // Fetch HPS scores for the selected term and merge into list
+      if (selectedTerm?.id) {
+        const summaries = await Promise.all(
+          studentsData.map(async (s: any) => {
+            try {
+              const res = await unifiedScoreAPI.getStudentScoreSummary(s.id, selectedTerm.id);
+              const total = res?.data?.summary?.total_hps;
+              return { id: s.id, total_hps: typeof total === 'number' ? total : 0 };
+            } catch (e) {
+              return { id: s.id, total_hps: 0 };
+            }
+          })
+        );
+        const idToHps = new Map(summaries.map((x) => [x.id, x.total_hps]));
+        studentsData = studentsData.map((s: any) => ({
+          ...s,
+          overall_score: idToHps.get(s.id) ?? 0,
+        }));
       }
 
       setStudents(studentsData);

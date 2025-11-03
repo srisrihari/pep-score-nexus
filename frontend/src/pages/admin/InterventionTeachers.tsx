@@ -138,8 +138,8 @@ const InterventionTeachers: React.FC = () => {
   };
 
   const handleAssignTeacher = async () => {
-    if (!selectedTeacher || selectedMicrocompetencies.length === 0) {
-      toast.error('Please select a teacher and at least one microcompetency');
+    if (!selectedTeacher) {
+      toast.error('Please select a teacher');
       return;
     }
 
@@ -149,42 +149,41 @@ const InterventionTeachers: React.FC = () => {
       return;
     }
 
-    // Validate quadrant permissions for selected microcompetencies
-    const selectedMcs = assignedMicrocompetencies.filter(mc => 
-      selectedMicrocompetencies.includes(mc.id)
-    );
+    // NEW: Teachers are assigned to intervention (all microcompetencies), not per microcompetency
+    // Validation for quadrant permissions can be done but is optional now
+    if (selectedMicrocompetencies.length > 0) {
+      const selectedMcs = assignedMicrocompetencies.filter(mc => 
+        selectedMicrocompetencies.includes(mc.id)
+      );
 
-    const requiredQuadrants = [...new Set(selectedMcs.map(mc => mc.quadrant_id))];
-    const teacherQuadrants = selectedTeacher.specialization_quadrants || [];
-    const unauthorizedQuadrants = requiredQuadrants.filter(qId => 
-      !teacherQuadrants.includes(qId)
-    );
+      const requiredQuadrants = [...new Set(selectedMcs.map(mc => mc.quadrant_id))];
+      const teacherQuadrants = selectedTeacher.specialization_quadrants || [];
+      const unauthorizedQuadrants = requiredQuadrants.filter(qId => 
+        !teacherQuadrants.includes(qId)
+      );
 
-    if (unauthorizedQuadrants.length > 0) {
-      const quadrantNames = unauthorizedQuadrants.map(qId => {
-        const mc = selectedMcs.find(mc => mc.quadrant_id === qId);
-        return mc?.quadrant_name || qId;
-      });
-      toast.error(`Teacher ${selectedTeacher.name} is not authorized for quadrants: ${quadrantNames.join(', ')}`);
-      return;
+      if (unauthorizedQuadrants.length > 0) {
+        const quadrantNames = unauthorizedQuadrants.map(qId => {
+          const mc = selectedMcs.find(mc => mc.quadrant_id === qId);
+          return mc?.quadrant_name || qId;
+        });
+        toast.warning(`Teacher ${selectedTeacher.name} may not be specialized in quadrants: ${quadrantNames.join(', ')}`);
+      }
     }
 
     try {
       setIsSubmitting(true);
 
-      // Create individual assignments for each microcompetency
-      const assignments = selectedMicrocompetencies.map(mcId => ({
-        teacher_id: selectedTeacher.id,
-        microcompetency_id: mcId,
-        can_score: assignmentForm.canScore,
-        can_create_tasks: assignmentForm.canCreateTasks,
-      }));
-
+      // NEW: Assign teacher to intervention (handles ALL microcompetencies)
       await interventionAPI.assignTeachersToMicrocompetencies(interventionId!, {
-        assignments
+        teachers: [{
+          teacher_id: selectedTeacher.id,
+          can_score: assignmentForm.canScore,
+          can_create_tasks: assignmentForm.canCreateTasks,
+        }]
       });
       
-      toast.success('Teacher assigned successfully');
+      toast.success('Teacher assigned to intervention successfully');
       setShowAssignDialog(false);
       resetAssignmentForm();
       fetchData();
@@ -391,7 +390,7 @@ const InterventionTeachers: React.FC = () => {
             <CardHeader>
               <CardTitle>Teacher Assignments ({teacherAssignments.length})</CardTitle>
               <CardDescription>
-                Current teacher assignments for microcompetencies
+                Teachers assigned to this intervention (handling all microcompetencies)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -400,7 +399,7 @@ const InterventionTeachers: React.FC = () => {
                   <UserCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No teachers assigned</h3>
                   <p className="text-gray-600 mb-4">
-                    Start by assigning teachers to microcompetencies.
+                    Start by assigning teachers to this intervention. Each teacher will handle all microcompetencies.
                   </p>
                   <Button onClick={() => setShowAssignDialog(true)}>
                     <UserPlus className="h-4 w-4 mr-2" />

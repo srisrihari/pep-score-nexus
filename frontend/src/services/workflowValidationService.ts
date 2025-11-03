@@ -44,11 +44,11 @@ class WorkflowValidationService {
         result.missingSteps.push('Assign microcompetencies to intervention');
       }
 
-      // Step 3: Validate teacher assignments
+      // Step 3: Validate teacher assignments (NEW: intervention-level, not per microcompetency)
       const teachersValid = await this.validateTeacherAssignments(interventionId);
       if (!teachersValid.isValid) {
         result.errors.push(...teachersValid.errors);
-        result.missingSteps.push('Assign teachers to microcompetencies');
+        result.missingSteps.push('Assign teachers to intervention');
       }
 
       // Step 4: Validate student enrollments
@@ -183,7 +183,7 @@ class WorkflowValidationService {
   }
 
   /**
-   * Validates teacher assignments
+   * Validates teacher assignments (NEW: intervention-level, not per microcompetency)
    */
   private async validateTeacherAssignments(interventionId: string): Promise<WorkflowValidationResult> {
     const result: WorkflowValidationResult = {
@@ -196,7 +196,6 @@ class WorkflowValidationService {
 
     try {
       const teacherAssignments = await this.fetchTeacherAssignments(interventionId);
-      const microcompetencies = await this.fetchInterventionMicrocompetencies(interventionId);
       
       if (teacherAssignments.length === 0) {
         result.errors.push('No teachers assigned to intervention');
@@ -204,30 +203,22 @@ class WorkflowValidationService {
         return result;
       }
 
-      // Check for unassigned microcompetencies
-      const assignedMicrocompetencyIds = new Set(
-        teacherAssignments.flatMap(ta => ta.microcompetency_assignments?.map(ma => ma.microcompetency_id) || [])
-      );
-      
-      const unassignedMicrocompetencies = microcompetencies.filter(mc => !assignedMicrocompetencyIds.has(mc.id));
-      if (unassignedMicrocompetencies.length > 0) {
-        result.errors.push(`${unassignedMicrocompetencies.length} microcompetencies have no teacher assigned`);
-      }
-
-      // Check for teachers without scoring permission
-      const teachersWithoutScoring = teacherAssignments.filter(ta => 
-        ta.microcompetency_assignments?.every(ma => !ma.can_score)
-      );
+      // NEW: Check for teachers without scoring permission (intervention-level)
+      const teachersWithoutScoring = teacherAssignments.filter(ta => !ta.can_score);
       if (teachersWithoutScoring.length > 0) {
-        result.warnings.push(`${teachersWithoutScoring.length} teachers cannot score any microcompetencies`);
+        result.warnings.push(`${teachersWithoutScoring.length} teacher(s) cannot score students in this intervention`);
       }
 
-      // Check for teachers without task creation permission
-      const teachersWithoutTaskCreation = teacherAssignments.filter(ta => 
-        ta.microcompetency_assignments?.every(ma => !ma.can_create_tasks)
-      );
+      // NEW: Check for teachers without task creation permission (intervention-level)
+      const teachersWithoutTaskCreation = teacherAssignments.filter(ta => !ta.can_create_tasks);
       if (teachersWithoutTaskCreation.length > 0) {
-        result.warnings.push(`${teachersWithoutTaskCreation.length} teachers cannot create tasks`);
+        result.warnings.push(`${teachersWithoutTaskCreation.length} teacher(s) cannot create tasks in this intervention`);
+      }
+
+      // NEW: Check for inactive teacher assignments
+      const inactiveAssignments = teacherAssignments.filter(ta => !ta.is_active);
+      if (inactiveAssignments.length > 0) {
+        result.warnings.push(`${inactiveAssignments.length} teacher assignment(s) are inactive`);
       }
 
       result.isValid = result.errors.length === 0;
@@ -241,7 +232,7 @@ class WorkflowValidationService {
   }
 
   /**
-   * Validates student enrollments
+   * Validates student enrollments (NEW: must have intervention_teacher_id)
    */
   private async validateStudentEnrollments(interventionId: string): Promise<WorkflowValidationResult> {
     const result: WorkflowValidationResult = {
@@ -262,6 +253,13 @@ class WorkflowValidationService {
         return result;
       }
 
+      // NEW: Check for enrollments without assigned teacher (should not happen but validate anyway)
+      const enrollmentsWithoutTeacher = enrollments.filter(e => !e.intervention_teacher_id);
+      if (enrollmentsWithoutTeacher.length > 0) {
+        result.errors.push(`${enrollmentsWithoutTeacher.length} student(s) are not assigned to a teacher`);
+        result.isValid = false;
+      }
+
       // Check enrollment capacity
       if (enrollments.length > intervention.max_students) {
         result.warnings.push(`${enrollments.length} students enrolled exceeds maximum capacity of ${intervention.max_students}`);
@@ -270,7 +268,23 @@ class WorkflowValidationService {
       // Check for inactive enrollments
       const inactiveEnrollments = enrollments.filter(e => e.enrollment_status !== 'Enrolled');
       if (inactiveEnrollments.length > 0) {
-        result.warnings.push(`${inactiveEnrollments.length} students have inactive enrollment status`);
+        result.warnings.push(`${inactiveEnrollments.length} student(s) have inactive enrollment status`);
+      }
+
+      // NEW: Validate teacher-student distribution
+      const teacherAssignments = await this.fetchTeacherAssignments(interventionId);
+      const enrollmentsByTeacher = enrollments.reduce((acc, e) => {
+        if (e.intervention_teacher_id) {
+          acc[e.intervention_teacher_id] = (acc[e.intervention_teacher_id] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const teachersWithoutStudents = teacherAssignments.filter(ta => 
+        !enrollmentsByTeacher[ta.id] || enrollmentsByTeacher[ta.id] === 0
+      );
+      if (teachersWithoutStudents.length > 0) {
+        result.warnings.push(`${teachersWithoutStudents.length} teacher(s) have no students assigned`);
       }
 
       result.isValid = result.errors.length === 0;

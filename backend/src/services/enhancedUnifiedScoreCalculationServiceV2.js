@@ -39,10 +39,12 @@ class EnhancedUnifiedScoreCalculationServiceV2 {
       const student = studentResult.rows[0];
       const batchId = student.batch_id;
 
-      console.log(`📚 Student batch: ${student.batches.name} (${batchId})`);
+      // Guard for missing batch relationship during initial provisioning
+      const batchNameSafe = student.batches && student.batches.name ? student.batches.name : 'Unknown';
+      console.log(`📚 Student batch: ${batchNameSafe} (${batchId || 'N/A'})`);
 
       // Get dynamic weightages for this batch-term
-      const quadrantWeightages = await enhancedWeightageService.getQuadrantWeightages(batchId, termId);
+      const quadrantWeightages = await enhancedWeightageService.getQuadrantWeightages(batchId || '', termId);
       console.log(`⚖️ Using ${quadrantWeightages[0]?.source} weightages`);
 
       // Step 1: IGNORE traditional component scores — intervention-only

@@ -242,7 +242,7 @@ const MicrocompetencyScoringPage: React.FC = () => {
               <p className="text-lg font-bold text-purple-600">{microcompetencyDetails?.weightage}%</p>
             </div>
             <div>
-              <Label className="text-sm text-gray-500">Students to Score</Label>
+              <Label className="text-sm text-gray-500">Your Assigned Students</Label>
               <p className="text-lg font-bold text-gray-900">{students.length}</p>
             </div>
           </div>
@@ -252,18 +252,18 @@ const MicrocompetencyScoringPage: React.FC = () => {
       {/* Students Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Students ({students.length})</CardTitle>
+          <CardTitle>Your Assigned Students ({students.length})</CardTitle>
           <CardDescription>
-            Score students on this microcompetency
+            Students assigned to you. Score them on this microcompetency.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {students.length === 0 ? (
             <div className="text-center py-12">
               <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No students enrolled</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No students assigned to you</h3>
               <p className="text-gray-600">
-                No students are enrolled in this intervention yet.
+                You don't have any students assigned to you for this intervention yet.
               </p>
             </div>
           ) : (

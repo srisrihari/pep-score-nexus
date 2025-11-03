@@ -6,24 +6,7 @@ class HPSController {
         try {
             const { studentId, termId } = req.params;
 
-            const result = await enhancedHPSCalculationService.calculateStudentHPS(studentId, termId);
-
-            // Store in cache if not partial
-            if (!result.isPartial) {
-                await query(
-                    supabase
-                        .from('hps_score_cache')
-                        .upsert({
-                            student_id: studentId,
-                            term_id: termId,
-                            total_hps: result.totalHPS,
-                            quadrant_scores: result.quadrantScores,
-                            calculation_version: 3,
-                            is_partial: false,
-                            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-                        }, { onConflict: 'student_id,term_id' })
-                );
-            }
+            const result = await enhancedHPSCalculationService.calculateUnifiedHPS(studentId, termId);
 
             res.json({
                 success: true,
@@ -83,28 +66,23 @@ class HPSController {
         try {
             const { studentId, termId } = req.params;
 
-            // Try to get from cache first
-            const { data: cachedScore } = await query(
-                supabase
-                    .from('hps_score_cache')
-                    .select('*')
-                    .eq('student_id', studentId)
-                    .eq('term_id', termId)
-                    .single()
-            );
-
-            if (cachedScore && new Date(cachedScore.expires_at) > new Date()) {
-                return res.json({
-                    success: true,
-                    data: {
-                        ...cachedScore,
-                        source: 'cache'
-                    }
-                });
+            // Return summary if present; otherwise calculate fresh
+            let result;
+            try {
+                const summary = await enhancedHPSCalculationService.getUnifiedScoreSummary(studentId, termId);
+                if (summary) {
+                    return res.json({
+                        success: true,
+                        data: {
+                            summary,
+                            source: 'summary'
+                        }
+                    });
+                }
+            } catch (_) {
+                // fall through to calculation
             }
-
-            // If not in cache or expired, calculate fresh
-            const result = await enhancedHPSCalculationService.calculateStudentHPS(studentId, termId);
+            result = await enhancedHPSCalculationService.calculateUnifiedHPS(studentId, termId);
 
             res.json({
                 success: true,

@@ -667,24 +667,43 @@ export const studentAPI = {
 
   // Profile Management APIs
   getStudentProfile: async (studentId: string) => {
-    return apiRequest<{
+    const resp = await apiRequest<{
       success: boolean;
       data: {
-        id: string;
-        name: string;
-        registrationNo: string;
-        email: string;
-        phone: string;
-        course: string;
-        batch: string;
-        section: string;
-        houseName: string;
-        gender: string;
+        student: {
+          id: string;
+          name: string;
+          registrationNo: string;
+          email: string | null;
+          phone: string | null;
+          course: string | null;
+          batch: string | null;
+          section: string | null;
+          houseName: string | null;
+          gender: string | null;
+        };
         preferences: any;
-        createdAt: string;
-        updatedAt: string;
       };
     }>(`/api/v1/students/${studentId}/profile`);
+
+    const s = resp.data.student;
+    return {
+      success: true,
+      message: 'Student profile retrieved successfully',
+      data: {
+        id: s.id,
+        name: s.name,
+        registrationNo: s.registrationNo,
+        email: s.email || '',
+        phone: s.phone || '',
+        course: s.course || '',
+        batch: s.batch || '',
+        section: s.section || '',
+        houseName: s.houseName || '',
+        gender: s.gender || '',
+        preferences: resp.data.preferences,
+      }
+    } as any;
   },
 
   updateStudentProfile: async (studentId: string, profileData: {
@@ -2176,18 +2195,27 @@ export const interventionAPI = {
     });
   },
 
-  enrollStudents: async (id: string, students: string[], enrollmentType: string = 'Mandatory') => {
+  enrollStudents: async (id: string, params: {
+    intervention_teacher_id: string;
+    studentIds: string[];
+    enrollmentType?: string;
+  }) => {
     return apiRequest<{
       success: boolean;
       message: string;
       data: any;
     }>(`/api/v1/interventions/${id}/enroll-students`, {
       method: 'POST',
-      body: JSON.stringify({ students, enrollmentType }),
+      body: JSON.stringify({
+        intervention_teacher_id: params.intervention_teacher_id,
+        studentIds: params.studentIds,
+        enrollmentType: params.enrollmentType || 'Mandatory'
+      }),
     });
   },
 
   enrollStudentsByBatch: async (id: string, params: {
+    intervention_teacher_id: string;
     batch_ids: string[];
     section_ids?: string[];
     course_filters?: string[];
@@ -2209,6 +2237,7 @@ export const interventionAPI = {
   },
 
   enrollStudentsByCriteria: async (id: string, params: {
+    intervention_teacher_id: string;
     criteria: {
       batch_years?: number[];
       courses?: string[];
@@ -3153,6 +3182,50 @@ export const teacherAPI = {
         }>;
       };
     }>(url);
+  },
+
+  // Teacher Microcompetency APIs
+  getTeacherMicrocompetencies: async (teacherId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+      data: {
+        teacher_id: string;
+        microcompetencies: Array<{
+          id: string;
+          name: string;
+          description: string;
+          maxScore: number;
+          component: string;
+          subCategory: string;
+          quadrant: string;
+          canScore: boolean;
+          canCreateTasks: boolean;
+          assignedAt: string;
+          intervention: {
+            id: string;
+            name: string;
+            status: string;
+            startDate: string;
+            endDate: string;
+            isScoringOpen: boolean;
+            scoringDeadline?: string;
+          };
+          scoringStats: {
+            totalStudents: number;
+            scoredStudents: number;
+            averageScore: number;
+            completionPercentage: number;
+          };
+          taskStats: {
+            totalTasks: number;
+            activeTasks: number;
+            completedTasks: number;
+          };
+        }>;
+        total_count: number;
+      };
+    }>(`/api/v1/teacher-microcompetencies/${teacherId}/microcompetencies`);
   },
 };
 

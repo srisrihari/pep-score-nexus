@@ -56,27 +56,42 @@ const getTeacherDashboard = async (req, res) => {
       }
     }
 
-    // Get assigned students count
-    const studentsResult = await query(
+    // Get active intervention-level assignments for this teacher
+    const activeInterventionAssignments = await query(
       supabase
-        .from('teacher_assignments')
-        .select('student_id', { count: 'exact' })
+        .from('teacher_microcompetency_assignments')
+        .select('id, intervention_id')
         .eq('teacher_id', teacher.id)
         .eq('is_active', true)
     );
 
-    const totalStudents = studentsResult.count || 0;
+    const assignmentIds = (activeInterventionAssignments.rows || []).map(r => r.id);
+    const interventionIdsForTeacher = (activeInterventionAssignments.rows || []).map(r => r.intervention_id);
+
+    // Get assigned students count from intervention enrollments
+    let totalStudents = 0;
+    if (assignmentIds.length > 0) {
+      const studentsResult = await query(
+        supabase
+          .from('intervention_enrollments')
+          .select('id', { count: 'exact' })
+          .in('intervention_teacher_id', assignmentIds)
+          .eq('enrollment_status', 'Enrolled')
+      );
+      totalStudents = studentsResult.count || 0;
+    }
 
     // Get pending assessments count
+    // Pending assessments from intervention microcompetency scores
+    let pendingAssessments = 0;
     const pendingAssessmentsResult = await query(
       supabase
-        .from('scores')
+        .from('microcompetency_scores')
         .select('id', { count: 'exact' })
-        .eq('assessed_by', teacher.user_id)
+        .eq('scored_by', teacher.user_id)
         .eq('status', 'Draft')
     );
-
-    const pendingAssessments = pendingAssessmentsResult.count || 0;
+    pendingAssessments = pendingAssessmentsResult.count || 0;
 
     // Get recent feedback count
     const recentFeedbackResult = await query(
@@ -89,30 +104,17 @@ const getTeacherDashboard = async (req, res) => {
 
     const recentFeedback = recentFeedbackResult.count || 0;
 
-    // Get assigned quadrant IDs
-    const assignmentResult = await query(
-      supabase
-        .from('teacher_assignments')
-        .select('quadrant_id')
-        .eq('teacher_id', teacherId)
-        .eq('is_active', true)
-        .not('quadrant_id', 'is', null)
-    );
-
-    // Get unique quadrant IDs
-    const uniqueQuadrantIds = [...new Set(assignmentResult.rows.map(item => item.quadrant_id))];
-
-    // Get quadrant details
+    // Assigned quadrants approximation: derive from interventions linked to teacher
+    // (Distinct interventions teacher can assess -> shown as assignments)
     let assignedQuadrants = [];
-    if (uniqueQuadrantIds.length > 0) {
-      const quadrantsResult = await query(
+    if (interventionIdsForTeacher.length > 0) {
+      const interventionsResult = await query(
         supabase
-          .from('quadrants')
-          .select('id, name, display_order')
-          .in('id', uniqueQuadrantIds)
-          .order('display_order', { ascending: true })
+          .from('interventions')
+          .select('id, name, created_at')
+          .in('id', interventionIdsForTeacher)
       );
-      assignedQuadrants = quadrantsResult.rows;
+      assignedQuadrants = (interventionsResult.rows || []).map(row => ({ id: row.id, name: row.name, display_order: 0 }));
     }
 
     // Get recent activities (last 10)

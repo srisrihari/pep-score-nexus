@@ -294,18 +294,18 @@ const InterventionScoringPage: React.FC = () => {
         <TabsContent value="microcompetencies" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Assigned Microcompetencies ({interventionDetails?.microcompetencies.length || 0})</CardTitle>
+              <CardTitle>All Microcompetencies ({interventionDetails?.microcompetencies.length || 0})</CardTitle>
               <CardDescription>
-                Microcompetencies you can score for this intervention
+                All microcompetencies in this intervention. You can score all of them for your assigned students.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {!interventionDetails?.microcompetencies || interventionDetails.microcompetencies.length === 0 ? (
                 <div className="text-center py-12">
                   <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No microcompetencies assigned</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No microcompetencies in intervention</h3>
                   <p className="text-gray-600">
-                    You haven't been assigned any microcompetencies for this intervention yet.
+                    This intervention doesn't have any microcompetencies yet.
                   </p>
                 </div>
               ) : (
@@ -359,18 +359,18 @@ const InterventionScoringPage: React.FC = () => {
         <TabsContent value="students" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Enrolled Students ({students.length})</CardTitle>
+              <CardTitle>Your Assigned Students ({students.length})</CardTitle>
               <CardDescription>
-                Students enrolled in this intervention
+                Students assigned to you in this intervention. You can score all microcompetencies for these students.
               </CardDescription>
             </CardHeader>
             <CardContent>
               {students.length === 0 ? (
                 <div className="text-center py-12">
                   <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No students enrolled</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No students assigned to you</h3>
                   <p className="text-gray-600">
-                    No students have been enrolled in this intervention yet.
+                    You don't have any students assigned to you for this intervention yet.
                   </p>
                 </div>
               ) : (

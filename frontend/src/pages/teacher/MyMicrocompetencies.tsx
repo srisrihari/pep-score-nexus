@@ -45,9 +45,8 @@ import {
   FileText,
   Award,
 } from 'lucide-react';
-import { interventionAPI } from '@/lib/api';
+import { interventionAPI, teacherAPI } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 interface AssignedMicrocompetency {
   id: string;
@@ -107,15 +106,10 @@ const MyMicrocompetencies: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
-      // Get teacher's interventions and assigned microcompetencies
+      // Get teacher's interventions and assigned microcompetencies (NEW: intervention-level assignments)
       const [interventionsResponse, microcompetenciesResponse] = await Promise.all([
         interventionAPI.getTeacherInterventions(user.id),
-        fetch(`${API_BASE_URL}/api/v1/teacher-microcompetencies/${user.id}/microcompetencies`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            'Content-Type': 'application/json'
-          }
-        }).then(res => res.json())
+        teacherAPI.getTeacherMicrocompetencies(user.id)
       ]);
 
       setInterventions(interventionsResponse.data.interventions || []);

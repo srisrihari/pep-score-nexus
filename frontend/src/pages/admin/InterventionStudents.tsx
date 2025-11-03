@@ -45,6 +45,8 @@ import {
   MoreHorizontal,
   Trash2,
   Eye,
+  UserCheck,
+  LayoutGrid,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { interventionAPI, adminAPI } from '@/lib/api';
@@ -70,6 +72,12 @@ interface EnrolledStudent extends Student {
   enrollment_type: string;
   current_score: number;
   completion_percentage: number;
+  intervention_teacher_id?: string;
+  assigned_teacher?: {
+    id: string;
+    name: string;
+    employee_id: string;
+  } | null;
 }
 
 interface Intervention {
@@ -95,6 +103,7 @@ const InterventionStudents: React.FC = () => {
   const [enrollmentType, setEnrollmentType] = useState<string>('Mandatory');
   const [searchTerm, setSearchTerm] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [groupByTeacher, setGroupByTeacher] = useState(false);
 
   useEffect(() => {
     if (interventionId) {
@@ -105,37 +114,45 @@ const InterventionStudents: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [interventionResponse, studentsResponse] = await Promise.all([
+      const [interventionResponse, studentsResponse, enrolledStudentsResponse] = await Promise.all([
         interventionAPI.getInterventionById(interventionId!),
         adminAPI.getAllStudents(1, 1000), // Get more students for enrollment
+        interventionAPI.getInterventionStudents(interventionId!), // NEW: Get enrolled students with teacher info
       ]);
 
       setIntervention(interventionResponse.data);
 
-      // Filter enrolled vs available students
-      const enrollments = interventionResponse.data.intervention_enrollments || [];
-      // Transform enrollments to match expected interface
-      const enrolled = enrollments.map((enrollment: any) => ({
-        id: enrollment.student_id,
-        name: enrollment.students?.name || '',
-        registration_no: enrollment.students?.registration_no || '',
-        course: '', // Will need to get from student details if needed
-        batch_name: '', // Will need to get from student details if needed
-        section_name: '', // Will need to get from student details if needed
-        overall_score: 0,
-        grade: '',
-        status: 'Active',
-        enrollment_status: enrollment.enrollment_status,
-        enrollment_date: enrollment.enrollment_date,
-        enrollment_type: enrollment.enrollment_type,
-        current_score: enrollment.current_score,
-        completion_percentage: enrollment.completion_percentage
-      }));
-
-      // Fix: studentsResponse.data.students is the array of students
+      // NEW: Use getInterventionStudents API which includes teacher information
+      const enrolledStudentsData = enrolledStudentsResponse.data?.students || [];
+      
+      // Get full student details with batch/section info
       const allStudents = studentsResponse.data?.students || [];
+      const studentDetailsMap = new Map(allStudents.map((s: any) => [s.id, s]));
 
-      // Transform students to match expected interface
+      // Transform enrolled students to match expected interface (with teacher info)
+      const enrolled = enrolledStudentsData.map((student: any) => {
+        const fullDetails = studentDetailsMap.get(student.id) || {};
+        return {
+          id: student.id,
+          name: student.name,
+          registration_no: student.registration_no,
+          course: student.course || fullDetails.course || '',
+          batch_name: fullDetails.batch?.name || fullDetails.batch_name || '',
+          section_name: fullDetails.section?.name || fullDetails.section_name || '',
+          overall_score: student.current_score || 0,
+          grade: fullDetails.grade || '',
+          status: 'Active',
+          enrollment_status: student.enrollment_status,
+          enrollment_date: student.enrolled_at || '',
+          enrollment_type: student.enrollment_type || 'Mandatory',
+          current_score: student.current_score || 0,
+          completion_percentage: student.completion_percentage || 0,
+          intervention_teacher_id: student.intervention_teacher_id,
+          assigned_teacher: student.assigned_teacher || null
+        };
+      });
+
+      // Transform students to match expected interface for available students
       const transformedStudents = allStudents.map((student: any) => ({
         ...student,
         batch_name: student.batch?.name || '',
@@ -179,6 +196,24 @@ const InterventionStudents: React.FC = () => {
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.registration_no.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Group students by teacher
+  const studentsByTeacher = enrolledStudents.reduce((acc, student) => {
+    const teacherId = student.assigned_teacher?.id || 'unassigned';
+    const teacherName = student.assigned_teacher?.name || 'Unassigned';
+    
+    if (!acc[teacherId]) {
+      acc[teacherId] = {
+        teacher: student.assigned_teacher || null,
+        teacherName: teacherName,
+        students: []
+      };
+    }
+    acc[teacherId].students.push(student);
+    return acc;
+  }, {} as Record<string, { teacher: EnrolledStudent['assigned_teacher'], teacherName: string, students: EnrolledStudent[] }>);
+
+  const groupedStudents = Object.values(studentsByTeacher);
 
   if (loading) {
     return (
@@ -254,10 +289,23 @@ const InterventionStudents: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Enrolled Students ({enrolledStudents.length})</CardTitle>
-          <CardDescription>
-            Students currently enrolled in this intervention
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Enrolled Students ({enrolledStudents.length})</CardTitle>
+              <CardDescription>
+                Students currently enrolled in this intervention
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setGroupByTeacher(!groupByTeacher)}
+              className="flex items-center gap-2"
+            >
+              {groupByTeacher ? <LayoutGrid className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+              {groupByTeacher ? 'Show All' : 'Group by Teacher'}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {enrolledStudents.length === 0 ? (
@@ -272,13 +320,96 @@ const InterventionStudents: React.FC = () => {
                 Enroll First Student
               </Button>
             </div>
+          ) : groupByTeacher ? (
+            // Grouped by Teacher View
+            <div className="space-y-6">
+              {groupedStudents.map((group, groupIndex) => (
+                <div key={group.teacher?.id || `unassigned-${groupIndex}`} className="border rounded-lg">
+                  <div className="bg-blue-50 px-4 py-3 border-b">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <UserCheck className="h-5 w-5 text-blue-600" />
+                        <h3 className="font-semibold text-gray-900">
+                          {group.teacherName}
+                        </h3>
+                        {group.teacher?.employee_id && (
+                          <span className="text-sm text-gray-600">({group.teacher.employee_id})</span>
+                        )}
+                      </div>
+                      <Badge variant="outline">
+                        {group.students.length} student{group.students.length !== 1 ? 's' : ''}
+                      </Badge>
+                    </div>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Student</TableHead>
+                        <TableHead>Registration No</TableHead>
+                        <TableHead>Course</TableHead>
+                        <TableHead>Enrollment Type</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Progress</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {group.students.map((student) => (
+                        <TableRow key={student.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{student.name}</div>
+                              <div className="text-sm text-gray-600">
+                                {student.batch_name} • {student.section_name}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{student.registration_no}</TableCell>
+                          <TableCell>{student.course}</TableCell>
+                          <TableCell>
+                            <Badge variant={student.enrollment_type === 'Mandatory' ? 'default' : 'secondary'}>
+                              {student.enrollment_type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={student.enrollment_status === 'Enrolled' ? 'default' : 'secondary'}>
+                              {student.enrollment_status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="w-16 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full" 
+                                  style={{ width: `${student.completion_percentage || 0}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm text-gray-600">
+                                {student.completion_percentage || 0}%
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ))}
+            </div>
           ) : (
+            // Regular Table View (with Teacher column)
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Student</TableHead>
                   <TableHead>Registration No</TableHead>
                   <TableHead>Course</TableHead>
+                  <TableHead>Assigned Teacher</TableHead>
                   <TableHead>Enrollment Type</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Progress</TableHead>
@@ -298,6 +429,18 @@ const InterventionStudents: React.FC = () => {
                     </TableCell>
                     <TableCell>{student.registration_no}</TableCell>
                     <TableCell>{student.course}</TableCell>
+                    <TableCell>
+                      {student.assigned_teacher ? (
+                        <div>
+                          <div className="font-medium text-sm">{student.assigned_teacher.name}</div>
+                          <div className="text-xs text-gray-500">{student.assigned_teacher.employee_id}</div>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="text-gray-500">
+                          Unassigned
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={student.enrollment_type === 'Mandatory' ? 'default' : 'secondary'}>
                         {student.enrollment_type}

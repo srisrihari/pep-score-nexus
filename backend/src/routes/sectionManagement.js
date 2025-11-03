@@ -263,7 +263,7 @@ router.put('/sections/:id', async (req, res) => {
           name,
           capacity,
           is_active,
-          updated_at,
+          created_at,
           batches:batch_id(id, name, year)
         `)
         .single()
@@ -375,6 +375,8 @@ router.delete('/sections/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
 
 
 

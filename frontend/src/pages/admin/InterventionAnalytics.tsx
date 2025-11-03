@@ -119,37 +119,53 @@ const InterventionAnalytics: React.FC = () => {
       const analyticsResponse = await interventionAPI.getInterventionAnalytics(interventionId!);
       const analyticsData = analyticsResponse.data;
 
-      // Transform API response to match our interface
+      // Transform API response to match our interface (with null checks)
+      const scoring = analyticsData.scoring || {
+        total_microcompetencies: 0,
+        scored_microcompetencies: 0,
+        scoring_progress: 0,
+        average_score: 0
+      };
+
       const transformedAnalytics: AnalyticsData = {
         intervention: {
-          id: analyticsData.intervention.id,
-          name: analyticsData.intervention.name,
+          id: analyticsData.intervention?.id || '',
+          name: analyticsData.intervention?.name || 'Unknown Intervention',
           description: '', // Not provided in analytics API
-          status: analyticsData.intervention.status,
+          status: analyticsData.intervention?.status || 'Unknown',
           start_date: '', // Not provided in analytics API
           end_date: '', // Not provided in analytics API
-          max_students: analyticsData.enrollment.max_capacity,
-          enrolled_count: analyticsData.enrollment.total_enrolled,
+          max_students: analyticsData.enrollment?.max_capacity || 0,
+          enrolled_count: analyticsData.enrollment?.total_enrolled || 0,
         },
         enrollment: {
-          totalEnrolled: analyticsData.enrollment.total_enrolled,
-          enrollmentRate: parseFloat(analyticsData.enrollment.capacity_utilization.replace('%', '')),
-          activeStudents: analyticsData.enrollment.by_status?.active || 0,
-          completedStudents: analyticsData.enrollment.by_status?.completed || 0,
+          totalEnrolled: analyticsData.enrollment?.total_enrolled || 0,
+          enrollmentRate: analyticsData.enrollment?.capacity_utilization
+            ? parseFloat(analyticsData.enrollment.capacity_utilization.replace('%', ''))
+            : 0,
+          activeStudents: analyticsData.enrollment?.by_status?.active || 
+                          analyticsData.enrollment?.by_status?.Enrolled || 0,
+          completedStudents: analyticsData.enrollment?.by_status?.completed || 
+                            analyticsData.enrollment?.by_status?.Completed || 0,
         },
         microcompetencies: {
-          totalAssigned: analyticsData.scoring.total_microcompetencies,
-          averageScore: analyticsData.scoring.average_score,
-          completionRate: analyticsData.scoring.scoring_progress,
+          totalAssigned: scoring.total_microcompetencies || 0,
+          averageScore: scoring.average_score || 0,
+          completionRate: scoring.scoring_progress || 0,
           topPerforming: [], // Would need additional API call
           lowPerforming: [], // Would need additional API call
         },
         tasks: {
-          totalTasks: 0, // Would need additional API call for task data
-          completedTasks: 0, // Would need additional API call for task data
-          averageTaskScore: 0, // Would need additional API call for task data
-          taskCompletionRate: 0, // Would need additional API call for task data
-          overdueSubmissions: 0, // Would need additional API call for task data
+          totalTasks: analyticsData.tasks?.total_tasks || 0,
+          completedTasks: analyticsData.tasks?.by_status?.Completed || 
+                         analyticsData.tasks?.by_status?.completed || 0,
+          averageTaskScore: parseFloat(analyticsData.submissions?.average_score || 0),
+          taskCompletionRate: analyticsData.tasks?.total_tasks > 0
+            ? Math.round(((analyticsData.tasks?.by_status?.Completed || 
+                          analyticsData.tasks?.by_status?.completed || 0) / 
+                         analyticsData.tasks.total_tasks) * 100)
+            : 0,
+          overdueSubmissions: analyticsData.submissions?.late_submissions || 0,
         },
         teachers: {
           totalAssigned: 0, // Would need additional API call for teacher data
@@ -157,8 +173,8 @@ const InterventionAnalytics: React.FC = () => {
           teacherWorkload: [], // Would need additional API call for teacher data
         },
         timeline: {
-          daysRemaining: analyticsData.intervention.duration_days || 0,
-          progressPercentage: analyticsData.scoring.scoring_progress || 0,
+          daysRemaining: analyticsData.intervention?.duration_days || 0,
+          progressPercentage: scoring.scoring_progress || 0,
           milestones: [], // Would need additional API call for milestone data
         },
       };

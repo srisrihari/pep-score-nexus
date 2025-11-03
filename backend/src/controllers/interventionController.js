@@ -602,17 +602,25 @@ const assignTeachers = async (req, res) => {
   }
 };
 
-// Enroll students in intervention
+// Enroll students in intervention (NEW: requires intervention_teacher_id)
 const enrollStudents = async (req, res) => {
   try {
     const { id } = req.params;
-    const { students, enrollmentType = 'Optional' } = req.body;
+    const { studentIds, intervention_teacher_id, enrollmentType = 'Optional' } = req.body;
 
-    // Validate input
-    if (!students || !Array.isArray(students) || students.length === 0) {
+    // Validate input - NEW: intervention_teacher_id is REQUIRED
+    if (!intervention_teacher_id) {
       return res.status(400).json({
         success: false,
-        message: 'Students array is required and must not be empty',
+        message: 'intervention_teacher_id is required. Students must be assigned to a teacher.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'studentIds array is required and must not be empty',
         timestamp: new Date().toISOString()
       });
     }
@@ -645,6 +653,55 @@ const enrollStudents = async (req, res) => {
       });
     }
 
+    // Validate intervention_teacher_id belongs to this intervention (NEW: critical validation)
+    const teacherAssignmentCheck = await query(
+      supabase
+        .from('teacher_microcompetency_assignments')
+        .select('id, teacher_id, teachers(name, employee_id)')
+        .eq('id', intervention_teacher_id)
+        .eq('intervention_id', id)
+        .eq('is_active', true)
+        .limit(1)
+    );
+
+    if (!teacherAssignmentCheck.rows || teacherAssignmentCheck.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid intervention_teacher_id. Teacher assignment not found for this intervention.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const teacherAssignment = teacherAssignmentCheck.rows[0];
+
+    // Check for already enrolled students (NEW: prevent duplicates using UNIQUE constraint)
+    const existingEnrollments = await query(
+      supabase
+        .from('intervention_enrollments')
+        .select('student_id, intervention_teacher_id')
+        .eq('intervention_id', id)
+        .in('student_id', studentIds)
+    );
+
+    const enrolledStudentIds = new Set(
+      (existingEnrollments.rows || []).map(e => e.student_id)
+    );
+
+    const alreadyEnrolledStudents = studentIds.filter(id => enrolledStudentIds.has(id));
+    const newStudentsToEnroll = studentIds.filter(id => !enrolledStudentIds.has(id));
+
+    if (alreadyEnrolledStudents.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Students already enrolled in this intervention: ${alreadyEnrolledStudents.join(', ')}`,
+        details: {
+          already_enrolled: alreadyEnrolledStudents,
+          can_enroll: newStudentsToEnroll
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // Get current enrollment count
     const currentEnrollmentResult = await query(
       supabase
@@ -657,18 +714,19 @@ const enrollStudents = async (req, res) => {
     const currentCount = currentEnrollmentResult.count || 0;
 
     // Check capacity
-    if (currentCount + students.length > intervention.max_students) {
+    if (currentCount + newStudentsToEnroll.length > intervention.max_students) {
       return res.status(400).json({
         success: false,
-        message: `Enrollment would exceed maximum capacity. Current: ${currentCount}, Max: ${intervention.max_students}`,
+        message: `Enrollment would exceed maximum capacity. Current: ${currentCount}, To enroll: ${newStudentsToEnroll.length}, Max: ${intervention.max_students}`,
         timestamp: new Date().toISOString()
       });
     }
 
-    // Prepare student enrollments
-    const studentEnrollments = students.map(studentId => ({
+    // Prepare student enrollments with intervention_teacher_id (NEW: required field)
+    const studentEnrollments = newStudentsToEnroll.map(studentId => ({
       intervention_id: id,
       student_id: studentId,
+      intervention_teacher_id: intervention_teacher_id, // NEW: Link to teacher assignment
       enrollment_date: new Date().toISOString().split('T')[0],
       enrollment_status: 'Enrolled',
       enrollment_type: enrollmentType,
@@ -678,14 +736,11 @@ const enrollStudents = async (req, res) => {
       enrolled_by: req.user.userId
     }));
 
-    // Insert enrollments (ignore conflicts for already enrolled students)
+    // Insert enrollments (NEW: UNIQUE constraint prevents duplicates at DB level)
     const result = await query(
       supabase
         .from('intervention_enrollments')
-        .upsert(studentEnrollments, {
-          onConflict: 'intervention_id,student_id',
-          ignoreDuplicates: false
-        })
+        .insert(studentEnrollments)
         .select(`
           *,
           students(name, registration_no)
@@ -697,8 +752,12 @@ const enrollStudents = async (req, res) => {
       message: 'Students enrolled successfully',
       data: {
         intervention_id: id,
+        intervention_teacher_id: intervention_teacher_id,
+        teacher: teacherAssignment.teachers,
         enrolled_students: result.rows || [],
-        total_enrolled: (currentCount + (result.rows?.length || 0))
+        enrollments_created: result.rows?.length || 0,
+        total_enrolled: (currentCount + (result.rows?.length || 0)),
+        rejected_students: alreadyEnrolledStudents.length > 0 ? alreadyEnrolledStudents : []
       },
       timestamp: new Date().toISOString()
     });
@@ -713,7 +772,7 @@ const enrollStudents = async (req, res) => {
   }
 };
 
-// Enroll students by batch
+// Enroll students by batch (NEW: requires intervention_teacher_id)
 const enrollStudentsByBatch = async (req, res) => {
   try {
     const { id } = req.params;
@@ -721,10 +780,19 @@ const enrollStudentsByBatch = async (req, res) => {
       batch_ids = [],
       section_ids = [],
       course_filters = [],
+      intervention_teacher_id, // NEW: REQUIRED
       enrollmentType = 'Optional'
     } = req.body;
 
-    // Validate input
+    // Validate input - NEW: intervention_teacher_id is REQUIRED
+    if (!intervention_teacher_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'intervention_teacher_id is required. Students must be assigned to a teacher.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     if (!batch_ids || !Array.isArray(batch_ids) || batch_ids.length === 0) {
       return res.status(400).json({
         success: false,
@@ -761,6 +829,27 @@ const enrollStudentsByBatch = async (req, res) => {
       });
     }
 
+    // Validate intervention_teacher_id belongs to this intervention (NEW: critical validation)
+    const teacherAssignmentCheck = await query(
+      supabase
+        .from('teacher_microcompetency_assignments')
+        .select('id, teacher_id, teachers(name, employee_id)')
+        .eq('id', intervention_teacher_id)
+        .eq('intervention_id', id)
+        .eq('is_active', true)
+        .limit(1)
+    );
+
+    if (!teacherAssignmentCheck.rows || teacherAssignmentCheck.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid intervention_teacher_id. Teacher assignment not found for this intervention.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const teacherAssignment = teacherAssignmentCheck.rows[0];
+
     // Build query to get students from specified batches
     let studentsQuery = supabase
       .from('students')
@@ -780,12 +869,42 @@ const enrollStudentsByBatch = async (req, res) => {
 
     // Get students
     const studentsResult = await query(studentsQuery);
-    const students = studentsResult.rows || [];
+    const allStudents = studentsResult.rows || [];
 
-    if (students.length === 0) {
+    if (allStudents.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'No students found matching the specified criteria',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const studentIds = allStudents.map(s => s.id);
+
+    // Check for already enrolled students (NEW: prevent duplicates)
+    const existingEnrollments = await query(
+      supabase
+        .from('intervention_enrollments')
+        .select('student_id')
+        .eq('intervention_id', id)
+        .in('student_id', studentIds)
+    );
+
+    const enrolledStudentIds = new Set(
+      (existingEnrollments.rows || []).map(e => e.student_id)
+    );
+
+    const alreadyEnrolledStudents = studentIds.filter(id => enrolledStudentIds.has(id));
+    const newStudentsToEnroll = allStudents.filter(s => !enrolledStudentIds.has(s.id));
+
+    if (newStudentsToEnroll.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'All students from the specified batches are already enrolled in this intervention',
+        details: {
+          total_students: allStudents.length,
+          already_enrolled: alreadyEnrolledStudents.length
+        },
         timestamp: new Date().toISOString()
       });
     }
@@ -802,18 +921,19 @@ const enrollStudentsByBatch = async (req, res) => {
     const currentCount = currentEnrollmentResult.count || 0;
 
     // Check capacity
-    if (currentCount + students.length > intervention.max_students) {
+    if (currentCount + newStudentsToEnroll.length > intervention.max_students) {
       return res.status(400).json({
         success: false,
-        message: `Enrollment would exceed maximum capacity. Current: ${currentCount}, Students to enroll: ${students.length}, Max: ${intervention.max_students}`,
+        message: `Enrollment would exceed maximum capacity. Current: ${currentCount}, To enroll: ${newStudentsToEnroll.length}, Max: ${intervention.max_students}`,
         timestamp: new Date().toISOString()
       });
     }
 
-    // Prepare student enrollments
-    const studentEnrollments = students.map(student => ({
+    // Prepare student enrollments with intervention_teacher_id (NEW: required field)
+    const studentEnrollments = newStudentsToEnroll.map(student => ({
       intervention_id: id,
       student_id: student.id,
+      intervention_teacher_id: intervention_teacher_id, // NEW: Link to teacher assignment
       enrollment_date: new Date().toISOString().split('T')[0],
       enrollment_status: 'Enrolled',
       enrollment_type: enrollmentType,
@@ -823,14 +943,11 @@ const enrollStudentsByBatch = async (req, res) => {
       enrolled_by: req.user.userId
     }));
 
-    // Insert enrollments (ignore conflicts for already enrolled students)
+    // Insert enrollments (NEW: using insert, duplicates already filtered)
     const result = await query(
       supabase
         .from('intervention_enrollments')
-        .upsert(studentEnrollments, {
-          onConflict: 'intervention_id,student_id',
-          ignoreDuplicates: true
-        })
+        .insert(studentEnrollments)
         .select(`
           *,
           students(name, registration_no, course)
@@ -842,8 +959,12 @@ const enrollStudentsByBatch = async (req, res) => {
       message: `${result.rows?.length || 0} students enrolled successfully from ${batch_ids.length} batch(es)`,
       data: {
         intervention_id: id,
+        intervention_teacher_id: intervention_teacher_id,
+        teacher: teacherAssignment.teachers,
         enrolled_students: result.rows || [],
+        enrollments_created: result.rows?.length || 0,
         total_enrolled: (currentCount + (result.rows?.length || 0)),
+        rejected_students: alreadyEnrolledStudents,
         criteria: {
           batch_ids,
           section_ids,
@@ -865,13 +986,24 @@ const enrollStudentsByBatch = async (req, res) => {
 };
 
 // Enroll students by criteria
+// Enroll students by criteria (NEW: requires intervention_teacher_id)
 const enrollStudentsByCriteria = async (req, res) => {
   try {
     const { id } = req.params;
     const {
       criteria = {},
+      intervention_teacher_id, // NEW: REQUIRED
       enrollmentType = 'Optional'
     } = req.body;
+
+    // Validate input - NEW: intervention_teacher_id is REQUIRED
+    if (!intervention_teacher_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'intervention_teacher_id is required. Students must be assigned to a teacher.',
+        timestamp: new Date().toISOString()
+      });
+    }
 
     const {
       batch_years = [],
@@ -917,6 +1049,27 @@ const enrollStudentsByCriteria = async (req, res) => {
       });
     }
 
+    // Validate intervention_teacher_id belongs to this intervention (NEW: critical validation)
+    const teacherAssignmentCheck = await query(
+      supabase
+        .from('teacher_microcompetency_assignments')
+        .select('id, teacher_id, teachers(name, employee_id)')
+        .eq('id', intervention_teacher_id)
+        .eq('intervention_id', id)
+        .eq('is_active', true)
+        .limit(1)
+    );
+
+    if (!teacherAssignmentCheck.rows || teacherAssignmentCheck.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid intervention_teacher_id. Teacher assignment not found for this intervention.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const teacherAssignment = teacherAssignmentCheck.rows[0];
+
     // Build complex query to get students matching criteria
     let studentsQuery = supabase
       .from('students')
@@ -956,12 +1109,42 @@ const enrollStudentsByCriteria = async (req, res) => {
 
     // Get students
     const studentsResult = await query(studentsQuery);
-    const students = studentsResult.rows || [];
+    const allStudents = studentsResult.rows || [];
 
-    if (students.length === 0) {
+    if (allStudents.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'No students found matching the specified criteria',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const studentIds = allStudents.map(s => s.id);
+
+    // Check for already enrolled students (NEW: prevent duplicates)
+    const existingEnrollments = await query(
+      supabase
+        .from('intervention_enrollments')
+        .select('student_id')
+        .eq('intervention_id', id)
+        .in('student_id', studentIds)
+    );
+
+    const enrolledStudentIds = new Set(
+      (existingEnrollments.rows || []).map(e => e.student_id)
+    );
+
+    const alreadyEnrolledStudents = studentIds.filter(id => enrolledStudentIds.has(id));
+    const newStudentsToEnroll = allStudents.filter(s => !enrolledStudentIds.has(s.id));
+
+    if (newStudentsToEnroll.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'All students matching the criteria are already enrolled in this intervention',
+        details: {
+          total_students: allStudents.length,
+          already_enrolled: alreadyEnrolledStudents.length
+        },
         timestamp: new Date().toISOString()
       });
     }
@@ -978,18 +1161,19 @@ const enrollStudentsByCriteria = async (req, res) => {
     const currentCount = currentEnrollmentResult.count || 0;
 
     // Check capacity
-    if (currentCount + students.length > intervention.max_students) {
+    if (currentCount + newStudentsToEnroll.length > intervention.max_students) {
       return res.status(400).json({
         success: false,
-        message: `Enrollment would exceed maximum capacity. Current: ${currentCount}, Students to enroll: ${students.length}, Max: ${intervention.max_students}`,
+        message: `Enrollment would exceed maximum capacity. Current: ${currentCount}, To enroll: ${newStudentsToEnroll.length}, Max: ${intervention.max_students}`,
         timestamp: new Date().toISOString()
       });
     }
 
-    // Prepare student enrollments
-    const studentEnrollments = students.map(student => ({
+    // Prepare student enrollments with intervention_teacher_id (NEW: required field)
+    const studentEnrollments = newStudentsToEnroll.map(student => ({
       intervention_id: id,
       student_id: student.id,
+      intervention_teacher_id: intervention_teacher_id, // NEW: Link to teacher assignment
       enrollment_date: new Date().toISOString().split('T')[0],
       enrollment_status: 'Enrolled',
       enrollment_type: enrollmentType,
@@ -999,14 +1183,11 @@ const enrollStudentsByCriteria = async (req, res) => {
       enrolled_by: req.user.userId
     }));
 
-    // Insert enrollments (ignore conflicts for already enrolled students)
+    // Insert enrollments (NEW: using insert, duplicates already filtered)
     const result = await query(
       supabase
         .from('intervention_enrollments')
-        .upsert(studentEnrollments, {
-          onConflict: 'intervention_id,student_id',
-          ignoreDuplicates: true
-        })
+        .insert(studentEnrollments)
         .select(`
           *,
           students(name, registration_no, course)
@@ -1018,8 +1199,12 @@ const enrollStudentsByCriteria = async (req, res) => {
       message: `${result.rows?.length || 0} students enrolled successfully based on criteria`,
       data: {
         intervention_id: id,
+        intervention_teacher_id: intervention_teacher_id,
+        teacher: teacherAssignment.teachers,
         enrolled_students: result.rows || [],
+        enrollments_created: result.rows?.length || 0,
         total_enrolled: (currentCount + (result.rows?.length || 0)),
+        rejected_students: alreadyEnrolledStudents,
         criteria: {
           batch_years,
           courses,
@@ -1094,10 +1279,75 @@ const getInterventionAnalytics = async (req, res) => {
         .eq('tasks.intervention_id', id)
     );
 
+    // Get microcompetency statistics (NEW: for scoring analytics)
+    const microcompetencyStats = await query(
+      supabase
+        .from('intervention_microcompetencies')
+        .select('id, microcompetency_id')
+        .eq('intervention_id', id)
+        .eq('is_active', true)
+    );
+
+    // Get student scores for microcompetencies in this intervention
+    // Note: Simplified query - get all scores and filter by task intervention_ids
+    let studentScores = [];
+    try {
+      // First get all tasks for this intervention
+      const interventionTasks = await query(
+        supabase
+          .from('tasks')
+          .select('id')
+          .eq('intervention_id', id)
+      );
+      
+      const taskIds = (interventionTasks.rows || []).map(t => t.id);
+      
+      if (taskIds.length > 0) {
+        // Get task microcompetencies for these tasks
+        const taskMicrocompetencies = await query(
+          supabase
+            .from('task_microcompetencies')
+            .select('id, microcompetency_id')
+            .in('task_id', taskIds)
+        );
+        
+        const taskMicrocompetencyIds = (taskMicrocompetencies.rows || []).map(tm => tm.id);
+        
+        if (taskMicrocompetencyIds.length > 0) {
+          // Get scores for these task microcompetencies
+          const scoresResult = await query(
+            supabase
+              .from('student_microcompetency_scores')
+              .select('score, microcompetency_id')
+              .in('task_microcompetency_id', taskMicrocompetencyIds)
+          );
+          
+          studentScores = scoresResult.rows || [];
+        }
+      }
+    } catch (scoreError) {
+      console.warn('Could not fetch student scores for analytics:', scoreError.message);
+      // Continue with empty scores array
+      studentScores = [];
+    }
+
     // Calculate analytics
     const enrollments = enrollmentStats.rows || [];
     const tasks = taskStats.rows || [];
     const submissions = submissionStats.rows || [];
+    const microcompetencies = microcompetencyStats.rows || [];
+    const scores = studentScores.rows || [];
+
+    // Calculate scoring statistics
+    const totalMicrocompetencies = microcompetencies.length;
+    const scoredMicrocompetencies = new Set(scores.map(s => s.microcompetency_id)).size;
+    const scoringProgress = totalMicrocompetencies > 0 
+      ? Math.round((scoredMicrocompetencies / totalMicrocompetencies) * 100)
+      : 0;
+    const validScores = scores.filter(s => s.score !== null && s.score !== undefined);
+    const averageScore = validScores.length > 0
+      ? parseFloat((validScores.reduce((sum, s) => sum + parseFloat(s.score || 0), 0) / validScores.length).toFixed(2))
+      : 0;
 
     const analytics = {
       intervention: {
@@ -1109,7 +1359,9 @@ const getInterventionAnalytics = async (req, res) => {
       enrollment: {
         total_enrolled: enrollments.length,
         max_capacity: intervention.max_students,
-        capacity_utilization: ((enrollments.length / intervention.max_students) * 100).toFixed(2),
+        capacity_utilization: intervention.max_students > 0 
+          ? ((enrollments.length / intervention.max_students) * 100).toFixed(2) + '%'
+          : '0%',
         by_status: enrollments.reduce((acc, enrollment) => {
           acc[enrollment.enrollment_status] = (acc[enrollment.enrollment_status] || 0) + 1;
           return acc;
@@ -1120,6 +1372,13 @@ const getInterventionAnalytics = async (req, res) => {
         average_score: enrollments.length > 0
           ? (enrollments.reduce((sum, e) => sum + (e.current_score || 0), 0) / enrollments.length).toFixed(2)
           : 0
+      },
+      scoring: {
+        total_microcompetencies: totalMicrocompetencies,
+        scored_microcompetencies: scoredMicrocompetencies,
+        scoring_progress: scoringProgress,
+        average_score: averageScore,
+        by_quadrant: {} // Can be enhanced later if needed
       },
       tasks: {
         total_tasks: tasks.length,
@@ -1376,36 +1635,31 @@ const createTask = async (req, res) => {
 
     const teacher = teacherResult.rows[0];
 
-    // Verify teacher is assigned to all microcompetencies
-    const microcompetencyIds = microcompetencies.map(mc => mc.microcompetencyId);
+    // NEW: Verify teacher is assigned to intervention (intervention-level, not per microcompetency)
     const assignmentCheck = await query(
       supabase
         .from('teacher_microcompetency_assignments')
-        .select('microcompetency_id, can_create_tasks')
+        .select('id, can_create_tasks')
         .eq('teacher_id', teacher.id)
         .eq('intervention_id', interventionId)
-        .in('microcompetency_id', microcompetencyIds)
         .eq('is_active', true)
+        .limit(1)
     );
 
-    // Check if teacher is assigned to all microcompetencies and has task creation permission
-    const assignedMicrocompetencies = assignmentCheck.rows.map(row => row.microcompetency_id);
-    const missingAssignments = microcompetencyIds.filter(id => !assignedMicrocompetencies.includes(id));
-
-    if (missingAssignments.length > 0) {
+    if (!assignmentCheck.rows || assignmentCheck.rows.length === 0) {
       return res.status(403).json({
         success: false,
-        message: `Teacher not assigned to microcompetencies: ${missingAssignments.join(', ')}`,
+        message: 'Teacher not assigned to this intervention',
         timestamp: new Date().toISOString()
       });
     }
 
-    // Check if teacher has task creation permission for all microcompetencies
-    const cannotCreateTasks = assignmentCheck.rows.filter(row => !row.can_create_tasks);
-    if (cannotCreateTasks.length > 0) {
+    // Check if teacher has task creation permission
+    const teacherAssignment = assignmentCheck.rows[0];
+    if (!teacherAssignment.can_create_tasks) {
       return res.status(403).json({
         success: false,
-        message: 'Teacher does not have task creation permission for some microcompetencies',
+        message: 'Teacher does not have task creation permission for this intervention',
         timestamp: new Date().toISOString()
       });
     }
@@ -3090,26 +3344,26 @@ const getTeacherSubmissions = async (req, res) => {
 
     const teacher = teacherResult.rows[0];
 
-    // Verify teacher is assigned to microcompetencies in this intervention
+    // NEW: Verify teacher is assigned to intervention (intervention-level, not per microcompetency)
     const assignmentResult = await query(
       supabase
         .from('teacher_microcompetency_assignments')
-        .select('microcompetency_id, can_score')
+        .select('id, can_score')
         .eq('teacher_id', teacher.id)
         .eq('intervention_id', interventionId)
         .eq('is_active', true)
+        .limit(1)
     );
 
     if (!assignmentResult.rows || assignmentResult.rows.length === 0) {
       return res.status(403).json({
         success: false,
-        message: 'Teacher not assigned to any microcompetencies in this intervention',
+        message: 'Teacher not assigned to this intervention',
         timestamp: new Date().toISOString()
       });
     }
 
-    const assignedMicrocompetencies = assignmentResult.rows.map(row => row.microcompetency_id);
-    const canScore = assignmentResult.rows.some(row => row.can_score);
+    const canScore = assignmentResult.rows[0].can_score;
 
     if (!canScore) {
       return res.status(403).json({
@@ -3119,7 +3373,7 @@ const getTeacherSubmissions = async (req, res) => {
       });
     }
 
-    // Get tasks that have microcompetencies assigned to this teacher
+    // NEW: Get all tasks for this intervention (teacher handles all microcompetencies in intervention)
     const teacherTasksQuery = supabase
       .from('tasks')
       .select(`
@@ -3128,12 +3382,11 @@ const getTeacherSubmissions = async (req, res) => {
         max_score,
         due_date,
         intervention_id,
-        task_microcompetencies!inner(
+        task_microcompetencies(
           microcompetency_id
         )
       `)
-      .eq('intervention_id', interventionId)
-      .in('task_microcompetencies.microcompetency_id', assignedMicrocompetencies);
+      .eq('intervention_id', interventionId);
 
     const teacherTasksResult = await query(teacherTasksQuery);
     const teacherTaskIds = teacherTasksResult.rows.map(task => task.id);
@@ -3141,7 +3394,7 @@ const getTeacherSubmissions = async (req, res) => {
     if (teacherTaskIds.length === 0) {
       return res.status(200).json({
         success: true,
-        message: 'No tasks found for teacher\'s assigned microcompetencies',
+        message: 'No tasks found for this intervention',
         data: [],
         timestamp: new Date().toISOString()
       });
@@ -3301,36 +3554,31 @@ const gradeSubmission = async (req, res) => {
 
     const intervention = interventionResult.rows[0];
 
-    // Verify teacher is assigned to all microcompetencies of this task
-    const microcompetencyIds = task.task_microcompetencies.map(tm => tm.microcompetency_id);
+    // NEW: Verify teacher is assigned to intervention (intervention-level assignment, not per microcompetency)
     const teacherAssignmentCheck = await query(
       supabase
         .from('teacher_microcompetency_assignments')
-        .select('microcompetency_id, can_score')
+        .select('id, can_score, can_create_tasks')
         .eq('teacher_id', teacher.id)
         .eq('intervention_id', task.intervention_id)
-        .in('microcompetency_id', microcompetencyIds)
         .eq('is_active', true)
+        .limit(1)
     );
 
-    // Check if teacher is assigned to all microcompetencies and has scoring permission
-    const assignedMicrocompetencies = teacherAssignmentCheck.rows.map(row => row.microcompetency_id);
-    const missingAssignments = microcompetencyIds.filter(id => !assignedMicrocompetencies.includes(id));
-
-    if (missingAssignments.length > 0) {
+    if (!teacherAssignmentCheck.rows || teacherAssignmentCheck.rows.length === 0) {
       return res.status(403).json({
         success: false,
-        message: `Teacher not assigned to microcompetencies: ${missingAssignments.join(', ')}`,
+        message: 'Teacher not assigned to this intervention',
         timestamp: new Date().toISOString()
       });
     }
 
-    // Check if teacher has scoring permission for all microcompetencies
-    const cannotScore = teacherAssignmentCheck.rows.filter(row => !row.can_score);
-    if (cannotScore.length > 0) {
+    // Check if teacher has scoring permission
+    const teacherAssignment = teacherAssignmentCheck.rows[0];
+    if (!teacherAssignment.can_score) {
       return res.status(403).json({
         success: false,
-        message: 'Teacher does not have scoring permission for some microcompetencies',
+        message: 'Teacher does not have scoring permission for this intervention',
         timestamp: new Date().toISOString()
       });
     }
@@ -3947,7 +4195,7 @@ const getInterventionStudents = async (req, res) => {
       });
     }
 
-    // Get enrolled students
+    // Get enrolled students with teacher assignment (NEW: includes intervention_teacher_id)
     const studentsResult = await query(
       supabase
         .from('intervention_enrollments')
@@ -3955,12 +4203,25 @@ const getInterventionStudents = async (req, res) => {
           id,
           enrollment_status,
           enrollment_date,
+          enrollment_type,
+          current_score,
+          completion_percentage,
+          intervention_teacher_id,
           students!inner(
             id,
             name,
             registration_no,
             course,
             status
+          ),
+          teacher_microcompetency_assignments!intervention_teacher_id(
+            id,
+            teacher_id,
+            teachers:teacher_id(
+              id,
+              name,
+              employee_id
+            )
           )
         `)
         .eq('intervention_id', interventionId)
@@ -3975,7 +4236,16 @@ const getInterventionStudents = async (req, res) => {
       registration_no: enrollment.students.registration_no,
       course: enrollment.students.course,
       enrollment_status: enrollment.enrollment_status,
-      enrolled_at: enrollment.enrollment_date
+      enrollment_type: enrollment.enrollment_type,
+      current_score: enrollment.current_score || 0,
+      completion_percentage: enrollment.completion_percentage || 0,
+      enrolled_at: enrollment.enrollment_date,
+      intervention_teacher_id: enrollment.intervention_teacher_id,
+      assigned_teacher: enrollment.teacher_microcompetency_assignments?.teachers ? {
+        id: enrollment.teacher_microcompetency_assignments.teachers.id,
+        name: enrollment.teacher_microcompetency_assignments.teachers.name,
+        employee_id: enrollment.teacher_microcompetency_assignments.teachers.employee_id
+      } : null
     })) || [];
 
     res.status(200).json({
@@ -4255,24 +4525,24 @@ const addMicrocompetenciesToIntervention = async (req, res) => {
   }
 };
 
-// Assign teachers to microcompetencies within intervention
+// Assign teachers to intervention (NEW: intervention-level assignment, not per microcompetency)
 const assignTeachersToMicrocompetencies = async (req, res) => {
   try {
     const { interventionId } = req.params;
-    const { assignments } = req.body;
+    const { teachers } = req.body; // Changed from 'assignments' to 'teachers'
 
     console.log('🎯 assignTeachersToMicrocompetencies called:', {
       interventionId,
-      assignmentsCount: assignments?.length,
-      assignments: assignments
+      teachersCount: teachers?.length,
+      teachers: teachers
     });
 
     // Validate input
-    if (!assignments || !Array.isArray(assignments) || assignments.length === 0) {
-      console.error('❌ Invalid assignments input:', { assignments });
+    if (!teachers || !Array.isArray(teachers) || teachers.length === 0) {
+      console.error('❌ Invalid teachers input:', { teachers });
       return res.status(400).json({
         success: false,
-        error: 'Assignments array is required and must not be empty',
+        error: 'Teachers array is required and must not be empty',
         timestamp: new Date().toISOString()
       });
     }
@@ -4297,72 +4567,14 @@ const assignTeachersToMicrocompetencies = async (req, res) => {
 
     console.log('✅ Intervention found:', interventionCheck.rows[0]);
 
-    // Verify all microcompetencies belong to this intervention
-    const microcompetencyIds = assignments.map(a => a.microcompetency_id);
-    console.log('🔍 Checking microcompetencies for intervention:', {
-      interventionId,
-      microcompetencyIds
-    });
-
-    const interventionMicrocompetencies = await query(
-      supabase
-        .from('intervention_microcompetencies')
-        .select('microcompetency_id, id, weightage, max_score, is_active')
-        .eq('intervention_id', interventionId)
-        .in('microcompetency_id', microcompetencyIds)
-    );
-
-    console.log('🔍 Found intervention microcompetencies:', {
-      requested: microcompetencyIds,
-      found: interventionMicrocompetencies.rows,
-      requestedCount: microcompetencyIds.length,
-      foundCount: interventionMicrocompetencies.rows.length
-    });
-
-    if (interventionMicrocompetencies.rows.length !== microcompetencyIds.length) {
-      console.error('❌ Microcompetency validation failed:', {
-        interventionId,
-        requestedMicrocompetencies: microcompetencyIds,
-        foundMicrocompetencies: interventionMicrocompetencies.rows.map(r => r.microcompetency_id),
-        requestedCount: microcompetencyIds.length,
-        foundCount: interventionMicrocompetencies.rows.length
-      });
-
-      // Let's also check what microcompetencies ARE in this intervention
-      const allInterventionMicrocompetencies = await query(
-        supabase
-          .from('intervention_microcompetencies')
-          .select('microcompetency_id, id, weightage, max_score, is_active')
-          .eq('intervention_id', interventionId)
-      );
-
-      console.error('❌ All microcompetencies in intervention:', allInterventionMicrocompetencies.rows);
-
-      return res.status(400).json({
-        success: false,
-        error: 'One or more microcompetencies do not belong to this intervention',
-        details: {
-          interventionId,
-          interventionName: interventionCheck.rows[0].name,
-          interventionStatus: interventionCheck.rows[0].status,
-          requested: microcompetencyIds,
-          found: interventionMicrocompetencies.rows.map(r => r.microcompetency_id),
-          allInIntervention: allInterventionMicrocompetencies.rows.map(r => r.microcompetency_id),
-          missing: microcompetencyIds.filter(id =>
-            !interventionMicrocompetencies.rows.some(r => r.microcompetency_id === id)
-          )
-        },
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    // Verify all teachers exist
-    const teacherIds = assignments.map(a => a.teacher_id);
-    const uniqueTeacherIds = [...new Set(teacherIds)]; // Remove duplicates for validation
+    // Verify all teachers exist and are active
+    const teacherIds = teachers.map(t => t.teacher_id || t.id);
+    const uniqueTeacherIds = [...new Set(teacherIds)]; // Remove duplicates
+    
     console.log('🔍 Checking teachers:', {
       teacherIds,
       uniqueTeacherIds,
-      totalAssignments: teacherIds.length,
+      totalTeachers: teacherIds.length,
       uniqueTeachers: uniqueTeacherIds.length
     });
 
@@ -4388,9 +4600,7 @@ const assignTeachersToMicrocompetencies = async (req, res) => {
       console.error('❌ Teacher validation failed:', {
         requestedTeachers: uniqueTeacherIds,
         foundTeachers: foundTeacherIds,
-        missingTeachers: missingTeacherIds,
-        requestedCount: uniqueTeacherIds.length,
-        foundCount: teacherCheck.rows.length
+        missingTeachers: missingTeacherIds
       });
 
       return res.status(400).json({
@@ -4405,7 +4615,7 @@ const assignTeachersToMicrocompetencies = async (req, res) => {
       });
     }
 
-    // Remove existing assignments for this intervention
+    // Remove existing assignments for this intervention (NEW: one assignment per teacher per intervention)
     await query(
       supabase
         .from('teacher_microcompetency_assignments')
@@ -4413,24 +4623,26 @@ const assignTeachersToMicrocompetencies = async (req, res) => {
         .eq('intervention_id', interventionId)
     );
 
-    // Prepare teacher assignments
-    const teacherAssignments = assignments.map(a => ({
+    // Prepare teacher assignments (NEW: no microcompetency_id, one per teacher)
+    const teacherAssignments = teachers.map(t => ({
       intervention_id: interventionId,
-      teacher_id: a.teacher_id,
-      microcompetency_id: a.microcompetency_id,
-      can_score: a.can_score !== undefined ? a.can_score : true,
-      can_create_tasks: a.can_create_tasks !== undefined ? a.can_create_tasks : true,
+      teacher_id: t.teacher_id || t.id,
+      // REMOVED: microcompetency_id (no longer needed)
+      can_score: t.can_score !== undefined ? t.can_score : true,
+      can_create_tasks: t.can_create_tasks !== undefined ? t.can_create_tasks : true,
       assigned_by: req.user.userId,
       is_active: true
     }));
 
-    // Insert new assignments
+    // Insert new assignments (one per teacher per intervention)
     const result = await query(
       supabase
         .from('teacher_microcompetency_assignments')
         .insert(teacherAssignments)
         .select(`
           id,
+          intervention_id,
+          teacher_id,
           can_score,
           can_create_tasks,
           assigned_at,
@@ -4438,37 +4650,25 @@ const assignTeachersToMicrocompetencies = async (req, res) => {
             id,
             name,
             employee_id
-          ),
-          microcompetencies:microcompetency_id(
-            id,
-            name,
-            components:component_id(
-              id,
-              name,
-              sub_categories:sub_category_id(
-                id,
-                name,
-                quadrants:quadrant_id(id, name)
-              )
-            )
           )
         `)
     );
 
     res.status(200).json({
       success: true,
-      message: 'Teachers assigned to microcompetencies successfully',
+      message: 'Teachers assigned to intervention successfully',
       data: {
         intervention_id: interventionId,
-        assignments: result.rows
+        assignments: result.rows, // Returns assignment IDs for use in student enrollment
+        assignment_count: result.rows.length
       },
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('❌ Assign teachers to microcompetencies error:', error);
+    console.error('❌ Assign teachers to intervention error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to assign teachers to microcompetencies',
+      error: 'Failed to assign teachers to intervention',
       message: error.message,
       timestamp: new Date().toISOString()
     });
@@ -4559,14 +4759,13 @@ const getInterventionTeacherAssignments = async (req, res) => {
       });
     }
 
-    // Get teacher microcompetency assignments for this intervention
-    const result = await query(
+    // NEW: Get teacher assignments for this intervention (intervention-level, no microcompetency_id)
+    const teacherAssignmentsResult = await query(
       supabase
         .from('teacher_microcompetency_assignments')
         .select(`
           id,
           teacher_id,
-          microcompetency_id,
           can_score,
           can_create_tasks,
           assigned_at,
@@ -4574,7 +4773,22 @@ const getInterventionTeacherAssignments = async (req, res) => {
             id,
             name,
             employee_id
-          ),
+          )
+        `)
+        .eq('intervention_id', interventionId)
+        .eq('is_active', true)
+        .order('assigned_at', { ascending: false })
+    );
+
+    // Get all microcompetencies for this intervention
+    const microcompetenciesResult = await query(
+      supabase
+        .from('intervention_microcompetencies')
+        .select(`
+          id,
+          microcompetency_id,
+          weightage,
+          max_score,
           microcompetencies:microcompetency_id(
             id,
             name,
@@ -4592,38 +4806,34 @@ const getInterventionTeacherAssignments = async (req, res) => {
         `)
         .eq('intervention_id', interventionId)
         .eq('is_active', true)
-        .order('assigned_at', { ascending: false })
     );
 
-    // Group assignments by teacher
-    const teacherAssignments = result.rows.reduce((acc, assignment) => {
-      const teacherId = assignment.teacher_id;
-
-      if (!acc[teacherId]) {
-        acc[teacherId] = {
-          id: `teacher_assignment_${teacherId}_${interventionId}`,
-          teacher: assignment.teachers,
-          assigned_at: assignment.assigned_at,
-          microcompetency_assignments: []
-        };
-      }
-
-      acc[teacherId].microcompetency_assignments.push({
-        id: assignment.id,
-        microcompetency_id: assignment.microcompetency_id,
+    // NEW: Build response - each teacher assignment includes ALL microcompetencies for the intervention
+    const allMicrocompetencies = microcompetenciesResult.rows || [];
+    const assignments = (teacherAssignmentsResult.rows || []).map(assignment => ({
+      id: assignment.id,
+      teacher_assignment_id: `teacher_assignment_${assignment.teacher_id}_${interventionId}`,
+      teacher: assignment.teachers,
+      assigned_at: assignment.assigned_at,
+      can_score: assignment.can_score,
+      can_create_tasks: assignment.can_create_tasks,
+      // NEW: Each teacher has access to ALL microcompetencies in the intervention
+      microcompetency_assignments: allMicrocompetencies.map(mc => ({
+        id: `${assignment.id}_mc_${mc.microcompetency_id}`, // Composite ID for UI compatibility
+        microcompetency_id: mc.microcompetency_id,
         can_score: assignment.can_score,
-        can_view: assignment.can_create_tasks, // Using can_create_tasks as can_view
-        microcompetencies: assignment.microcompetencies
-      });
-
-      return acc;
-    }, {});
+        can_view: assignment.can_create_tasks,
+        microcompetencies: mc.microcompetencies,
+        weightage: mc.weightage,
+        max_score: mc.max_score
+      }))
+    }));
 
     res.status(200).json({
       success: true,
       message: 'Teacher assignments retrieved successfully',
       data: {
-        assignments: Object.values(teacherAssignments)
+        assignments: assignments
       },
       timestamp: new Date().toISOString()
     });
@@ -4638,36 +4848,76 @@ const getInterventionTeacherAssignments = async (req, res) => {
   }
 };
 
-// Remove teacher assignment
+// Remove teacher assignment (NEW: uses direct assignment ID)
 const removeTeacherAssignment = async (req, res) => {
   try {
     const { interventionId, assignmentId } = req.params;
 
-    // Extract teacher ID from assignment ID (format: teacher_assignment_{teacherId}_{interventionId})
-    const teacherIdMatch = assignmentId.match(/teacher_assignment_(.+)_/);
-    if (!teacherIdMatch) {
-      return res.status(400).json({
+    // NEW: assignmentId can be either:
+    // 1. Direct UUID from teacher_microcompetency_assignments.id
+    // 2. Composite format: teacher_assignment_{teacherId}_{interventionId} (for backward compatibility)
+    
+    let teacherAssignmentId = assignmentId;
+    let teacherId = null;
+
+    // Check if it's a composite format (old structure)
+    const teacherIdMatch = assignmentId.match(/teacher_assignment_(.+?)_(.+)/);
+    if (teacherIdMatch) {
+      // Old format: extract teacher ID and find the assignment
+      teacherId = teacherIdMatch[1];
+      const result = await query(
+        supabase
+          .from('teacher_microcompetency_assignments')
+          .select('id')
+          .eq('intervention_id', interventionId)
+          .eq('teacher_id', teacherId)
+          .eq('is_active', true)
+          .limit(1)
+      );
+
+      if (!result.rows || result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Teacher assignment not found',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      teacherAssignmentId = result.rows[0].id;
+    }
+
+    // Verify assignment exists and belongs to this intervention
+    const assignmentCheck = await query(
+      supabase
+        .from('teacher_microcompetency_assignments')
+        .select('id, teacher_id')
+        .eq('id', teacherAssignmentId)
+        .eq('intervention_id', interventionId)
+        .limit(1)
+    );
+
+    if (!assignmentCheck.rows || assignmentCheck.rows.length === 0) {
+      return res.status(404).json({
         success: false,
-        error: 'Invalid assignment ID format',
+        error: 'Teacher assignment not found for this intervention',
         timestamp: new Date().toISOString()
       });
     }
 
-    const teacherId = teacherIdMatch[1];
-
-    // Remove all microcompetency assignments for this teacher in this intervention
+    // NEW: Remove the intervention-level assignment (one record per teacher per intervention)
     const result = await query(
       supabase
         .from('teacher_microcompetency_assignments')
         .delete()
+        .eq('id', teacherAssignmentId)
         .eq('intervention_id', interventionId)
-        .eq('teacher_id', teacherId)
     );
 
     res.status(200).json({
       success: true,
       message: 'Teacher assignment removed successfully',
       data: {
+        removed_assignment_id: teacherAssignmentId,
         removed_assignments: result.count || 0
       },
       timestamp: new Date().toISOString()

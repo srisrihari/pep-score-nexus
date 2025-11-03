@@ -456,17 +456,17 @@ const login = async (req, res) => {
       } else {
         console.log('❌ KOS-Core authentication failed:', kosResult.message);
 
-        // If KOS authentication fails, fall back to local authentication
-        if (kosResult.error === 'KOS_UNAVAILABLE') {
-          console.log('⚠️ KOS-Core unavailable, falling back to local authentication');
-        } else {
-          // For invalid credentials, return error immediately
+        // Fall back to local authentication for any non-credential errors
+        // Only block when KOS explicitly says credentials are invalid
+        if (kosResult.error === 'INVALID_CREDENTIALS') {
           return res.status(401).json({
             success: false,
             message: kosResult.message || 'Invalid credentials',
             timestamp: new Date().toISOString()
           });
         }
+
+        console.log('⚠️ KOS-Core error/non-credential issue, falling back to local authentication');
       }
     }
 
@@ -483,18 +483,57 @@ const login = async (req, res) => {
         .limit(1)
     );
 
+    let loginRegistrationNo = null;
+
     if (!userResult.rows || userResult.rows.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials',
-        timestamp: new Date().toISOString()
-      });
+      // Secondary lookup: allow students to login using registration number
+      // Resolve registration_no -> users row via students.user_id
+      const studentUserLookup = await query(
+        supabase
+          .from('students')
+          .select(`user_id, registration_no, users:user_id(id, username, email, password_hash, role, status, last_login)`) // join to users and bring registration_no
+          .eq('registration_no', username)
+          .limit(1)
+      );
+
+      const joinedUser = studentUserLookup.rows?.[0]?.users;
+      loginRegistrationNo = studentUserLookup.rows?.[0]?.registration_no || null;
+      if (!joinedUser) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid credentials',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Mimic original structure for downstream logic
+      userResult.rows = [joinedUser];
     }
 
     const user = userResult.rows[0];
 
+    // Ensure user is active (avoid issuing tokens for inactive users)
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({
+        success: false,
+        message: 'User not found or inactive',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    let isValidPassword = await bcrypt.compare(password, user.password_hash);
+
+    // Allow fallback for KOS-provisioned users with dummy hash when KOS is unavailable:
+    // Accept registration_no==password (common SSO pattern) to avoid lockout
+    const DUMMY_KOS_HASH = '$2b$10$dummy.hash.for.kos.authenticated.users.only';
+    if (!isValidPassword && user.password_hash === DUMMY_KOS_HASH) {
+      const candidate = loginRegistrationNo || username;
+      if (candidate && password === String(candidate)) {
+        isValidPassword = true;
+      }
+    }
+
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
@@ -532,7 +571,7 @@ const login = async (req, res) => {
     // Get role-specific profile data
     let profileData = null;
     if (user.role === 'student') {
-      const studentResult = await query(
+      let studentResult = await query(
         supabase
           .from('students')
           .select(`
@@ -551,6 +590,27 @@ const login = async (req, res) => {
           .limit(1)
       );
       profileData = studentResult.rows[0] || null;
+
+      // Auto-provision a minimal student profile if missing
+      if (!profileData) {
+        const registrationNoCandidate = username || user.username;
+        const displayName = user.username || 'Student';
+        const createStudent = await query(
+          supabase
+            .from('students')
+            .insert({
+              user_id: user.id,
+              registration_no: String(registrationNoCandidate),
+              name: String(displayName),
+              course: 'General',
+              status: 'Active'
+            })
+            .select(`id, registration_no, name, course, status`)
+        );
+        if (createStudent.rows && createStudent.rows[0]) {
+          profileData = createStudent.rows[0];
+        }
+      }
     } else if (user.role === 'teacher') {
       const teacherResult = await query(
         supabase

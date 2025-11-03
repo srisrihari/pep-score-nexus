@@ -57,7 +57,7 @@ interface BulkAssignmentData {
   interventionId: string;
   teacherIds: string[];
   role: string;
-  microcompetencyIds: string[];
+  // REMOVED: microcompetencyIds - teachers are now assigned to intervention (all microcompetencies)
 }
 
 const BulkTeacherAssignment: React.FC = () => {
@@ -156,12 +156,11 @@ const BulkTeacherAssignment: React.FC = () => {
       setLoading(true);
       setAssignmentProgress(0);
 
-      // Prepare bulk assignment data
+      // Prepare bulk assignment data (NEW: intervention-level assignment, no microcompetencyIds)
       const assignments: BulkAssignmentData[] = selectedInterventions.map(interventionId => ({
         interventionId,
         teacherIds: selectedTeachers,
-        role: assignmentRole,
-        microcompetencyIds: []
+        role: assignmentRole
       }));
 
       // Execute bulk assignment

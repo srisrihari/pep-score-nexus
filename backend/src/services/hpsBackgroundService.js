@@ -51,29 +51,39 @@ class HPSBackgroundService {
 
     async runConsistencyCheck() {
         try {
-            // Get all active students and their current terms
-            const { data: students } = await query(
+            // Get active students with current term
+            const studentsResult = await query(
                 supabase
                     .from('students')
-                    .select(`
-                        id,
-                        current_term_id,
-                        overall_score,
-                        student_score_summary!inner (
-                            total_hps
-                        )
-                    `)
+                    .select('id, current_term_id, overall_score')
                     .eq('status', 'Active')
             );
 
+            const students = studentsResult.rows || [];
+
             for (const student of students) {
+                if (!student.current_term_id) continue;
+
+                // Get stored summary for current term
+                const summaryResult = await query(
+                    supabase
+                        .from('student_score_summary')
+                        .select('total_hps')
+                        .eq('student_id', student.id)
+                        .eq('term_id', student.current_term_id)
+                        .limit(1)
+                );
+
+                const storedHPS = (summaryResult.rows && summaryResult.rows[0]) ? parseFloat(summaryResult.rows[0].total_hps) : null;
+
                 const calculatedHPS = await enhancedHPSCalculationService.calculateUnifiedHPS(
                     student.id,
                     student.current_term_id
                 );
 
-                // If there's a significant difference, trigger recalculation
-                if (Math.abs(calculatedHPS.totalHPS - student.overall_score) > 0.01) {
+                const needsUpdate = storedHPS === null || Math.abs(calculatedHPS.totalHPS - storedHPS) > 0.01;
+
+                if (needsUpdate) {
                     await query(
                         supabase
                             .from('hps_recalculation_queue')

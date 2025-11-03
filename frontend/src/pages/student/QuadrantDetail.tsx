@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatusBadge from "@/components/common/StatusBadge";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
 import BehaviorRatingScale from "@/components/student/BehaviorRatingScale";
-import { studentAPI } from "@/lib/api";
+import { studentAPI, unifiedScoreAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { transformStudentPerformanceData, transformLeaderboardData } from "@/lib/dataTransform";
 import { Student, Leaderboard } from "@/types/api";
@@ -63,10 +63,15 @@ const QuadrantDetail: React.FC = () => {
         const studentId = currentStudentResponse.data.id;
 
         // Fetch performance data and quadrant details (using selected term)
-        const [performanceResponse, leaderboardResponse, quadrantDetailsResponse] = await Promise.all([
+        const [performanceResponse, leaderboardResponse, unifiedBreakdown] = await Promise.all([
           studentAPI.getStudentPerformance(studentId, selectedTerm?.id, true),
-          studentAPI.getStudentLeaderboard(studentId, selectedTerm?.id).catch(() => null),
-          studentAPI.getQuadrantDetails(studentId, activeQuadrant, selectedTerm?.id).catch(() => null)
+          // Leaderboard API does not take termId; fetch overall/current context
+          studentAPI.getStudentLeaderboard(studentId).catch(() => null),
+          // Unified V2 breakdown for consistent quadrant totals
+          (selectedTerm?.id
+            ? unifiedScoreAPI.getScoreBreakdown(studentId, selectedTerm.id)
+            : Promise.resolve(null)
+          ).catch(() => null)
         ]);
 
         // Transform data
@@ -77,7 +82,7 @@ const QuadrantDetail: React.FC = () => {
 
         setStudentData(transformedStudent);
         setLeaderboardData(leaderboard);
-        setQuadrantDetails(quadrantDetailsResponse?.data);
+        setQuadrantDetails(unifiedBreakdown?.data?.breakdown || null);
 
       } catch (err) {
         console.error('Failed to load quadrant data:', err);
@@ -138,19 +143,46 @@ const QuadrantDetail: React.FC = () => {
   const leaderboard = leaderboardData?.quadrants?.[activeQuadrant || ""];
 
   // Use quadrant details data if available, otherwise fall back to transformed student data
-  const quadrantDisplayData = quadrantDetails?.quadrant ? {
-    ...quadrant,
-    obtained: quadrantDetails.quadrant.obtainedScore || 0,
-    maxScore: quadrantDetails.quadrant.totalMax || quadrantDetails.quadrant.weightage,
-    weightage: quadrantDetails.quadrant.weightage,
-    status: quadrantDetails.quadrant.status,
-    sub_categories: quadrantDetails.subCategories || quadrant?.sub_categories || []
-  } : quadrant;
+  // Prefer unified breakdown if available
+  let quadrantDisplayData = quadrantDetails ? (() => {
+    const unifiedQuadrant = quadrantDetails.quadrants?.find((q: any) => (
+      q.id === activeQuadrant ||
+      (q.name && quadrant?.name && q.name.toLowerCase() === quadrant.name.toLowerCase())
+    ));
+    if (unifiedQuadrant) {
+      return {
+        ...quadrant,
+        obtained: unifiedQuadrant.finalScore ?? unifiedQuadrant.obtainedScore ?? 0,
+        maxScore: quadrant?.weightage || unifiedQuadrant.maxScore || unifiedQuadrant.weightage || 0,
+        weightage: quadrant?.weightage || unifiedQuadrant.weightage || 0,
+        status: unifiedQuadrant.status || quadrant?.status,
+        sub_categories: unifiedQuadrant.subCategories || quadrant?.sub_categories || []
+      };
+    }
+    return quadrant;
+  })() : quadrant;
 
-  // Generate chart data from current term only (to avoid showing incorrect historical data)
+  // Fallback: if quadrant total is 0 but sub-categories have data, derive from sub-categories
+  if (
+    quadrantDisplayData &&
+    (Number(quadrantDisplayData.obtained) === 0 || quadrantDisplayData.obtained === undefined) &&
+    Array.isArray(quadrantDisplayData.sub_categories) &&
+    quadrantDisplayData.sub_categories.length > 0
+  ) {
+    const derived = quadrantDisplayData.sub_categories.reduce((sum: number, sc: any) => sum + (Number(sc.obtained) || 0), 0);
+    if (derived > 0) {
+      quadrantDisplayData = { ...quadrantDisplayData, obtained: derived };
+    }
+  }
+
+  // Generate chart data from current term only (normalized to 100)
   const chartData = currentTermData ? [{
     term: currentTermData.termName,
-    score: quadrantDisplayData?.obtained || 0
+    score: (() => {
+      const max = Number(quadrantDisplayData?.maxScore || quadrantDisplayData?.weightage || 0);
+      const obt = Number(quadrantDisplayData?.obtained || 0);
+      return max > 0 ? (obt / max) * 100 : 0;
+    })()
   }] : [];
 
   if (!quadrant) {
@@ -213,9 +245,12 @@ const QuadrantDetail: React.FC = () => {
               <TabsTrigger key={q.id} value={q.id} className="flex items-center justify-center">
                 <div className="flex items-center">
                   <span className="mr-1">{q.name}</span>
-                  {q.status && (
+                  {q.status && studentData.terms?.length > 1 && (
                     <Badge variant={q.status === "Cleared" ? "outline" : "destructive"} className="ml-1 text-xs py-0 h-5">
-                      {q.obtained?.toFixed(1) || '0.0'}/{q.weightage}
+                      {(() => {
+                        const pct = (Number(q.weightage) > 0) ? (Number(q.obtained || 0) / Number(q.weightage)) * 100 : 0;
+                        return `${pct.toFixed(1)}/100`;
+                      })()}
                     </Badge>
                   )}
                 </div>
@@ -231,7 +266,12 @@ const QuadrantDetail: React.FC = () => {
             <div className="text-center">
               <h2 className="text-xl font-bold mb-1">Your Score</h2>
               <div className="text-4xl font-bold mb-4">
-              {quadrantDisplayData?.obtained?.toFixed(1) || '0.0'}/{quadrantDisplayData?.maxScore || quadrantDisplayData?.weightage || 0}
+                {(() => {
+                  const max = Number(quadrantDisplayData?.maxScore || quadrantDisplayData?.weightage || 0);
+                  const obt = Number(quadrantDisplayData?.obtained || 0);
+                  const pct = max > 0 ? (obt / max) * 100 : 0;
+                  return `${pct.toFixed(1)}/100`;
+                })()}
               </div>
               <div className="inline-flex">
                 <StatusBadge
@@ -240,15 +280,17 @@ const QuadrantDetail: React.FC = () => {
                 />
               </div>
 
-              {quadrant.attendance && (
+              {typeof quadrant.attendance === 'number' && (
                 <div className="mt-3 text-sm">
                   <p className="text-white/70">Attendance: {quadrant.attendance}%</p>
-                  <p className="text-white/70">
-                    Status:
-                    <Badge variant={quadrant.eligibility === "Eligible" ? "outline" : "destructive"} className="ml-2">
-                      {quadrant.eligibility}
-                    </Badge>
-                  </p>
+                  {quadrant.eligibility && (
+                    <p className="text-white/70">
+                      Status:
+                      <Badge variant={quadrant.eligibility === "Eligible" ? "outline" : "destructive"} className="ml-2">
+                        {quadrant.eligibility}
+                      </Badge>
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -293,7 +335,7 @@ const QuadrantDetail: React.FC = () => {
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="term" />
-                <YAxis domain={[0, quadrantDisplayData?.maxScore || quadrantDisplayData?.weightage || 100]} />
+                <YAxis domain={[0, 100]} />
                 <Tooltip />
                 <Line
                   type="monotone"
@@ -320,10 +362,14 @@ const QuadrantDetail: React.FC = () => {
                   <h3 className="text-lg font-medium">{subCategory.name}</h3>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">
-                      {subCategory.weightage}% of {quadrantDisplayData.name}
+                      Weight: {subCategory.weightage}% of {quadrantDisplayData.name}
                     </Badge>
                     <Badge variant="outline">
-                      {(subCategory.obtained || 0).toFixed(1)}/{(subCategory.maxScore || 0).toFixed(1)}
+                      {(() => {
+                        const obtained = (subCategory.obtained || 0).toFixed(1);
+                        const displayMax = (((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0)).toFixed(1);
+                        return `${obtained}/${displayMax}`;
+                      })()}
                     </Badge>
                   </div>
                 </div>
@@ -331,6 +377,43 @@ const QuadrantDetail: React.FC = () => {
                 {subCategory.description && (
                   <p className="text-sm text-muted-foreground">{subCategory.description}</p>
                 )}
+
+                {/* Sub-category normalized score (weight-based) */}
+                <div className="mt-3">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Score</span>
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                        const subObtained = Number(subCategory.obtained || 0);
+                        const pct = subMax > 0 ? (subObtained / subMax) * 100 : 0;
+                        return (
+                          <span className="font-bold">{pct.toFixed(1)}/100</span>
+                        );
+                      })()}
+                      <Badge variant="secondary" className="text-xs">
+                        {(() => {
+                          const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                          const subObtained = Number(subCategory.obtained || 0);
+                          const pct = subMax > 0 ? Math.round((subObtained / subMax) * 100) : 0;
+                          return `${pct}%`;
+                        })()}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full"
+                      style={{
+                        width: `${(() => {
+                          const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                          const subObtained = Number(subCategory.obtained || 0);
+                          return subMax > 0 ? (subObtained / subMax) * 100 : 0;
+                        })()}%`,
+                      }}
+                    />
+                  </div>
+                </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {subCategory.components.map((component) => (
@@ -358,9 +441,15 @@ const QuadrantDetail: React.FC = () => {
                         <div className="flex justify-between text-sm mb-1">
                           <span>Score</span>
                             <div className="flex items-center gap-2">
-                          <span className="font-bold">
-                                {component.score.toFixed(1)}/{component.maxScore.toFixed(1)}
-                          </span>
+                              {(() => {
+                                const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                                const compMax = ((component.weightage || 0) / 100) * subMax;
+                                const compScore = Number(component.score || 0);
+                                const compPct = compMax > 0 ? (compScore / compMax) * 100 : 0;
+                                return (
+                                  <span className="font-bold">{compPct.toFixed(1)}/100</span>
+                                );
+                              })()}
                               {component.weightage && (
                                 <Badge variant="secondary" className="text-xs">
                                   {component.weightage}%
@@ -372,12 +461,22 @@ const QuadrantDetail: React.FC = () => {
                           <div
                             className="h-full bg-primary rounded-full"
                             style={{
-                                width: `${component.maxScore > 0 ? (component.score / component.maxScore) * 100 : 0}%`,
+                              width: `${(() => {
+                                const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                                const compMax = ((component.weightage || 0) / 100) * subMax;
+                                const compScore = Number(component.score || 0);
+                                return compMax > 0 ? (compScore / compMax) * 100 : 0;
+                              })()}%`,
                             }}
                           />
                           </div>
                           <div className="text-right text-xs text-muted-foreground mt-1">
-                            {component.maxScore > 0 ? Math.round((component.score / component.maxScore) * 100) : 0}%
+                            {(() => {
+                              const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                              const compMax = ((component.weightage || 0) / 100) * subMax;
+                              const compScore = Number(component.score || 0);
+                              return compMax > 0 ? Math.round((compScore / compMax) * 100) : 0;
+                            })()}%
                           </div>
                         </div>
 
@@ -390,13 +489,19 @@ const QuadrantDetail: React.FC = () => {
                                 <div key={micro.id} className="flex justify-between items-center text-xs">
                                   <span className="truncate">{micro.name}</span>
                                   <div className="flex items-center gap-1">
-                                    {micro.score !== undefined ? (
-                                      <span className="font-medium">
-                                        {micro.score.toFixed(1)}/{micro.maxScore}
-                                      </span>
-                                    ) : (
-                                      <span className="text-muted-foreground">Not scored</span>
-                                    )}
+                                    {(() => {
+                                      const subMax = ((subCategory.weightage || 0) / 100) * (quadrantDisplayData?.weightage || 0);
+                                      const compMax = ((component.weightage || 0) / 100) * subMax;
+                                      const microMax = ((micro.weightage || 0) / 100) * compMax;
+                                      if (micro.score !== undefined) {
+                                        const microScore = Number(micro.score || 0);
+                                        const microPct = microMax > 0 ? (microScore / microMax) * 100 : 0;
+                                        return (
+                                          <span className="font-medium">{microPct.toFixed(1)}/100</span>
+                                        );
+                                      }
+                                      return <span className="text-muted-foreground">Not scored</span>;
+                                    })()}
                                     <Badge variant="outline" className="text-xs py-0">
                                       {micro.weightage}%
                                     </Badge>
@@ -477,7 +582,7 @@ const QuadrantDetail: React.FC = () => {
             <CardTitle className="text-lg">Improvement Recommendations</CardTitle>
           </CardHeader>
           <CardContent>
-            {quadrant.eligibility === "Not Eligible" ? (
+              {quadrant.eligibility === "Not Eligible" && typeof quadrant.attendance === 'number' && quadrant.attendance > 0 ? (
               <div className="flex items-start gap-2 text-amber-600">
                 <AlertCircle className="h-5 w-5 mt-0.5" />
                 <div>

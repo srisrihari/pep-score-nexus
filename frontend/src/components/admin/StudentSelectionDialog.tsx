@@ -82,6 +82,11 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [loadingFilters, setLoadingFilters] = useState(false);
 
+  // Dependent option state (narrowed lists based on selections)
+  const [availableCourses, setAvailableCourses] = useState<string[] | null>(null);
+  const [availableSections, setAvailableSections] = useState<Array<{ id: string; name: string; batch_name?: string }> | null>(null);
+  const [availableHouses, setAvailableHouses] = useState<Array<{ id: string; name: string; color: string }> | null>(null);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -181,6 +186,73 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
       loadStudents();
     }
   }, [currentPage]);
+
+  // Dependent dropdowns: when batch changes, recalc courses
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      // Reset downstream filters on batch change
+      setFilters(prev => ({ ...prev, courses: [], sections: [], houses: [] }));
+      setAvailableSections(null);
+      setAvailableHouses(null);
+      if (filters.batch_ids.length === 0) {
+        setAvailableCourses(null);
+        return;
+      }
+      try {
+        const resp = await adminAPI.getAllStudents({
+          batch_ids: filters.batch_ids,
+          limit: 2000,
+        });
+        const studentsList = resp?.data?.students || [];
+        const uniqueCourses = Array.from(new Set(studentsList.map((s: any) => s.course))).filter(Boolean).sort();
+        setAvailableCourses(uniqueCourses);
+      } catch (e) {
+        setAvailableCourses(null);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, JSON.stringify(filters.batch_ids)]);
+
+  // When course changes (with optional batch), recalc sections and houses
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      setFilters(prev => ({ ...prev, sections: [], houses: [] }));
+      setAvailableSections(null);
+      setAvailableHouses(null);
+      const activeCourses = filters.courses;
+      if (!activeCourses.length && !filters.batch_ids.length) {
+        setAvailableSections(null);
+        setAvailableHouses(null);
+        return;
+      }
+      try {
+        const resp = await adminAPI.getAllStudents({
+          batch_ids: filters.batch_ids.length ? filters.batch_ids : undefined,
+          courses: activeCourses.length ? activeCourses : undefined,
+          limit: 2000,
+        });
+        const studentsList = resp?.data?.students || [];
+        const sectionMap = new Map<string, { id: string; name: string; batch_name?: string }>();
+        const houseMap = new Map<string, { id: string; name: string; color: string }>();
+        for (const s of studentsList) {
+          if (s.section_id && s.section_name) {
+            if (!sectionMap.has(s.section_id)) sectionMap.set(s.section_id, { id: s.section_id, name: s.section_name, batch_name: s.batch_name });
+          }
+          if (s.house_id && s.house_name) {
+            if (!houseMap.has(s.house_id)) houseMap.set(s.house_id, { id: s.house_id, name: s.house_name, color: s.house_color });
+          }
+        }
+        setAvailableSections(Array.from(sectionMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+        setAvailableHouses(Array.from(houseMap.values()).sort((a, b) => a.name.localeCompare(b.name)));
+      } catch (e) {
+        setAvailableSections(null);
+        setAvailableHouses(null);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, JSON.stringify(filters.courses), JSON.stringify(filters.batch_ids)]);
 
   // Student selection handlers
   const handleStudentToggle = (studentId: string) => {
@@ -417,7 +489,7 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Courses</SelectItem>
-                      {filterOptions?.courses?.map(course => (
+                      {(availableCourses ?? filterOptions?.courses ?? []).map((course) => (
                         <SelectItem key={course} value={course}>
                           {course}
                         </SelectItem>
@@ -445,11 +517,11 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Sections</SelectItem>
-                      {filterOptions?.sections
-                        ?.filter(section => section.id && section.id.trim() !== '')
+                      {(availableSections ?? filterOptions?.sections ?? [])
+                        .filter(section => section.id && section.id.trim() !== '')
                         .map(section => (
                           <SelectItem key={section.id} value={section.id}>
-                            {section.name} ({section.batch_name})
+                            {section.name}{section.batch_name ? ` (${section.batch_name})` : ''}
                           </SelectItem>
                         ))}
                       {!filterOptions?.sections && (
@@ -475,19 +547,19 @@ export const StudentSelectionDialog: React.FC<StudentSelectionDialogProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Houses</SelectItem>
-                      {filterOptions?.houses
-                        ?.filter(house => house.id && house.id.trim() !== '')
+                      {(availableHouses ?? filterOptions?.houses ?? [])
+                        .filter(house => house.id && house.id.trim() !== '')
                         .map(house => (
                           <SelectItem key={house.id} value={house.id}>
                             <div className="flex items-center gap-2">
                               <div
                                 className="w-3 h-3 rounded-full"
                                 style={{ backgroundColor: house.color }}
-                            />
-                            {house.name}
-                          </div>
-                        </SelectItem>
-                      ))}
+                              />
+                              {house.name}
+                            </div>
+                          </SelectItem>
+                        ))}
                       {!filterOptions?.houses && (
                         <SelectItem value="loading" disabled>Loading...</SelectItem>
                       )}
