@@ -339,7 +339,20 @@ const getTeacherMicrocompetencies = async (req, res) => {
               description: mcData.microcompetency.description,
               weightage: mcData.microcompetency.component_weightage,
               max_score: mcData.microcompetency.max_score,
-              display_order: mcData.microcompetency.display_order
+              display_order: mcData.microcompetency.display_order,
+              components: componentData.component ? {
+                id: componentData.component.id,
+                name: componentData.component.name,
+                category: componentData.component.category || null,
+                sub_categories: componentData.component.sub_categories ? {
+                  id: componentData.component.sub_categories.id,
+                  name: componentData.component.sub_categories.name,
+                  quadrants: {
+                    id: quadrantData.quadrant.id,
+                    name: quadrantData.quadrant.name
+                  }
+                } : null
+              } : null
             },
             quadrant: {
               id: quadrantData.quadrant.id,

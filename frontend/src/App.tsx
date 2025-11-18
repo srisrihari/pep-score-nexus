@@ -35,6 +35,7 @@ import TeacherStudents from "./pages/teacher/TeacherStudents";
 
 import InterventionScoringPage from "./pages/teacher/InterventionScoringPage";
 import MicrocompetencyScoringPage from "./pages/teacher/MicrocompetencyScoringPage";
+import StudentScoringPage from "./pages/teacher/StudentScoringPage";
 import TeacherFeedback from "./pages/teacher/TeacherFeedback";
 import TeacherInterventions from "./pages/teacher/TeacherInterventions";
 import TeacherSettings from "./pages/teacher/TeacherSettings";
@@ -239,10 +240,7 @@ const AppRoutes = () => {
       <Route path="/teacher/students/:studentId/scores" element={
         <ProtectedRoute requiredRole="teacher">
           <Layout>
-            <div className="container mx-auto p-6">
-              <h1 className="text-2xl font-bold mb-4">Student Score Details</h1>
-              <p className="text-gray-600">Detailed student score view will be implemented here.</p>
-            </div>
+            <StudentScoringPage />
           </Layout>
         </ProtectedRoute>
       } />

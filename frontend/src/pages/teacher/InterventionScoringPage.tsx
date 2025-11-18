@@ -416,7 +416,7 @@ const InterventionScoringPage: React.FC = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => navigate(`/teacher/students/${student.id}/scores`)}
+                            onClick={() => navigate(`/teacher/students/${student.id}/scores?interventionId=${interventionId}`)}
                           >
                             View Scores
                           </Button>
