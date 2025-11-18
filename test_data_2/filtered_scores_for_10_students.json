@@ -1,0 +1,4152 @@
+[
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 1,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 1,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 4,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 1.5,
+      "D5": 1.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 0",
+    "intervention": "Fearless (Level 0)",
+    "scores": {
+      "D1": 0,
+      "D2": 0,
+      "D3": 0,
+      "D4": 0.5714285714285714,
+      "D5": 2.857142857142857
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "E1": 3,
+      "E3": 3,
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "A4": 4,
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C5": 3,
+      "E1": 4,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 3,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 3,
+      "N2": 2,
+      "N3": 3,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 2,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 3,
+      "P4": 1,
+      "T1": 2,
+      "D3": 2,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 3.5,
+      "C2": 3,
+      "C3": 5,
+      "C4": 3.75
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 2.666666667,
+      "T2": 2.666666667,
+      "T3": 2.555555556,
+      "T4": 2.777777778,
+      "T5": 2.722222222,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 3,
+      "C2": 4,
+      "C3": 2,
+      "C5": 4,
+      "L1": 4,
+      "P1": 2,
+      "P2": 2,
+      "P4": 4,
+      "T1": 1,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 5,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "L1": 5,
+      "P1": 5,
+      "P2": 5,
+      "P4": 5,
+      "T1": 4,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 4,
+      "C2": 4,
+      "C3": 3,
+      "C5": 5,
+      "E1": 4,
+      "E3": 4,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "A4": 4,
+      "C1": 4,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "E1": 3,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 2,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 5,
+      "N2": 4,
+      "N3": 4,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 2,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 2,
+      "P4": 1,
+      "T1": 2,
+      "D3": 2,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 2.5,
+      "C2": 2,
+      "C3": 3,
+      "C4": 2.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 3,
+      "P2": 2,
+      "P3": 2,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 2,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 2,
+      "C2": 4,
+      "C3": 3,
+      "C5": 4,
+      "L1": 2,
+      "P1": 2,
+      "P2": 3,
+      "P4": 2,
+      "T1": 1,
+      "D4": 1,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 4,
+      "C3": 4,
+      "C5": 5,
+      "L1": 4,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 2,
+      "A2": 2,
+      "A3": 2,
+      "A4": 2,
+      "C1": 3,
+      "C2": 3,
+      "C3": 2,
+      "C5": 3,
+      "E1": 3,
+      "E3": 3,
+      "P1": 2,
+      "P2": 2,
+      "P3": 2,
+      "P4": 2,
+      "T1": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 1,
+      "A4": 1,
+      "C1": 1,
+      "C2": 1,
+      "C3": 1,
+      "C5": 1,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P4": 1,
+      "T1": 1,
+      "D4": 1,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 4,
+      "N2": 4,
+      "N3": 4,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 3,
+      "E1": 2,
+      "P1": 2,
+      "P2": 1,
+      "P3": 2,
+      "P4": 1,
+      "T1": 2,
+      "D3": 2,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 3,
+      "C2": 2,
+      "C3": 3,
+      "C4": 2.75
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 1,
+      "C2": 1,
+      "C3": 1,
+      "C5": 1,
+      "L1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P4": 1,
+      "T1": 1,
+      "D4": 1,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "L1": 4,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 1,
+      "A4": 1,
+      "C1": 3,
+      "C2": 1,
+      "C3": 1,
+      "C5": 1,
+      "E1": 1,
+      "E3": 0,
+      "P1": 1,
+      "P2": 1,
+      "P3": 0,
+      "P4": 1,
+      "T1": 3,
+      "D4": 1,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 1,
+      "A4": 1,
+      "C1": 1,
+      "C2": 2,
+      "C3": 1,
+      "C5": 1,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P4": 1,
+      "T1": 2,
+      "D4": 1,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 2,
+      "N2": 3,
+      "N3": 3,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 1,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 1,
+      "P4": 1,
+      "T1": 1,
+      "D3": 1,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 4,
+      "C2": 4.5,
+      "C3": 5,
+      "C4": 4.375
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 2,
+      "P2": 1,
+      "P3": 2,
+      "P4": 1,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 2,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 1,
+      "C2": 2,
+      "C3": 3,
+      "C5": 1,
+      "L1": 2,
+      "P1": 2,
+      "P2": 2,
+      "P4": 2,
+      "T1": 1,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 4,
+      "C3": 5,
+      "C5": 4,
+      "L1": 5,
+      "P1": 4,
+      "P2": 4,
+      "P4": 5,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 0,
+      "A2": 0,
+      "A3": 0,
+      "A4": 0,
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C5": 0,
+      "E1": 0,
+      "E3": 0,
+      "P1": 0,
+      "P2": 0,
+      "P3": 0,
+      "P4": 0,
+      "T1": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 0,
+      "A2": 0,
+      "A3": 0,
+      "A4": 0,
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C5": 0,
+      "E1": 0,
+      "P1": 0,
+      "P2": 0,
+      "P4": 0,
+      "T1": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 0,
+      "N2": 0,
+      "N3": 0,
+      "D4": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 0,
+      "E1": 0,
+      "P1": 0,
+      "P2": 0,
+      "P3": 0,
+      "P4": 0,
+      "T1": 0,
+      "D3": 0,
+      "D4": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 0,
+      "P2": 0,
+      "P3": 0,
+      "P4": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 0,
+      "C2": 0,
+      "C3": 0,
+      "C5": 0,
+      "L1": 0,
+      "P1": 0,
+      "P2": 0,
+      "P4": 0,
+      "T1": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 0,
+      "C2": 0,
+      "C3": 0,
+      "C5": 0,
+      "L1": 0,
+      "P1": 0,
+      "P2": 0,
+      "P4": 0,
+      "T1": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 2,
+      "A2": 2,
+      "A3": 2,
+      "A4": 2,
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C5": 3,
+      "E1": 2,
+      "E3": 2,
+      "P1": 2,
+      "P2": 2,
+      "P3": 2,
+      "P4": 2,
+      "T1": 4,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "A4": 4,
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C5": 4,
+      "E1": 4,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 3,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 1,
+      "N2": 1,
+      "N3": 1,
+      "D4": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 3,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 3,
+      "P4": 1,
+      "T1": 2,
+      "D3": 2,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 4,
+      "C2": 4,
+      "C3": 5,
+      "C4": 4.25
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 1,
+      "C2": 3,
+      "C3": 1,
+      "C5": 3,
+      "L1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P4": 2,
+      "T1": 1,
+      "D4": 1,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 5,
+      "C3": 4,
+      "C5": 5,
+      "L1": 5,
+      "P1": 5,
+      "P2": 5,
+      "P4": 5,
+      "T1": 5,
+      "D4": 5,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "E1": 3,
+      "E3": 3,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 2,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "A4": 4,
+      "C1": 4,
+      "C2": 4,
+      "C3": 5,
+      "C5": 4,
+      "E1": 3,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 3,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 2,
+      "N2": 2,
+      "N3": 2,
+      "D4": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 3,
+      "E1": 2,
+      "P1": 2,
+      "P2": 1,
+      "P3": 2,
+      "P4": 1,
+      "T1": 2,
+      "D3": 2,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 3.5,
+      "C2": 3,
+      "C3": 5,
+      "C4": 3.75
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 3,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "L1": 3,
+      "P1": 3,
+      "P2": 4,
+      "P4": 3,
+      "T1": 1,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 5,
+      "C2": 5,
+      "C3": 5,
+      "C5": 5,
+      "L1": 4,
+      "P1": 5,
+      "P2": 5,
+      "P4": 5,
+      "T1": 5,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 4,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "E1": 3,
+      "E3": 3,
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 2,
+      "A2": 2,
+      "A3": 3,
+      "A4": 3,
+      "C1": 2,
+      "C2": 3,
+      "C3": 2,
+      "C5": 2,
+      "E1": 2,
+      "P1": 3,
+      "P2": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 3,
+      "N2": 2,
+      "N3": 3,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 2,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 3,
+      "P4": 1,
+      "T1": 2,
+      "D3": 2,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 3.5,
+      "C2": 3,
+      "C3": 5,
+      "C4": 3.75
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 3,
+      "C2": 3,
+      "C3": 4,
+      "C5": 3,
+      "L1": 3,
+      "P1": 4,
+      "P2": 4,
+      "P4": 2,
+      "T1": 1,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "L1": 4,
+      "P1": 5,
+      "P2": 5,
+      "P4": 4,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 2,
+      "A2": 3,
+      "A3": 2,
+      "A4": 2,
+      "C1": 2,
+      "C2": 2,
+      "C3": 3,
+      "C5": 2,
+      "E1": 2,
+      "E3": 2,
+      "P1": 2,
+      "P2": 2,
+      "P3": 2,
+      "P4": 2,
+      "T1": 2,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C5": 3,
+      "E1": 3,
+      "P1": 3,
+      "P2": 3,
+      "P4": 3,
+      "T1": 2,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 3,
+      "N2": 2,
+      "N3": 3,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 1,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 1,
+      "P4": 1,
+      "T1": 1,
+      "D3": 1,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 3.5,
+      "C2": 4.5,
+      "C3": 5,
+      "C4": 4.125
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 2,
+      "C2": 3,
+      "C3": 4,
+      "C5": 3,
+      "L1": 3,
+      "P1": 2,
+      "P2": 3,
+      "P4": 2,
+      "T1": 1,
+      "D4": 4,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 4,
+      "C3": 4,
+      "C5": 4,
+      "L1": 4,
+      "P1": 4,
+      "P2": 5,
+      "P4": 5,
+      "T1": 4,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Storytelling Presentation",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "A4": 2,
+      "C1": 2,
+      "C2": 3,
+      "C3": 2,
+      "C5": 4,
+      "E1": 4,
+      "E3": 4,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Book Review Presentation",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C5": 5,
+      "E1": 3,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 2,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Interpersonal Role Play",
+    "scores": {
+      "N1": 4,
+      "N2": 4,
+      "N3": 4,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Business Proposal Report",
+    "scores": {
+      "C4": 3,
+      "E1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 1,
+      "P4": 1,
+      "T1": 1,
+      "D3": 1,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Email Writing",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C4": 3.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Case Study Analysis",
+    "scores": {
+      "P1": 4,
+      "P2": 3,
+      "P3": 3,
+      "P4": 2,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "T4": 0,
+      "T5": 0,
+      "D4": 3,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Debating",
+    "scores": {
+      "A3": 4,
+      "C2": 5,
+      "C3": 4,
+      "C5": 5,
+      "L1": 4,
+      "P1": 4,
+      "P2": 4,
+      "P4": 4,
+      "T1": 1,
+      "D4": 4,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 1",
+    "intervention": "Capstone",
+    "scores": {
+      "A3": 4,
+      "C2": 4,
+      "C3": 5,
+      "C5": 4,
+      "L1": 5,
+      "P1": 5,
+      "P2": 4,
+      "P4": 5,
+      "T1": 4,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 2,
+      "E2": 2,
+      "E4": 3,
+      "L1": 3,
+      "L2": 2,
+      "N1": 2,
+      "N3": 2,
+      "T1": 3,
+      "T2": 3,
+      "T3": 3,
+      "D3": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 2,
+      "E2": 2,
+      "E4": 3,
+      "L1": 3,
+      "L2": 2,
+      "N1": 2,
+      "N3": 2,
+      "T1": 3,
+      "T2": 3,
+      "T3": 3,
+      "D3": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Review 1",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 0,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 2,
+      "E2": 2,
+      "E4": 2,
+      "L1": 3,
+      "L2": 2,
+      "N1": 2,
+      "N3": 2,
+      "T1": 2,
+      "T2": 2,
+      "T3": 2,
+      "D3": 2,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 2,
+      "L1": 1,
+      "L2": 2,
+      "N1": 3,
+      "N3": 2,
+      "T1": 2,
+      "T2": 2,
+      "T3": 2,
+      "D3": 1,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C4": 3,
+      "C5": 4,
+      "E1": 4,
+      "E2": 3,
+      "E4": 3,
+      "L1": 2,
+      "L2": 1,
+      "N1": 2,
+      "N3": 1,
+      "T1": 2,
+      "T2": 2,
+      "T3": 2,
+      "D3": 1,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 2,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 1,
+      "E1": 2,
+      "E2": 2,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 1,
+      "N3": 1,
+      "T1": 3,
+      "T2": 3,
+      "T3": 3,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 3,
+      "N3": 0,
+      "T1": 4,
+      "T2": 2,
+      "T3": 2,
+      "D3": 2,
+      "D4": 5,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 2,
+      "E1": 2,
+      "E2": 2,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 2,
+      "N3": 2,
+      "T1": 2,
+      "T2": 2,
+      "T3": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 2,
+      "E1": 2,
+      "E2": 3,
+      "E4": 3,
+      "L1": 3,
+      "L2": 3,
+      "N1": 3,
+      "N3": 3,
+      "T1": 1,
+      "T2": 1,
+      "T3": 1,
+      "D3": 2,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 3,
+      "N3": 0,
+      "T1": 4,
+      "T2": 2,
+      "T3": 2,
+      "D3": 2,
+      "D4": 5,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E1": 2,
+      "E2": 2,
+      "E4": 3,
+      "L1": 4,
+      "L2": 4,
+      "N1": 2,
+      "N3": 3,
+      "T1": 3,
+      "T2": 3,
+      "T3": 4,
+      "D3": 2,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Review 2",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C4": 3,
+      "C5": 4,
+      "E1": 3,
+      "E2": 3,
+      "E4": 3,
+      "L1": 2,
+      "L2": 2,
+      "N1": 3,
+      "N3": 2,
+      "T1": 1,
+      "T2": 1,
+      "T3": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 4,
+      "C2": 4,
+      "C3": 3,
+      "C4": 3,
+      "C5": 4,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 4,
+      "C2": 4,
+      "C3": 3,
+      "C4": 3,
+      "C5": 4,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 3,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 2,
+      "C4": 3,
+      "C5": 2,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 2,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 2,
+      "E1": 2,
+      "E2": 2,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 2,
+      "N3": 2,
+      "T1": 2,
+      "T2": 2,
+      "T3": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 3,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 2,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 2,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 2,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 2,
+      "E1": 2,
+      "E2": 2,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 2,
+      "N3": 2,
+      "T1": 2,
+      "T2": 2,
+      "T3": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 2,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Review 3",
+    "scores": {
+      "C1": 0,
+      "C2": 0,
+      "C3": 0,
+      "C4": 3,
+      "C5": 0,
+      "E1": 0,
+      "E2": 0,
+      "E4": 0,
+      "L1": 0,
+      "L2": 0,
+      "N1": 0,
+      "N3": 0,
+      "T1": 0,
+      "T2": 0,
+      "T3": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 4,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 3,
+      "L1": 4,
+      "L2": 4,
+      "N1": 5,
+      "N3": 0,
+      "T1": 5,
+      "T2": 4,
+      "T3": 5,
+      "D3": 5,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 4,
+      "E1": 2,
+      "E2": 3,
+      "E4": 2,
+      "L1": 3,
+      "L2": 2,
+      "N1": 1,
+      "N3": 0,
+      "T1": 1,
+      "T2": 3,
+      "T3": 3,
+      "D3": 3,
+      "D4": 1,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C4": 3,
+      "C5": 4,
+      "E1": 4,
+      "E2": 3,
+      "E4": 2,
+      "L1": 2,
+      "L2": 1,
+      "N1": 1,
+      "N3": 0,
+      "T1": 1,
+      "T2": 3,
+      "T3": 2,
+      "D3": 2,
+      "D4": 1,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 2,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 1,
+      "E1": 3,
+      "E2": 3,
+      "E4": 3,
+      "L1": 2,
+      "L2": 3,
+      "N1": 3,
+      "N3": 0,
+      "T1": 3,
+      "T2": 4,
+      "T3": 4,
+      "D3": 4,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 4,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 3,
+      "L1": 4,
+      "L2": 4,
+      "N1": 5,
+      "N3": 5,
+      "T1": 4,
+      "T2": 5,
+      "T3": 5,
+      "D3": 5,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 2,
+      "C2": 4,
+      "C3": 2,
+      "C4": 4,
+      "C5": 3,
+      "E1": 3,
+      "E2": 2,
+      "E4": 2,
+      "L1": 2,
+      "L2": 3,
+      "N1": 5,
+      "N3": 0,
+      "T1": 5,
+      "T2": 3,
+      "T3": 5,
+      "D3": 5,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 5,
+      "C3": 4,
+      "C4": 4,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 3,
+      "L1": 3,
+      "L2": 3,
+      "N1": 5,
+      "N3": 0,
+      "T1": 5,
+      "T2": 4,
+      "T3": 3,
+      "D3": 4,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 4,
+      "C5": 3,
+      "E1": 3,
+      "E2": 3,
+      "E4": 3,
+      "L1": 4,
+      "L2": 4,
+      "N1": 5,
+      "N3": 5,
+      "T1": 4,
+      "T2": 5,
+      "T3": 5,
+      "D3": 5,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 4,
+      "C5": 3,
+      "E1": 4,
+      "E2": 5,
+      "E4": 4,
+      "L1": 4,
+      "L2": 4,
+      "N1": 5,
+      "N3": 0,
+      "T1": 5,
+      "T2": 5,
+      "T3": 5,
+      "D3": 5,
+      "D4": 5,
+      "D5": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Review 4",
+    "scores": {
+      "C1": 4,
+      "C2": 4,
+      "C3": 4,
+      "C4": 3,
+      "C5": 4,
+      "E1": 2,
+      "E2": 2,
+      "E4": 2,
+      "L1": 2,
+      "L2": 2,
+      "N1": 1,
+      "N3": 0,
+      "T1": 1,
+      "T2": 2,
+      "T3": 2,
+      "D3": 1,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 4,
+      "C3": 4,
+      "C4": 4,
+      "D3": 5,
+      "D4": 0,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 4,
+      "C3": 4,
+      "C4": 3,
+      "D3": 5,
+      "D4": 0,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 3,
+      "D3": 5,
+      "D4": 0,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 4,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 5,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Reflection -1 ",
+    "scores": {
+      "C1": 3,
+      "C3": 2,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 4,
+      "C3": 4,
+      "C4": 4,
+      "D3": 5,
+      "D4": 0,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 3,
+      "C3": 4,
+      "C4": 4,
+      "D3": 5,
+      "D4": 0,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 4,
+      "C3": 4,
+      "C4": 4,
+      "D3": 4,
+      "D4": 2,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 3,
+      "C3": 4,
+      "C4": 4,
+      "D3": 5,
+      "D4": 0,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 4,
+      "C3": 4,
+      "C4": 4,
+      "D3": 5,
+      "D4": 2,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 4,
+      "D3": 5,
+      "D4": 0,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Reflection -2",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 4,
+      "C3": 3,
+      "C4": 3,
+      "D3": 5,
+      "D4": 0,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 1,
+      "D3": 5,
+      "D4": 0,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 3,
+      "D3": 5,
+      "D4": 0,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 2,
+      "C3": 2,
+      "C4": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 2,
+      "C3": 2,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 2,
+      "C3": 2,
+      "C4": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 3,
+      "C3": 2,
+      "C4": 3,
+      "D3": 5,
+      "D4": 0,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Reflection -3",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 3,
+      "C3": 2,
+      "C4": 2,
+      "D3": 5,
+      "D4": 0,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 2,
+      "C3": 2,
+      "C4": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 2,
+      "C3": 2,
+      "C4": 2,
+      "D3": 2,
+      "D4": 2,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 3,
+      "C3": 3,
+      "C4": 3,
+      "D3": 5,
+      "D4": 0,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Reflection -4",
+    "scores": {
+      "C1": 0,
+      "C3": 0,
+      "C4": 0,
+      "D3": 0,
+      "D4": 0,
+      "D5": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 5,
+      "C3": 5,
+      "C5": 5,
+      "E1": 5,
+      "L1": 5,
+      "N1": 5,
+      "P2": 4,
+      "T1": 4,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3,
+      "C3": 3,
+      "C5": 2,
+      "E1": 3,
+      "L1": 3,
+      "N1": 3,
+      "P2": 2,
+      "T1": 3,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3,
+      "C3": 3,
+      "C5": 3,
+      "E1": 4,
+      "L1": 4,
+      "N1": 3,
+      "P2": 3,
+      "T1": 3,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3,
+      "C3": 3,
+      "C5": 2,
+      "E1": 2,
+      "L1": 2,
+      "N1": 2,
+      "P2": 2,
+      "T1": 2,
+      "D4": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3,
+      "C3": 3,
+      "C5": 3,
+      "E1": 3,
+      "L1": 3,
+      "N1": 2,
+      "P2": 2,
+      "T1": 2,
+      "D4": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 5,
+      "C3": 5,
+      "C5": 5,
+      "E1": 5,
+      "L1": 5,
+      "N1": 4,
+      "P2": 4,
+      "T1": 4,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3,
+      "C3": 4,
+      "C5": 3,
+      "E1": 4,
+      "L1": 4,
+      "N1": 4,
+      "P2": 4,
+      "T1": 4,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3.5,
+      "C3": 3,
+      "C5": 3,
+      "E1": 3,
+      "L1": 3,
+      "N1": 2.5,
+      "P2": 2.5,
+      "T1": 2.5,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 3,
+      "C3": 4,
+      "C5": 3,
+      "E1": 4,
+      "L1": 4,
+      "N1": 3,
+      "P2": 3,
+      "T1": 4,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 2",
+    "intervention": "Capstone",
+    "scores": {
+      "C2": 5,
+      "C3": 5,
+      "C5": 3,
+      "E1": 3,
+      "L1": 3,
+      "N1": 4,
+      "P2": 4,
+      "T1": 4,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "A4": 4,
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 4,
+      "C5": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 4,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 2,
+      "A2": 1,
+      "A3": 2,
+      "A4": 3,
+      "C1": 3,
+      "C2": 2,
+      "C3": 3,
+      "C4": 3,
+      "C5": 2,
+      "E2": 4,
+      "P1": 3,
+      "P2": 3,
+      "P4": 4,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 2,
+      "A2": 1,
+      "A3": 3,
+      "A4": 3,
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 2,
+      "A2": 4,
+      "A3": 2,
+      "A4": 4,
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C4": 3,
+      "C5": 2,
+      "E2": 4,
+      "P1": 3,
+      "P2": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 1,
+      "A4": 1,
+      "C1": 1,
+      "C2": 1,
+      "C3": 1,
+      "C4": 1,
+      "C5": 1,
+      "E2": 1,
+      "P1": 1,
+      "P2": 1,
+      "P4": 1,
+      "T1": 1,
+      "D4": 3,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 4,
+      "A4": 3,
+      "C1": 2,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 2,
+      "E2": 2,
+      "P1": 3,
+      "P2": 4,
+      "P4": 3,
+      "T1": 3,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 2,
+      "A2": 2,
+      "A3": 3,
+      "A4": 3,
+      "C1": 3,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 2,
+      "P4": 4,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 2,
+      "A2": 3,
+      "A3": 2,
+      "A4": 4,
+      "C1": 4,
+      "C2": 2,
+      "C3": 3,
+      "C4": 3,
+      "C5": 4,
+      "E2": 3,
+      "P1": 3,
+      "P2": 3,
+      "P4": 3,
+      "T1": 4,
+      "D4": 3,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 3.5,
+      "A2": 3,
+      "A3": 3.5,
+      "A4": 3.5,
+      "C1": 3.5,
+      "C2": 3.5,
+      "C3": 3.5,
+      "C4": 3,
+      "C5": 3.5,
+      "E2": 3.5,
+      "P1": 3.5,
+      "P2": 3,
+      "P4": 3.5,
+      "T1": 3.5,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 3",
+    "intervention": "Book Review",
+    "scores": {
+      "A1": 3,
+      "A2": 4,
+      "A3": 4,
+      "A4": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 2,
+      "C4": 4,
+      "C5": 5,
+      "E2": 2,
+      "P1": 4,
+      "P2": 4,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 0.5,
+      "C5": 4,
+      "L1": 3,
+      "P1": 4,
+      "P2": 3,
+      "P4": 4,
+      "T1": 3,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 2,
+      "C3": 4,
+      "C4": 1.5,
+      "C5": 2,
+      "L1": 3,
+      "P1": 3,
+      "P2": 2,
+      "P4": 3,
+      "T1": 3,
+      "D4": 4,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 2,
+      "C5": 2,
+      "L1": 3,
+      "P1": 2,
+      "P2": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 2,
+      "C3": 4,
+      "C4": 3,
+      "C5": 2,
+      "L1": 4,
+      "P1": 3,
+      "P2": 3,
+      "P4": 4,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 1,
+      "C1": 1,
+      "C2": 1,
+      "C3": 1,
+      "C4": 1,
+      "C5": 1,
+      "L1": 1,
+      "P1": 1,
+      "P2": 1,
+      "P4": 1,
+      "T1": 1,
+      "D4": 1,
+      "D5": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 4,
+      "L1": 3,
+      "P1": 4,
+      "P2": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 2,
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C4": 2.5,
+      "C5": 2,
+      "L1": 3,
+      "P1": 3,
+      "P2": 2,
+      "P4": 2,
+      "T1": 3,
+      "D4": 4,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 2.5,
+      "C5": 2,
+      "L1": 4,
+      "P1": 4,
+      "P2": 2,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 3.5,
+      "C3": 3.5,
+      "C4": 3.25,
+      "C5": 3,
+      "L1": 3.5,
+      "P1": 3.5,
+      "P2": 3.5,
+      "P4": 3.5,
+      "T1": 3.5,
+      "D4": 3.5,
+      "D5": 3.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 3",
+    "intervention": "Debate",
+    "scores": {
+      "A3": 3,
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C4": 1.5,
+      "C5": 4,
+      "L1": 4,
+      "P1": 4,
+      "P2": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 3,
+      "C5": 3,
+      "E1": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 3,
+      "C2": 2,
+      "C3": 3,
+      "C5": 2,
+      "E1": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C5": 2,
+      "E1": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C5": 2,
+      "E1": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 1,
+      "C2": 1,
+      "C3": 1,
+      "C5": 1,
+      "E1": 1
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 2,
+      "C2": 3,
+      "C3": 2,
+      "C5": 4,
+      "E1": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 3,
+      "C2": 2,
+      "C3": 2,
+      "C5": 2,
+      "E1": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 4,
+      "C2": 2,
+      "C3": 3,
+      "C5": 2,
+      "E1": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 3.5,
+      "C2": 3.5,
+      "C3": 3,
+      "C5": 3,
+      "E1": 3.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 3",
+    "intervention": "GD",
+    "scores": {
+      "C1": 3,
+      "C2": 4,
+      "C3": 3,
+      "C5": 4,
+      "E1": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 2,
+      "A4": 2,
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C4": 4,
+      "C5": 3,
+      "E2": 2,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 2,
+      "A2": 1,
+      "A3": 2,
+      "A4": 3,
+      "C1": 3,
+      "C2": 2,
+      "C3": 3,
+      "C4": 3,
+      "C5": 2,
+      "E2": 4,
+      "P1": 3,
+      "P2": 3,
+      "P3": 4,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 2,
+      "A2": 1,
+      "A3": 3,
+      "A4": 3,
+      "C1": 2,
+      "C2": 3,
+      "C3": 3,
+      "C4": 3,
+      "C5": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 2,
+      "A2": 4,
+      "A3": 2,
+      "A4": 4,
+      "C1": 3,
+      "C2": 3,
+      "C3": 4,
+      "C4": 3,
+      "C5": 2,
+      "E2": 4,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 2
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 1,
+      "A2": 1,
+      "A3": 1,
+      "A4": 1,
+      "C1": 1,
+      "C2": 1,
+      "C3": 1,
+      "C4": 1,
+      "C5": 1,
+      "E2": 1,
+      "P1": 1,
+      "P2": 1,
+      "P3": 1,
+      "P4": 1,
+      "T1": 3,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "A4": 3,
+      "C1": 2,
+      "C2": 3,
+      "C3": 2,
+      "C4": 4,
+      "C5": 2,
+      "E2": 2,
+      "P1": 2,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 2,
+      "A2": 2,
+      "A3": 3,
+      "A4": 3,
+      "C1": 3,
+      "C2": 2,
+      "C3": 2,
+      "C4": 3,
+      "C5": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 2,
+      "P3": 4,
+      "P4": 3,
+      "T1": 3,
+      "D4": 3,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 2,
+      "A2": 3,
+      "A3": 2,
+      "A4": 4,
+      "C1": 4,
+      "C2": 2,
+      "C3": 3,
+      "C4": 3,
+      "C5": 4,
+      "E2": 3,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 4,
+      "T1": 3,
+      "D4": 2,
+      "D5": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 3.5,
+      "A2": 3.5,
+      "A3": 3.5,
+      "A4": 3,
+      "C1": 3.5,
+      "C2": 3.5,
+      "C3": 3.5,
+      "C4": 3,
+      "C5": 3.5,
+      "E2": 3.5,
+      "P1": 3.5,
+      "P2": 3.5,
+      "P3": 3.5,
+      "P4": 3.5,
+      "T1": 3.5,
+      "D4": 3,
+      "D5": 3.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 3",
+    "intervention": "Case study",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "A4": 4,
+      "C1": 3,
+      "C2": 4,
+      "C3": 4,
+      "C4": 4,
+      "C5": 5,
+      "E2": 4,
+      "P1": 4,
+      "P2": 4,
+      "P3": 4,
+      "P4": 4,
+      "T1": 3,
+      "D4": 4,
+      "D5": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00001",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 4,
+      "A2": 4,
+      "A3": 4,
+      "C2": 5,
+      "C3": 5,
+      "E2": 2,
+      "P1": 4,
+      "P2": 4,
+      "P3": 4,
+      "P4": 4,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00002",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "C2": 4,
+      "C3": 4,
+      "E2": 4,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "D4": 4
+    }
+  },
+  {
+    "registrationNo": "2024JULB00003",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 2,
+      "A2": 2,
+      "A3": 2,
+      "C2": 3,
+      "C3": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00004",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 3,
+      "A2": 2,
+      "A3": 3,
+      "C2": 4,
+      "C3": 3,
+      "E2": 4,
+      "P1": 2,
+      "P2": 2,
+      "P3": 2,
+      "P4": 2,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00005",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 0,
+      "A2": 0,
+      "A3": 0,
+      "C2": 0,
+      "C3": 0,
+      "E2": 1,
+      "P1": 0,
+      "P2": 0,
+      "P3": 0,
+      "P4": 0,
+      "D4": 0
+    }
+  },
+  {
+    "registrationNo": "2024JULB00006",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 3,
+      "A2": 4,
+      "A3": 4,
+      "C2": 5,
+      "C3": 4,
+      "E2": 2,
+      "P1": 3,
+      "P2": 5,
+      "P3": 5,
+      "P4": 4,
+      "D4": 5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00007",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 3,
+      "A2": 3,
+      "A3": 3,
+      "C2": 3,
+      "C3": 3,
+      "E2": 3,
+      "P1": 3,
+      "P2": 3,
+      "P3": 3,
+      "P4": 3,
+      "D4": 2.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00008",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 3.5,
+      "A2": 4,
+      "A3": 4.5,
+      "C2": 4,
+      "C3": 4,
+      "E2": 3,
+      "P1": 4.5,
+      "P2": 4,
+      "P3": 4,
+      "P4": 4,
+      "D4": 4.5
+    }
+  },
+  {
+    "registrationNo": "2024JULB00009",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 3.5,
+      "A2": 3,
+      "A3": 4,
+      "C2": 3.5,
+      "C3": 3.5,
+      "E2": 3.5,
+      "P1": 3.5,
+      "P2": 3,
+      "P3": 3.5,
+      "P4": 4,
+      "D4": 3
+    }
+  },
+  {
+    "registrationNo": "2024JULB00012",
+    "level": "Level 3",
+    "intervention": "Capstone",
+    "scores": {
+      "A1": 5,
+      "A2": 4,
+      "A3": 4,
+      "C2": 5,
+      "C3": 5,
+      "E2": 4,
+      "P1": 4,
+      "P2": 4,
+      "P3": 5,
+      "P4": 5,
+      "D4": 4
+    }
+  }
+]

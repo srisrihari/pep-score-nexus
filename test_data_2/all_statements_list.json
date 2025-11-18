@@ -1,0 +1,1152 @@
+[
+  {
+    "index": 1,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 2,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 3,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 4,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 5,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 6,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 7,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 8,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 9,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 10,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n ..."
+  },
+  {
+    "index": 11,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 12,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 13,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 14,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 15,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 16,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 17,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 18,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 19,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 20,
+    "file": "optimized_score_batch_1.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_..."
+  },
+  {
+    "index": 21,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 22,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 23,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 24,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 25,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 26,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 27,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 28,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 29,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 30,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Book Review Presentation (15 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_s..."
+  },
+  {
+    "index": 31,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 32,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 33,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 34,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 35,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 36,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 37,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 38,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 39,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 40,
+    "file": "optimized_score_batch_2.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sco..."
+  },
+  {
+    "index": 41,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 42,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 43,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 44,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 45,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 46,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 47,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 48,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 49,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 50,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Business Proposal Report (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_sc..."
+  },
+  {
+    "index": 51,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 52,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 53,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 54,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 55,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 56,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 57,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 58,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 59,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 60,
+    "file": "optimized_score_batch_3.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Email Writing (4 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 61,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 62,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 63,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 64,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 65,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 66,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 67,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 68,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 69,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 70,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Case Study Analysis (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,..."
+  },
+  {
+    "index": 71,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 72,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 73,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 74,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 75,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 76,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 77,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 78,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 79,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 80,
+    "file": "optimized_score_batch_4.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Debating (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 81,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 82,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 83,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 84,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 85,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 86,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 87,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 88,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 89,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 90,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 91,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 92,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 93,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 94,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 95,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 96,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 97,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 98,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 99,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 100,
+    "file": "optimized_score_batch_5.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 1 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 101,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 102,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 103,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 104,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 105,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 106,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 107,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 108,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 109,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 110,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 2 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 111,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 112,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 113,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 114,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 115,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 116,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 117,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 118,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 119,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 120,
+    "file": "optimized_score_batch_6.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 3 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 121,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 122,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 123,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 124,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 125,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 126,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 127,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 128,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 129,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 130,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 4 (18 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 131,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 132,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 133,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 134,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 135,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 136,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 137,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 138,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 139,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 140,
+    "file": "optimized_score_batch_7.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -1  (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max..."
+  },
+  {
+    "index": 141,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 142,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 143,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 144,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 145,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 146,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 147,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 148,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 149,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 150,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -2 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 151,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 152,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 153,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 154,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 155,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 156,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 157,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 158,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 159,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 160,
+    "file": "optimized_score_batch_8.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -3 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 161,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 162,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 163,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 164,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 165,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 166,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 167,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 168,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 169,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 170,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -4 (6 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_..."
+  },
+  {
+    "index": 171,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 172,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 173,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 174,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 175,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 176,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 177,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 178,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 179,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 180,
+    "file": "optimized_score_batch_9.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Capstone (9 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score..."
+  },
+  {
+    "index": 181,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 182,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 183,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 184,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 185,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 186,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 187,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 188,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 189,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 190,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Book Review (16 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_s..."
+  },
+  {
+    "index": 191,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 192,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 193,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 194,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 195,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 196,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 197,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 198,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 199,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 200,
+    "file": "optimized_score_batch_10.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Debate (13 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,..."
+  },
+  {
+    "index": 201,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 202,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 203,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 204,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 205,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 206,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 207,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 208,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 209,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 210,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: GD (5 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_score,\n  sc..."
+  },
+  {
+    "index": 211,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 212,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 213,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 214,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 215,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 216,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 217,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 218,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 219,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 220,
+    "file": "optimized_score_batch_11.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Case study (17 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_sc..."
+  },
+  {
+    "index": 221,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 222,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 223,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 224,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 225,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 226,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 227,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 228,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 229,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  },
+  {
+    "index": 230,
+    "file": "optimized_score_batch_12.sql",
+    "statement": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Capstone (11 scores)\nINSERT INTO microcompetency_scores (\n  student_id,\n  intervention_id,\n  microcompetency_id,\n  obtained_score,\n  max_scor..."
+  }
+]

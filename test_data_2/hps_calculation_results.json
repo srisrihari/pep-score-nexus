@@ -1,0 +1,452 @@
+[
+  {
+    "student_id": "613b4e1d-331f-4b0a-b6ff-941198610cfb",
+    "student_name": "A Divya Sree",
+    "registration_no": "2024JULB00001",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 66.04563492063494,
+    "success": true
+  },
+  {
+    "student_id": "613b4e1d-331f-4b0a-b6ff-941198610cfb",
+    "student_name": "A Divya Sree",
+    "registration_no": "2024JULB00001",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 60.983333333333334,
+    "success": true
+  },
+  {
+    "student_id": "613b4e1d-331f-4b0a-b6ff-941198610cfb",
+    "student_name": "A Divya Sree",
+    "registration_no": "2024JULB00001",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 68.89625850340137,
+    "success": true
+  },
+  {
+    "student_id": "613b4e1d-331f-4b0a-b6ff-941198610cfb",
+    "student_name": "A Divya Sree",
+    "registration_no": "2024JULB00001",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 43.446851851851854,
+    "success": true
+  },
+  {
+    "student_id": "613b4e1d-331f-4b0a-b6ff-941198610cfb",
+    "student_name": "A Divya Sree",
+    "registration_no": "2024JULB00001",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 48.231944444444444,
+    "success": true
+  },
+  {
+    "student_id": "4a4fff20-6685-4331-8db8-091471ad98fa",
+    "student_name": "Aaditya K",
+    "registration_no": "2024JULB00002",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 59.55357142857144,
+    "success": true
+  },
+  {
+    "student_id": "4a4fff20-6685-4331-8db8-091471ad98fa",
+    "student_name": "Aaditya K",
+    "registration_no": "2024JULB00002",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 51.83333333333333,
+    "success": true
+  },
+  {
+    "student_id": "4a4fff20-6685-4331-8db8-091471ad98fa",
+    "student_name": "Aaditya K",
+    "registration_no": "2024JULB00002",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 58.85214285714286,
+    "success": true
+  },
+  {
+    "student_id": "4a4fff20-6685-4331-8db8-091471ad98fa",
+    "student_name": "Aaditya K",
+    "registration_no": "2024JULB00002",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 29.52166666666666,
+    "success": true
+  },
+  {
+    "student_id": "4a4fff20-6685-4331-8db8-091471ad98fa",
+    "student_name": "Aaditya K",
+    "registration_no": "2024JULB00002",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 56.72,
+    "success": true
+  },
+  {
+    "student_id": "a2d12128-3445-4f49-a757-54a4e723fad1",
+    "student_name": "Aanchal Sapra",
+    "registration_no": "2024JULB00003",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 44.92460317460318,
+    "success": true
+  },
+  {
+    "student_id": "a2d12128-3445-4f49-a757-54a4e723fad1",
+    "student_name": "Aanchal Sapra",
+    "registration_no": "2024JULB00003",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 60.53,
+    "success": true
+  },
+  {
+    "student_id": "a2d12128-3445-4f49-a757-54a4e723fad1",
+    "student_name": "Aanchal Sapra",
+    "registration_no": "2024JULB00003",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 36.37476190476191,
+    "success": true
+  },
+  {
+    "student_id": "a2d12128-3445-4f49-a757-54a4e723fad1",
+    "student_name": "Aanchal Sapra",
+    "registration_no": "2024JULB00003",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 28.000370370370373,
+    "success": true
+  },
+  {
+    "student_id": "a2d12128-3445-4f49-a757-54a4e723fad1",
+    "student_name": "Aanchal Sapra",
+    "registration_no": "2024JULB00003",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 42.06944444444445,
+    "success": true
+  },
+  {
+    "student_id": "9fa5d66f-23db-4f14-87bf-815e6249ce10",
+    "student_name": "Abhinav B",
+    "registration_no": "2024JULB00004",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 36.83849206349206,
+    "success": true
+  },
+  {
+    "student_id": "9fa5d66f-23db-4f14-87bf-815e6249ce10",
+    "student_name": "Abhinav B",
+    "registration_no": "2024JULB00004",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 61.5,
+    "success": true
+  },
+  {
+    "student_id": "9fa5d66f-23db-4f14-87bf-815e6249ce10",
+    "student_name": "Abhinav B",
+    "registration_no": "2024JULB00004",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 32.18309523809524,
+    "success": true
+  },
+  {
+    "student_id": "9fa5d66f-23db-4f14-87bf-815e6249ce10",
+    "student_name": "Abhinav B",
+    "registration_no": "2024JULB00004",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 43.75055555555556,
+    "success": true
+  },
+  {
+    "student_id": "9fa5d66f-23db-4f14-87bf-815e6249ce10",
+    "student_name": "Abhinav B",
+    "registration_no": "2024JULB00004",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 58.31944444444444,
+    "success": true
+  },
+  {
+    "student_id": "725bb3df-3cfb-4b10-a9c1-a48875a6c8c2",
+    "student_name": "Abhirup Choudhury",
+    "registration_no": "2024JULB00005",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 0,
+    "success": true
+  },
+  {
+    "student_id": "725bb3df-3cfb-4b10-a9c1-a48875a6c8c2",
+    "student_name": "Abhirup Choudhury",
+    "registration_no": "2024JULB00005",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 36,
+    "success": true
+  },
+  {
+    "student_id": "725bb3df-3cfb-4b10-a9c1-a48875a6c8c2",
+    "student_name": "Abhirup Choudhury",
+    "registration_no": "2024JULB00005",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 4.571428571428572,
+    "success": true
+  },
+  {
+    "student_id": "725bb3df-3cfb-4b10-a9c1-a48875a6c8c2",
+    "student_name": "Abhirup Choudhury",
+    "registration_no": "2024JULB00005",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 52.94444444444444,
+    "success": true
+  },
+  {
+    "student_id": "725bb3df-3cfb-4b10-a9c1-a48875a6c8c2",
+    "student_name": "Abhirup Choudhury",
+    "registration_no": "2024JULB00005",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 22.625,
+    "success": true
+  },
+  {
+    "student_id": "b294952f-dd1f-45d3-a814-0dc1d0c7b625",
+    "student_name": "Abhyuday Tripathi",
+    "registration_no": "2024JULB00006",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 47.30357142857144,
+    "success": true
+  },
+  {
+    "student_id": "b294952f-dd1f-45d3-a814-0dc1d0c7b625",
+    "student_name": "Abhyuday Tripathi",
+    "registration_no": "2024JULB00006",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 64.07,
+    "success": true
+  },
+  {
+    "student_id": "b294952f-dd1f-45d3-a814-0dc1d0c7b625",
+    "student_name": "Abhyuday Tripathi",
+    "registration_no": "2024JULB00006",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 44.80214285714286,
+    "success": true
+  },
+  {
+    "student_id": "b294952f-dd1f-45d3-a814-0dc1d0c7b625",
+    "student_name": "Abhyuday Tripathi",
+    "registration_no": "2024JULB00006",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 37.4787037037037,
+    "success": true
+  },
+  {
+    "student_id": "b294952f-dd1f-45d3-a814-0dc1d0c7b625",
+    "student_name": "Abhyuday Tripathi",
+    "registration_no": "2024JULB00006",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 61.47166666666668,
+    "success": true
+  },
+  {
+    "student_id": "d852a168-d8ce-440d-8de5-8b189a567388",
+    "student_name": "Adarsh G",
+    "registration_no": "2024JULB00007",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 57.426587301587304,
+    "success": true
+  },
+  {
+    "student_id": "d852a168-d8ce-440d-8de5-8b189a567388",
+    "student_name": "Adarsh G",
+    "registration_no": "2024JULB00007",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 51.7,
+    "success": true
+  },
+  {
+    "student_id": "d852a168-d8ce-440d-8de5-8b189a567388",
+    "student_name": "Adarsh G",
+    "registration_no": "2024JULB00007",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 56.155952380952385,
+    "success": true
+  },
+  {
+    "student_id": "d852a168-d8ce-440d-8de5-8b189a567388",
+    "student_name": "Adarsh G",
+    "registration_no": "2024JULB00007",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 38.24420634920635,
+    "success": true
+  },
+  {
+    "student_id": "d852a168-d8ce-440d-8de5-8b189a567388",
+    "student_name": "Adarsh G",
+    "registration_no": "2024JULB00007",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 50.75888888888889,
+    "success": true
+  },
+  {
+    "student_id": "a98a3174-4877-487a-aeb2-d508339707b1",
+    "student_name": "Adarsh Raj Barman",
+    "registration_no": "2024JULB00008",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 54.47023809523809,
+    "success": true
+  },
+  {
+    "student_id": "a98a3174-4877-487a-aeb2-d508339707b1",
+    "student_name": "Adarsh Raj Barman",
+    "registration_no": "2024JULB00008",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 56.58533333333334,
+    "success": true
+  },
+  {
+    "student_id": "a98a3174-4877-487a-aeb2-d508339707b1",
+    "student_name": "Adarsh Raj Barman",
+    "registration_no": "2024JULB00008",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 52.06214285714285,
+    "success": true
+  },
+  {
+    "student_id": "a98a3174-4877-487a-aeb2-d508339707b1",
+    "student_name": "Adarsh Raj Barman",
+    "registration_no": "2024JULB00008",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 50.89599206349206,
+    "success": true
+  },
+  {
+    "student_id": "a98a3174-4877-487a-aeb2-d508339707b1",
+    "student_name": "Adarsh Raj Barman",
+    "registration_no": "2024JULB00008",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 57.32722222222222,
+    "success": true
+  },
+  {
+    "student_id": "65e8800b-9eed-4990-9b21-b1a8cd7583ea",
+    "student_name": "Aditi Kumari",
+    "registration_no": "2024JULB00009",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 48.89007936507937,
+    "success": true
+  },
+  {
+    "student_id": "65e8800b-9eed-4990-9b21-b1a8cd7583ea",
+    "student_name": "Aditi Kumari",
+    "registration_no": "2024JULB00009",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 55.35,
+    "success": true
+  },
+  {
+    "student_id": "65e8800b-9eed-4990-9b21-b1a8cd7583ea",
+    "student_name": "Aditi Kumari",
+    "registration_no": "2024JULB00009",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 50.53404761904763,
+    "success": true
+  },
+  {
+    "student_id": "65e8800b-9eed-4990-9b21-b1a8cd7583ea",
+    "student_name": "Aditi Kumari",
+    "registration_no": "2024JULB00009",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 51.8639947089947,
+    "success": true
+  },
+  {
+    "student_id": "65e8800b-9eed-4990-9b21-b1a8cd7583ea",
+    "student_name": "Aditi Kumari",
+    "registration_no": "2024JULB00009",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 62.66597222222223,
+    "success": true
+  },
+  {
+    "student_id": "32b6f5d2-4c03-409e-87f4-da87ca94dab3",
+    "student_name": "Akarsh Narain",
+    "registration_no": "2024JULB00012",
+    "term_id": "033dad1c-da84-4e90-b867-f7f0b3b2f664",
+    "term_name": "Level 1",
+    "hps_score": 60.78968253968254,
+    "success": true
+  },
+  {
+    "student_id": "32b6f5d2-4c03-409e-87f4-da87ca94dab3",
+    "student_name": "Akarsh Narain",
+    "registration_no": "2024JULB00012",
+    "term_id": "a83328b8-fad6-4e5b-b3d3-f0e6e11967d8",
+    "term_name": "Level 0",
+    "hps_score": 64.73,
+    "success": true
+  },
+  {
+    "student_id": "32b6f5d2-4c03-409e-87f4-da87ca94dab3",
+    "student_name": "Akarsh Narain",
+    "registration_no": "2024JULB00012",
+    "term_id": "ea9a7617-a53e-421f-bf8b-13a0fb908b55",
+    "term_name": "Level 1",
+    "hps_score": 47.593809523809526,
+    "success": true
+  },
+  {
+    "student_id": "32b6f5d2-4c03-409e-87f4-da87ca94dab3",
+    "student_name": "Akarsh Narain",
+    "registration_no": "2024JULB00012",
+    "term_id": "b92e022b-078e-45ee-aff3-c1c6761fb17e",
+    "term_name": "Level 2",
+    "hps_score": 40.262830687830686,
+    "success": true
+  },
+  {
+    "student_id": "32b6f5d2-4c03-409e-87f4-da87ca94dab3",
+    "student_name": "Akarsh Narain",
+    "registration_no": "2024JULB00012",
+    "term_id": "4f49e30e-27df-47b8-bede-e0c0c2a988dc",
+    "term_name": "Level 3",
+    "hps_score": 56.98416666666667,
+    "success": true
+  }
+]

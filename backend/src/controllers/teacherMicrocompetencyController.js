@@ -76,6 +76,7 @@ const getTeacherInterventions = async (req, res) => {
 
     // Remove duplicates and format data (one assignment per intervention now)
     const uniqueInterventions = {};
+    const assignmentIds = [];
     result.rows.forEach(row => {
       const intervention = row.interventions;
       if (intervention && !uniqueInterventions[intervention.id]) {
@@ -86,12 +87,14 @@ const getTeacherInterventions = async (req, res) => {
           can_create_tasks: row.can_create_tasks,
           assigned_at: row.assigned_at
         };
+        assignmentIds.push(row.id);
       }
     });
 
-    // Get microcompetency counts for each intervention (from intervention_microcompetencies)
+    // Get microcompetency counts and enrollment counts for each intervention
     const interventionIds = Object.keys(uniqueInterventions);
     if (interventionIds.length > 0) {
+      // Get microcompetency counts
       const microcompetencyCounts = await query(
         supabase
           .from('intervention_microcompetencies')
@@ -106,8 +109,27 @@ const getTeacherInterventions = async (req, res) => {
         return acc;
       }, {});
 
+      // Get enrollment counts per intervention (for this teacher's assignments)
+      // Use student_interventions as the source of truth, filtered by intervention_id
+      const enrollmentCounts = await query(
+        supabase
+          .from('student_interventions')
+          .select('intervention_id, student_id')
+          .in('intervention_id', interventionIds)
+      );
+
+      // Count distinct students per intervention
+      const enrollmentCountsByIntervention = {};
+      (enrollmentCounts.rows || []).forEach(row => {
+        if (!enrollmentCountsByIntervention[row.intervention_id]) {
+          enrollmentCountsByIntervention[row.intervention_id] = new Set();
+        }
+        enrollmentCountsByIntervention[row.intervention_id].add(row.student_id);
+      });
+
       Object.values(uniqueInterventions).forEach(intervention => {
         intervention.assigned_microcompetencies_count = countsByIntervention[intervention.id] || 0;
+        intervention.enrolled_students_count = enrollmentCountsByIntervention[intervention.id]?.size || 0;
       });
     }
 

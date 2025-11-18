@@ -1,0 +1,691 @@
+{
+  "comparison": [
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 0",
+      "calculated_hps": 52.35333333333333,
+      "excel_hps": 55.73611111111111,
+      "difference": 3.3827777777777754,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 1",
+      "calculated_hps": 68.89625850340137,
+      "excel_hps": 53.71,
+      "difference": 15.186258503401369,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 2",
+      "calculated_hps": 43.446851851851854,
+      "excel_hps": 55.52777777777777,
+      "difference": 12.080925925925918,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 3",
+      "calculated_hps": 48.231944444444444,
+      "excel_hps": 53.57592592592592,
+      "difference": 5.343981481481478,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 0",
+      "calculated_hps": 53.15333333333333,
+      "excel_hps": 57.19444444444444,
+      "difference": 4.041111111111114,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 1",
+      "calculated_hps": 58.85214285714286,
+      "excel_hps": 65.31904761904762,
+      "difference": 6.466904761904765,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 2",
+      "calculated_hps": 29.52166666666666,
+      "excel_hps": 36.35777777777778,
+      "difference": 6.836111111111116,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 3",
+      "calculated_hps": 56.72,
+      "excel_hps": 58.859259259259254,
+      "difference": 2.139259259259255,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 0",
+      "calculated_hps": 54.18000000000001,
+      "excel_hps": 54.20833333333333,
+      "difference": 0.028333333333321775,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 1",
+      "calculated_hps": 36.37476190476191,
+      "excel_hps": 44.43583333333333,
+      "difference": 8.061071428571417,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 2",
+      "calculated_hps": 28.000370370370373,
+      "excel_hps": 35.117777777777775,
+      "difference": 7.117407407407402,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 3",
+      "calculated_hps": 42.06944444444445,
+      "excel_hps": 38.742592592592594,
+      "difference": 3.326851851851856,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 0",
+      "calculated_hps": 63.019999999999996,
+      "excel_hps": 64.08333333333333,
+      "difference": 1.0633333333333326,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 1",
+      "calculated_hps": 32.18309523809524,
+      "excel_hps": 46.65452380952381,
+      "difference": 14.471428571428568,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 2",
+      "calculated_hps": 43.75055555555556,
+      "excel_hps": 46.437777777777775,
+      "difference": 2.6872222222222177,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 3",
+      "calculated_hps": 58.31944444444444,
+      "excel_hps": 55.72962962962963,
+      "difference": 2.5898148148148152,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 0",
+      "calculated_hps": 36,
+      "excel_hps": 7.5,
+      "difference": 28.5,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 1",
+      "calculated_hps": 4.571428571428572,
+      "excel_hps": 3.1999999999999997,
+      "difference": 1.3714285714285723,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 2",
+      "calculated_hps": 52.94444444444444,
+      "excel_hps": 29.00444444444445,
+      "difference": 23.939999999999994,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 3",
+      "calculated_hps": 22.625,
+      "excel_hps": 6.044444444444446,
+      "difference": 16.580555555555556,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 0",
+      "calculated_hps": 62.81999999999999,
+      "excel_hps": 66.29166666666666,
+      "difference": 3.471666666666664,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 1",
+      "calculated_hps": 44.80214285714286,
+      "excel_hps": 58.27571428571429,
+      "difference": 13.473571428571425,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 2",
+      "calculated_hps": 37.4787037037037,
+      "excel_hps": 49.946666666666665,
+      "difference": 12.467962962962964,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 3",
+      "calculated_hps": 61.47166666666668,
+      "excel_hps": 66.86574074074073,
+      "difference": 5.394074074074055,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 0",
+      "calculated_hps": 56.2,
+      "excel_hps": 59.541666666666664,
+      "difference": 3.3416666666666615,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 1",
+      "calculated_hps": 56.155952380952385,
+      "excel_hps": 67.37607142857144,
+      "difference": 11.22011904761905,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 2",
+      "calculated_hps": 38.24420634920635,
+      "excel_hps": 43.43333333333333,
+      "difference": 5.189126984126979,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 3",
+      "calculated_hps": 50.75888888888889,
+      "excel_hps": 50.23796296296296,
+      "difference": 0.5209259259259298,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 0",
+      "calculated_hps": 54.68533333333333,
+      "excel_hps": 57.32093253968254,
+      "difference": 2.6355992063492053,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 1",
+      "calculated_hps": 52.06214285714285,
+      "excel_hps": 60.90238095238095,
+      "difference": 8.8402380952381,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 2",
+      "calculated_hps": 50.89599206349206,
+      "excel_hps": 48.815555555555555,
+      "difference": 2.080436507936504,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 3",
+      "calculated_hps": 57.32722222222222,
+      "excel_hps": 59.96388888888888,
+      "difference": 2.636666666666663,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 0",
+      "calculated_hps": 53.580000000000005,
+      "excel_hps": 55.58333333333333,
+      "difference": 2.003333333333323,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 1",
+      "calculated_hps": 50.53404761904763,
+      "excel_hps": 61.93880952380953,
+      "difference": 11.404761904761905,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 2",
+      "calculated_hps": 51.8639947089947,
+      "excel_hps": 55.16333333333333,
+      "difference": 3.299338624338624,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 3",
+      "calculated_hps": 62.66597222222223,
+      "excel_hps": 62.644444444444446,
+      "difference": 0.02152777777778425,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 0",
+      "calculated_hps": 61.980000000000004,
+      "excel_hps": 66.875,
+      "difference": 4.894999999999996,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 1",
+      "calculated_hps": 47.593809523809526,
+      "excel_hps": 54.611428571428576,
+      "difference": 7.01761904761905,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 2",
+      "calculated_hps": 40.262830687830686,
+      "excel_hps": 46.63888888888888,
+      "difference": 6.376058201058193,
+      "match": false
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 3",
+      "calculated_hps": 56.98416666666667,
+      "excel_hps": 60.65185185185185,
+      "difference": 3.667685185185185,
+      "match": false
+    }
+  ],
+  "discrepancies": [
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 0",
+      "calculated_hps": "52.35",
+      "excel_hps": 55.73611111111111,
+      "difference": "3.38"
+    },
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 1",
+      "calculated_hps": "68.90",
+      "excel_hps": 53.71,
+      "difference": "15.19"
+    },
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 2",
+      "calculated_hps": "43.45",
+      "excel_hps": 55.52777777777777,
+      "difference": "12.08"
+    },
+    {
+      "registration_no": "2024JULB00001",
+      "student_name": "A Divya Sree",
+      "level": "Level 3",
+      "calculated_hps": "48.23",
+      "excel_hps": 53.57592592592592,
+      "difference": "5.34"
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 0",
+      "calculated_hps": "53.15",
+      "excel_hps": 57.19444444444444,
+      "difference": "4.04"
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 1",
+      "calculated_hps": "58.85",
+      "excel_hps": 65.31904761904762,
+      "difference": "6.47"
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 2",
+      "calculated_hps": "29.52",
+      "excel_hps": 36.35777777777778,
+      "difference": "6.84"
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "student_name": "Aaditya K",
+      "level": "Level 3",
+      "calculated_hps": "56.72",
+      "excel_hps": 58.859259259259254,
+      "difference": "2.14"
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 0",
+      "calculated_hps": "54.18",
+      "excel_hps": 54.20833333333333,
+      "difference": "0.03"
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 1",
+      "calculated_hps": "36.37",
+      "excel_hps": 44.43583333333333,
+      "difference": "8.06"
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 2",
+      "calculated_hps": "28.00",
+      "excel_hps": 35.117777777777775,
+      "difference": "7.12"
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "student_name": "Aanchal Sapra",
+      "level": "Level 3",
+      "calculated_hps": "42.07",
+      "excel_hps": 38.742592592592594,
+      "difference": "3.33"
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 0",
+      "calculated_hps": "63.02",
+      "excel_hps": 64.08333333333333,
+      "difference": "1.06"
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 1",
+      "calculated_hps": "32.18",
+      "excel_hps": 46.65452380952381,
+      "difference": "14.47"
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 2",
+      "calculated_hps": "43.75",
+      "excel_hps": 46.437777777777775,
+      "difference": "2.69"
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "student_name": "Abhinav B",
+      "level": "Level 3",
+      "calculated_hps": "58.32",
+      "excel_hps": 55.72962962962963,
+      "difference": "2.59"
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 0",
+      "calculated_hps": "36.00",
+      "excel_hps": 7.5,
+      "difference": "28.50"
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 1",
+      "calculated_hps": "4.57",
+      "excel_hps": 3.1999999999999997,
+      "difference": "1.37"
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 2",
+      "calculated_hps": "52.94",
+      "excel_hps": 29.00444444444445,
+      "difference": "23.94"
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "student_name": "Abhirup Choudhury",
+      "level": "Level 3",
+      "calculated_hps": "22.63",
+      "excel_hps": 6.044444444444446,
+      "difference": "16.58"
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 0",
+      "calculated_hps": "62.82",
+      "excel_hps": 66.29166666666666,
+      "difference": "3.47"
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 1",
+      "calculated_hps": "44.80",
+      "excel_hps": 58.27571428571429,
+      "difference": "13.47"
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 2",
+      "calculated_hps": "37.48",
+      "excel_hps": 49.946666666666665,
+      "difference": "12.47"
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "student_name": "Abhyuday Tripathi",
+      "level": "Level 3",
+      "calculated_hps": "61.47",
+      "excel_hps": 66.86574074074073,
+      "difference": "5.39"
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 0",
+      "calculated_hps": "56.20",
+      "excel_hps": 59.541666666666664,
+      "difference": "3.34"
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 1",
+      "calculated_hps": "56.16",
+      "excel_hps": 67.37607142857144,
+      "difference": "11.22"
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 2",
+      "calculated_hps": "38.24",
+      "excel_hps": 43.43333333333333,
+      "difference": "5.19"
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "student_name": "Adarsh G",
+      "level": "Level 3",
+      "calculated_hps": "50.76",
+      "excel_hps": 50.23796296296296,
+      "difference": "0.52"
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 0",
+      "calculated_hps": "54.69",
+      "excel_hps": 57.32093253968254,
+      "difference": "2.64"
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 1",
+      "calculated_hps": "52.06",
+      "excel_hps": 60.90238095238095,
+      "difference": "8.84"
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 2",
+      "calculated_hps": "50.90",
+      "excel_hps": 48.815555555555555,
+      "difference": "2.08"
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "student_name": "Adarsh Raj Barman",
+      "level": "Level 3",
+      "calculated_hps": "57.33",
+      "excel_hps": 59.96388888888888,
+      "difference": "2.64"
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 0",
+      "calculated_hps": "53.58",
+      "excel_hps": 55.58333333333333,
+      "difference": "2.00"
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 1",
+      "calculated_hps": "50.53",
+      "excel_hps": 61.93880952380953,
+      "difference": "11.40"
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 2",
+      "calculated_hps": "51.86",
+      "excel_hps": 55.16333333333333,
+      "difference": "3.30"
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "student_name": "Aditi Kumari",
+      "level": "Level 3",
+      "calculated_hps": "62.67",
+      "excel_hps": 62.644444444444446,
+      "difference": "0.02"
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 0",
+      "calculated_hps": "61.98",
+      "excel_hps": 66.875,
+      "difference": "4.89"
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 1",
+      "calculated_hps": "47.59",
+      "excel_hps": 54.611428571428576,
+      "difference": "7.02"
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 2",
+      "calculated_hps": "40.26",
+      "excel_hps": 46.63888888888888,
+      "difference": "6.38"
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "student_name": "Akarsh Narain",
+      "level": "Level 3",
+      "calculated_hps": "56.98",
+      "excel_hps": 60.65185185185185,
+      "difference": "3.67"
+    }
+  ],
+  "summary": {
+    "total_comparisons": 40,
+    "matches": 0,
+    "discrepancies_count": 40
+  }
+}

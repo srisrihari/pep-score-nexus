@@ -1,0 +1,1616 @@
+{
+  "totalBatches": 23,
+  "totalStatements": 230,
+  "statements": [
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 1,
+      "filename": "stmt_0001_batch1_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 2,
+      "filename": "stmt_0002_batch1_stmt2.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 3,
+      "filename": "stmt_0003_batch1_stmt3.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 4,
+      "filename": "stmt_0004_batch1_stmt4.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 5,
+      "filename": "stmt_0005_batch1_stmt5.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 6,
+      "filename": "stmt_0006_batch1_stmt6.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 7,
+      "filename": "stmt_0007_batch1_stmt7.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 8,
+      "filename": "stmt_0008_batch1_stmt8.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 9,
+      "filename": "stmt_0009_batch1_stmt9.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_1.sql",
+      "batchIndex": 1,
+      "statementIndex": 10,
+      "filename": "stmt_0010_batch1_stmt10.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 0 | Intervention: Fearless (Level 0) (5 scores) INSERT INTO microcompetency_scores (   student_id,   interven"
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 1,
+      "filename": "stmt_0011_batch2_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 2,
+      "filename": "stmt_0012_batch2_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 3,
+      "filename": "stmt_0013_batch2_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 4,
+      "filename": "stmt_0014_batch2_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 5,
+      "filename": "stmt_0015_batch2_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 6,
+      "filename": "stmt_0016_batch2_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 7,
+      "filename": "stmt_0017_batch2_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 8,
+      "filename": "stmt_0018_batch2_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 9,
+      "filename": "stmt_0019_batch2_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_2.sql",
+      "batchIndex": 2,
+      "statementIndex": 10,
+      "filename": "stmt_0020_batch2_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Storytelling Presentation (17 scores) INSERT INTO microcompetency_scores (   student_id,   "
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 1,
+      "filename": "stmt_0021_batch3_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 2,
+      "filename": "stmt_0022_batch3_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 3,
+      "filename": "stmt_0023_batch3_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 4,
+      "filename": "stmt_0024_batch3_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 5,
+      "filename": "stmt_0025_batch3_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 6,
+      "filename": "stmt_0026_batch3_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 7,
+      "filename": "stmt_0027_batch3_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 8,
+      "filename": "stmt_0028_batch3_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 9,
+      "filename": "stmt_0029_batch3_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_3.sql",
+      "batchIndex": 3,
+      "statementIndex": 10,
+      "filename": "stmt_0030_batch3_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Book Review Presentation (15 scores) INSERT INTO microcompetency_scores (   student_id,   i"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 1,
+      "filename": "stmt_0031_batch4_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 2,
+      "filename": "stmt_0032_batch4_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 3,
+      "filename": "stmt_0033_batch4_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 4,
+      "filename": "stmt_0034_batch4_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 5,
+      "filename": "stmt_0035_batch4_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 6,
+      "filename": "stmt_0036_batch4_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 7,
+      "filename": "stmt_0037_batch4_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 8,
+      "filename": "stmt_0038_batch4_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 9,
+      "filename": "stmt_0039_batch4_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_4.sql",
+      "batchIndex": 4,
+      "statementIndex": 10,
+      "filename": "stmt_0040_batch4_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Interpersonal Role Play (4 scores) INSERT INTO microcompetency_scores (   student_id,   int"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 1,
+      "filename": "stmt_0041_batch5_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 2,
+      "filename": "stmt_0042_batch5_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 3,
+      "filename": "stmt_0043_batch5_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 4,
+      "filename": "stmt_0044_batch5_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 5,
+      "filename": "stmt_0045_batch5_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 6,
+      "filename": "stmt_0046_batch5_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 7,
+      "filename": "stmt_0047_batch5_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 8,
+      "filename": "stmt_0048_batch5_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 9,
+      "filename": "stmt_0049_batch5_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_5.sql",
+      "batchIndex": 5,
+      "statementIndex": 10,
+      "filename": "stmt_0050_batch5_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Business Proposal Report (9 scores) INSERT INTO microcompetency_scores (   student_id,   in"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 1,
+      "filename": "stmt_0051_batch6_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 2,
+      "filename": "stmt_0052_batch6_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 3,
+      "filename": "stmt_0053_batch6_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 4,
+      "filename": "stmt_0054_batch6_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 5,
+      "filename": "stmt_0055_batch6_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 6,
+      "filename": "stmt_0056_batch6_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 7,
+      "filename": "stmt_0057_batch6_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 8,
+      "filename": "stmt_0058_batch6_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 9,
+      "filename": "stmt_0059_batch6_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_6.sql",
+      "batchIndex": 6,
+      "statementIndex": 10,
+      "filename": "stmt_0060_batch6_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Email Writing (4 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 1,
+      "filename": "stmt_0061_batch7_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 2,
+      "filename": "stmt_0062_batch7_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 3,
+      "filename": "stmt_0063_batch7_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 4,
+      "filename": "stmt_0064_batch7_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 5,
+      "filename": "stmt_0065_batch7_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 6,
+      "filename": "stmt_0066_batch7_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 7,
+      "filename": "stmt_0067_batch7_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 8,
+      "filename": "stmt_0068_batch7_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 9,
+      "filename": "stmt_0069_batch7_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_7.sql",
+      "batchIndex": 7,
+      "statementIndex": 10,
+      "filename": "stmt_0070_batch7_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Case Study Analysis (11 scores) INSERT INTO microcompetency_scores (   student_id,   interv"
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 1,
+      "filename": "stmt_0071_batch8_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 2,
+      "filename": "stmt_0072_batch8_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 3,
+      "filename": "stmt_0073_batch8_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 4,
+      "filename": "stmt_0074_batch8_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 5,
+      "filename": "stmt_0075_batch8_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 6,
+      "filename": "stmt_0076_batch8_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 7,
+      "filename": "stmt_0077_batch8_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 8,
+      "filename": "stmt_0078_batch8_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 9,
+      "filename": "stmt_0079_batch8_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_8.sql",
+      "batchIndex": 8,
+      "statementIndex": 10,
+      "filename": "stmt_0080_batch8_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Debating (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 1,
+      "filename": "stmt_0081_batch9_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 2,
+      "filename": "stmt_0082_batch9_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 3,
+      "filename": "stmt_0083_batch9_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 4,
+      "filename": "stmt_0084_batch9_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 5,
+      "filename": "stmt_0085_batch9_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 6,
+      "filename": "stmt_0086_batch9_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 7,
+      "filename": "stmt_0087_batch9_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 8,
+      "filename": "stmt_0088_batch9_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 9,
+      "filename": "stmt_0089_batch9_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_9.sql",
+      "batchIndex": 9,
+      "statementIndex": 10,
+      "filename": "stmt_0090_batch9_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 1 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 1,
+      "filename": "stmt_0091_batch10_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 2,
+      "filename": "stmt_0092_batch10_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 3,
+      "filename": "stmt_0093_batch10_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 4,
+      "filename": "stmt_0094_batch10_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 5,
+      "filename": "stmt_0095_batch10_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 6,
+      "filename": "stmt_0096_batch10_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 7,
+      "filename": "stmt_0097_batch10_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 8,
+      "filename": "stmt_0098_batch10_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 9,
+      "filename": "stmt_0099_batch10_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_10.sql",
+      "batchIndex": 10,
+      "statementIndex": 10,
+      "filename": "stmt_0100_batch10_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 1 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 1,
+      "filename": "stmt_0101_batch11_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 2,
+      "filename": "stmt_0102_batch11_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 3,
+      "filename": "stmt_0103_batch11_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 4,
+      "filename": "stmt_0104_batch11_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 5,
+      "filename": "stmt_0105_batch11_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 6,
+      "filename": "stmt_0106_batch11_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 7,
+      "filename": "stmt_0107_batch11_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 8,
+      "filename": "stmt_0108_batch11_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 9,
+      "filename": "stmt_0109_batch11_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_11.sql",
+      "batchIndex": 11,
+      "statementIndex": 10,
+      "filename": "stmt_0110_batch11_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 2 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 1,
+      "filename": "stmt_0111_batch12_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 2,
+      "filename": "stmt_0112_batch12_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 3,
+      "filename": "stmt_0113_batch12_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 4,
+      "filename": "stmt_0114_batch12_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 5,
+      "filename": "stmt_0115_batch12_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 6,
+      "filename": "stmt_0116_batch12_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 7,
+      "filename": "stmt_0117_batch12_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 8,
+      "filename": "stmt_0118_batch12_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 9,
+      "filename": "stmt_0119_batch12_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_12.sql",
+      "batchIndex": 12,
+      "statementIndex": 10,
+      "filename": "stmt_0120_batch12_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 3 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 1,
+      "filename": "stmt_0121_batch13_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 2,
+      "filename": "stmt_0122_batch13_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 3,
+      "filename": "stmt_0123_batch13_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 4,
+      "filename": "stmt_0124_batch13_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 5,
+      "filename": "stmt_0125_batch13_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 6,
+      "filename": "stmt_0126_batch13_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 7,
+      "filename": "stmt_0127_batch13_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 8,
+      "filename": "stmt_0128_batch13_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 9,
+      "filename": "stmt_0129_batch13_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_13.sql",
+      "batchIndex": 13,
+      "statementIndex": 10,
+      "filename": "stmt_0130_batch13_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Review 4 (18 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 1,
+      "filename": "stmt_0131_batch14_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 2,
+      "filename": "stmt_0132_batch14_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 3,
+      "filename": "stmt_0133_batch14_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 4,
+      "filename": "stmt_0134_batch14_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 5,
+      "filename": "stmt_0135_batch14_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 6,
+      "filename": "stmt_0136_batch14_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 7,
+      "filename": "stmt_0137_batch14_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 8,
+      "filename": "stmt_0138_batch14_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 9,
+      "filename": "stmt_0139_batch14_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_14.sql",
+      "batchIndex": 14,
+      "statementIndex": 10,
+      "filename": "stmt_0140_batch14_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -1  (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 1,
+      "filename": "stmt_0141_batch15_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 2,
+      "filename": "stmt_0142_batch15_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 3,
+      "filename": "stmt_0143_batch15_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 4,
+      "filename": "stmt_0144_batch15_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 5,
+      "filename": "stmt_0145_batch15_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 6,
+      "filename": "stmt_0146_batch15_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 7,
+      "filename": "stmt_0147_batch15_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 8,
+      "filename": "stmt_0148_batch15_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 9,
+      "filename": "stmt_0149_batch15_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_15.sql",
+      "batchIndex": 15,
+      "statementIndex": 10,
+      "filename": "stmt_0150_batch15_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -2 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 1,
+      "filename": "stmt_0151_batch16_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 2,
+      "filename": "stmt_0152_batch16_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 3,
+      "filename": "stmt_0153_batch16_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 4,
+      "filename": "stmt_0154_batch16_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 5,
+      "filename": "stmt_0155_batch16_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 6,
+      "filename": "stmt_0156_batch16_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 7,
+      "filename": "stmt_0157_batch16_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 8,
+      "filename": "stmt_0158_batch16_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 9,
+      "filename": "stmt_0159_batch16_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_16.sql",
+      "batchIndex": 16,
+      "statementIndex": 10,
+      "filename": "stmt_0160_batch16_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -3 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 1,
+      "filename": "stmt_0161_batch17_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 2,
+      "filename": "stmt_0162_batch17_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 3,
+      "filename": "stmt_0163_batch17_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 4,
+      "filename": "stmt_0164_batch17_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 5,
+      "filename": "stmt_0165_batch17_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 6,
+      "filename": "stmt_0166_batch17_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 7,
+      "filename": "stmt_0167_batch17_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 8,
+      "filename": "stmt_0168_batch17_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 9,
+      "filename": "stmt_0169_batch17_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_17.sql",
+      "batchIndex": 17,
+      "statementIndex": 10,
+      "filename": "stmt_0170_batch17_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Reflection -4 (6 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_"
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 1,
+      "filename": "stmt_0171_batch18_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 2,
+      "filename": "stmt_0172_batch18_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 3,
+      "filename": "stmt_0173_batch18_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 4,
+      "filename": "stmt_0174_batch18_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 5,
+      "filename": "stmt_0175_batch18_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 6,
+      "filename": "stmt_0176_batch18_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 7,
+      "filename": "stmt_0177_batch18_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 8,
+      "filename": "stmt_0178_batch18_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 9,
+      "filename": "stmt_0179_batch18_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_18.sql",
+      "batchIndex": 18,
+      "statementIndex": 10,
+      "filename": "stmt_0180_batch18_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 2 | Intervention: Capstone (9 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,  "
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 1,
+      "filename": "stmt_0181_batch19_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 2,
+      "filename": "stmt_0182_batch19_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 3,
+      "filename": "stmt_0183_batch19_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 4,
+      "filename": "stmt_0184_batch19_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 5,
+      "filename": "stmt_0185_batch19_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 6,
+      "filename": "stmt_0186_batch19_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 7,
+      "filename": "stmt_0187_batch19_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 8,
+      "filename": "stmt_0188_batch19_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 9,
+      "filename": "stmt_0189_batch19_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_19.sql",
+      "batchIndex": 19,
+      "statementIndex": 10,
+      "filename": "stmt_0190_batch19_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Book Review (16 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_i"
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 1,
+      "filename": "stmt_0191_batch20_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 2,
+      "filename": "stmt_0192_batch20_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 3,
+      "filename": "stmt_0193_batch20_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 4,
+      "filename": "stmt_0194_batch20_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 5,
+      "filename": "stmt_0195_batch20_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 6,
+      "filename": "stmt_0196_batch20_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 7,
+      "filename": "stmt_0197_batch20_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 8,
+      "filename": "stmt_0198_batch20_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 9,
+      "filename": "stmt_0199_batch20_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_20.sql",
+      "batchIndex": 20,
+      "statementIndex": 10,
+      "filename": "stmt_0200_batch20_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Debate (13 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   "
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 1,
+      "filename": "stmt_0201_batch21_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 2,
+      "filename": "stmt_0202_batch21_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 3,
+      "filename": "stmt_0203_batch21_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 4,
+      "filename": "stmt_0204_batch21_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 5,
+      "filename": "stmt_0205_batch21_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 6,
+      "filename": "stmt_0206_batch21_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 7,
+      "filename": "stmt_0207_batch21_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 8,
+      "filename": "stmt_0208_batch21_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 9,
+      "filename": "stmt_0209_batch21_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_21.sql",
+      "batchIndex": 21,
+      "statementIndex": 10,
+      "filename": "stmt_0210_batch21_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: GD (5 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id,   micro"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 1,
+      "filename": "stmt_0211_batch22_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 2,
+      "filename": "stmt_0212_batch22_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 3,
+      "filename": "stmt_0213_batch22_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 4,
+      "filename": "stmt_0214_batch22_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 5,
+      "filename": "stmt_0215_batch22_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 6,
+      "filename": "stmt_0216_batch22_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 7,
+      "filename": "stmt_0217_batch22_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 8,
+      "filename": "stmt_0218_batch22_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 9,
+      "filename": "stmt_0219_batch22_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_22.sql",
+      "batchIndex": 22,
+      "statementIndex": 10,
+      "filename": "stmt_0220_batch22_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Case study (17 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id"
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 1,
+      "filename": "stmt_0221_batch23_stmt1.sql",
+      "preview": "-- Student: 2024JULB00001 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 2,
+      "filename": "stmt_0222_batch23_stmt2.sql",
+      "preview": "-- Student: 2024JULB00002 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 3,
+      "filename": "stmt_0223_batch23_stmt3.sql",
+      "preview": "-- Student: 2024JULB00003 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 4,
+      "filename": "stmt_0224_batch23_stmt4.sql",
+      "preview": "-- Student: 2024JULB00004 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 5,
+      "filename": "stmt_0225_batch23_stmt5.sql",
+      "preview": "-- Student: 2024JULB00005 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 6,
+      "filename": "stmt_0226_batch23_stmt6.sql",
+      "preview": "-- Student: 2024JULB00006 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 7,
+      "filename": "stmt_0227_batch23_stmt7.sql",
+      "preview": "-- Student: 2024JULB00007 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 8,
+      "filename": "stmt_0228_batch23_stmt8.sql",
+      "preview": "-- Student: 2024JULB00008 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 9,
+      "filename": "stmt_0229_batch23_stmt9.sql",
+      "preview": "-- Student: 2024JULB00009 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    },
+    {
+      "batch": "batch_23.sql",
+      "batchIndex": 23,
+      "statementIndex": 10,
+      "filename": "stmt_0230_batch23_stmt10.sql",
+      "preview": "-- Student: 2024JULB00012 | Level: Level 3 | Intervention: Capstone (11 scores) INSERT INTO microcompetency_scores (   student_id,   intervention_id, "
+    }
+  ]
+}

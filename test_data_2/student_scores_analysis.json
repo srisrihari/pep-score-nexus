@@ -1,0 +1,547 @@
+{
+  "sourceFile": "HPS Input Data - Level 1 updated.xlsx",
+  "analyzedAt": "2025-11-18T05:28:21.152Z",
+  "totalStudents": 10,
+  "students": [
+    {
+      "registration_no": "2024JULB00001",
+      "name": "A Divya Sree",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "name": "Aaditya K",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "name": "Aanchal Sapra",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "name": "Abhinav B",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "name": "Abhirup Choudhury",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "name": "Abhyuday Tripathi",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "name": "Adarsh G",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "name": "Adarsh Raj Barman",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "name": "Aditi Kumari",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "name": "Akarsh Narain",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Problem Solving",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {},
+          "total_microcomps_scored": 0
+        }
+      ]
+    }
+  ]
+}

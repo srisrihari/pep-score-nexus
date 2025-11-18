@@ -183,7 +183,7 @@ const TeacherInterventions: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {assignments.reduce((sum, a) => sum + (a.assigned_microcompetencies_count || 0), 0)}
+              {assignments.reduce((sum, a) => sum + (a.enrolled_students_count || 0), 0)}
             </div>
           </CardContent>
         </Card>
@@ -292,6 +292,12 @@ const TeacherInterventions: React.FC = () => {
                       </span>
                     </div>
 
+                    <div className="flex items-center text-gray-600">
+                      <Users className="h-4 w-4 mr-2" />
+                      <span>
+                        {assignment.enrolled_students_count || 0} students enrolled
+                      </span>
+                    </div>
                     <div className="flex items-center text-gray-600">
                       <Target className="h-4 w-4 mr-2" />
                       <span>

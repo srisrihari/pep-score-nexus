@@ -1,0 +1,209 @@
+{
+  "level0": {
+    "interventions": [
+      {
+        "name": "Fearless (Level 0)",
+        "type": "Level 0",
+        "microcompetencies": [
+          "D1",
+          "D2",
+          "D3",
+          "D4",
+          "D5"
+        ]
+      }
+    ],
+    "students": []
+  },
+  "level1": {
+    "interventions": [
+      {
+        "name": "Book Review Presentation",
+        "activityName": "Art of Storytelling",
+        "institution": "JAGSoM",
+        "program": "PGDM",
+        "batch": "2024 -26",
+        "sessionsPlanned": "3",
+        "sessionsConducted": "3",
+        "microcompetencies": [
+          "C1",
+          "C2",
+          "C3",
+          "C5",
+          "E1",
+          "E3",
+          "A1",
+          "A2",
+          "A3",
+          "A4",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "T1",
+          "D3",
+          "D4"
+        ]
+      },
+      {
+        "name": "Interpersonal Role Play",
+        "activityName": "Interpersonal Role Play",
+        "institution": "JAGSoM",
+        "program": "PGDM",
+        "batch": "2024 -26",
+        "sessionsPlanned": "2",
+        "sessionsConducted": "1",
+        "microcompetencies": [
+          "T4",
+          "T5",
+          "D3",
+          "D4"
+        ]
+      },
+      {
+        "name": "Case Study Analysis",
+        "activityName": "Case Study Analysis",
+        "institution": "JAGSoM",
+        "program": "PGDM",
+        "batch": "2024 -26",
+        "sessionsPlanned": "0",
+        "sessionsConducted": "0",
+        "microcompetencies": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "D3",
+          "D4"
+        ]
+      },
+      {
+        "name": "Business Proposal Report",
+        "activityName": "Business Proposal Report",
+        "institution": "JAGSoM",
+        "program": "PGDM",
+        "batch": "2024 -26",
+        "sessionsPlanned": "2",
+        "sessionsConducted": "2",
+        "microcompetencies": [
+          "C1",
+          "A1",
+          "A2",
+          "A3",
+          "A4",
+          "E1",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "D3",
+          "D4"
+        ]
+      },
+      {
+        "name": "Email Writing",
+        "activityName": "Email Writing",
+        "institution": "JAGSoM",
+        "program": "PGDM",
+        "batch": "2024 -26",
+        "sessionsPlanned": "2",
+        "sessionsConducted": "2",
+        "microcompetencies": [
+          "C4",
+          "D3",
+          "D4"
+        ]
+      },
+      {
+        "name": "Debating",
+        "activityName": "Debating",
+        "institution": "JAGSoM",
+        "program": "PGDM",
+        "batch": "2024 -26",
+        "sessionsPlanned": "3",
+        "sessionsConducted": "3",
+        "microcompetencies": [
+          "C1",
+          "C2",
+          "C3",
+          "C5",
+          "A1",
+          "A2",
+          "A3",
+          "A4",
+          "L1",
+          "T1",
+          "D3",
+          "D4"
+        ]
+      }
+    ],
+    "students": []
+  },
+  "level2": {
+    "interventions": [
+      {
+        "name": "Review 1",
+        "microcompetencies": []
+      },
+      {
+        "name": "Review 2",
+        "microcompetencies": []
+      },
+      {
+        "name": "Review 3",
+        "microcompetencies": []
+      },
+      {
+        "name": "Review 4",
+        "microcompetencies": []
+      },
+      {
+        "name": "Reflection -1 ",
+        "microcompetencies": []
+      },
+      {
+        "name": "Reflection -2",
+        "microcompetencies": []
+      },
+      {
+        "name": "Reflection -3",
+        "microcompetencies": []
+      },
+      {
+        "name": "Reflection -4",
+        "microcompetencies": []
+      },
+      {
+        "name": "Capstone",
+        "microcompetencies": []
+      }
+    ],
+    "students": []
+  },
+  "level3": {
+    "interventions": [
+      {
+        "name": "Book Review",
+        "microcompetencies": []
+      },
+      {
+        "name": "Debate",
+        "microcompetencies": []
+      },
+      {
+        "name": "GD",
+        "microcompetencies": []
+      },
+      {
+        "name": "Case study",
+        "microcompetencies": []
+      },
+      {
+        "name": "Capstone",
+        "microcompetencies": []
+      }
+    ],
+    "students": []
+  }
+}

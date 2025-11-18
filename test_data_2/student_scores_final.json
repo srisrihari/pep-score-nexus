@@ -1,0 +1,1447 @@
+{
+  "sourceFile": "HPS Input Data - Level 1 updated.xlsx",
+  "analyzedAt": "2025-11-18T06:44:54.446Z",
+  "totalStudents": 10,
+  "students": [
+    {
+      "registration_no": "2024JULB00001",
+      "name": "A Divya Sree",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 3,
+            "A3": 3,
+            "A4": 3,
+            "C1": 3,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "E1": 3,
+            "E3": 3,
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 3,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 4,
+            "A3": 4,
+            "A4": 4,
+            "C1": 3,
+            "C2": 3,
+            "C3": 4,
+            "C5": 3,
+            "E1": 4,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 3,
+            "D4": 5,
+            "D5": 5
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 3,
+            "N2": 2,
+            "N3": 3,
+            "D4": 3
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 2,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 3,
+            "P4": 1,
+            "T1": 2,
+            "D3": 2,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 3.5,
+            "C2": 3,
+            "C3": 5,
+            "C4": 3.75
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 2.666666667,
+            "T2": 2.666666667,
+            "T3": 2.555555556,
+            "T4": 2.777777778,
+            "T5": 2.722222222,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 3,
+            "C2": 4,
+            "C3": 2,
+            "C5": 4,
+            "L1": 4,
+            "P1": 2,
+            "P2": 2,
+            "P4": 4,
+            "T1": 1,
+            "D4": 2,
+            "D5": 3
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 5,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "L1": 5,
+            "P1": 5,
+            "P2": 5,
+            "P4": 5,
+            "T1": 4,
+            "D4": 5,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00002",
+      "name": "Aaditya K",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 3,
+            "A3": 3,
+            "A4": 3,
+            "C1": 4,
+            "C2": 4,
+            "C3": 3,
+            "C5": 5,
+            "E1": 4,
+            "E3": 4,
+            "P1": 3,
+            "P2": 3,
+            "P3": 3,
+            "P4": 3,
+            "T1": 3,
+            "D4": 3,
+            "D5": 4
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 4,
+            "A3": 4,
+            "A4": 4,
+            "C1": 4,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "E1": 3,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 2,
+            "D4": 3,
+            "D5": 4
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 5,
+            "N2": 4,
+            "N3": 4,
+            "D4": 4
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 2,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 2,
+            "P4": 1,
+            "T1": 2,
+            "D3": 2,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 2.5,
+            "C2": 2,
+            "C3": 3,
+            "C4": 2.5
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 3,
+            "P2": 2,
+            "P3": 2,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 2,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 2,
+            "C2": 4,
+            "C3": 3,
+            "C5": 4,
+            "L1": 2,
+            "P1": 2,
+            "P2": 3,
+            "P4": 2,
+            "T1": 1,
+            "D4": 1,
+            "D5": 3
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 4,
+            "C3": 4,
+            "C5": 5,
+            "L1": 4,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00003",
+      "name": "Aanchal Sapra",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 2,
+            "A2": 2,
+            "A3": 2,
+            "A4": 2,
+            "C1": 3,
+            "C2": 3,
+            "C3": 2,
+            "C5": 3,
+            "E1": 3,
+            "E3": 3,
+            "P1": 2,
+            "P2": 2,
+            "P3": 2,
+            "P4": 2,
+            "T1": 2,
+            "D4": 2,
+            "D5": 2
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 1,
+            "A2": 1,
+            "A3": 1,
+            "A4": 1,
+            "C1": 1,
+            "C2": 1,
+            "C3": 1,
+            "C5": 1,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P4": 1,
+            "T1": 1,
+            "D4": 1,
+            "D5": 1
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 4,
+            "N2": 4,
+            "N3": 4,
+            "D4": 3
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 3,
+            "E1": 2,
+            "P1": 2,
+            "P2": 1,
+            "P3": 2,
+            "P4": 1,
+            "T1": 2,
+            "D3": 2,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 3,
+            "C2": 2,
+            "C3": 3,
+            "C4": 2.75
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 1,
+            "C2": 1,
+            "C3": 1,
+            "C5": 1,
+            "L1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P4": 1,
+            "T1": 1,
+            "D4": 1,
+            "D5": 1
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "L1": 4,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00004",
+      "name": "Abhinav B",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 1,
+            "A2": 1,
+            "A3": 1,
+            "A4": 1,
+            "C1": 3,
+            "C2": 1,
+            "C3": 1,
+            "C5": 1,
+            "E1": 1,
+            "E3": 0,
+            "P1": 1,
+            "P2": 1,
+            "P3": 0,
+            "P4": 1,
+            "T1": 3,
+            "D4": 1,
+            "D5": 1
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 1,
+            "A2": 1,
+            "A3": 1,
+            "A4": 1,
+            "C1": 1,
+            "C2": 2,
+            "C3": 1,
+            "C5": 1,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P4": 1,
+            "T1": 2,
+            "D4": 1,
+            "D5": 1
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 2,
+            "N2": 3,
+            "N3": 3,
+            "D4": 4
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 1,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 1,
+            "P4": 1,
+            "T1": 1,
+            "D3": 1,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 4,
+            "C2": 4.5,
+            "C3": 5,
+            "C4": 4.375
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 2,
+            "P2": 1,
+            "P3": 2,
+            "P4": 1,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 2,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 1,
+            "C2": 2,
+            "C3": 3,
+            "C5": 1,
+            "L1": 2,
+            "P1": 2,
+            "P2": 2,
+            "P4": 2,
+            "T1": 1,
+            "D4": 3,
+            "D5": 3
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 4,
+            "C3": 5,
+            "C5": 4,
+            "L1": 5,
+            "P1": 4,
+            "P2": 4,
+            "P4": 5,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00005",
+      "name": "Abhirup Choudhury",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 0,
+            "A2": 0,
+            "A3": 0,
+            "A4": 0,
+            "C1": 0,
+            "C2": 0,
+            "C3": 0,
+            "C5": 0,
+            "E1": 0,
+            "E3": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "T1": 0,
+            "D4": 0,
+            "D5": 0
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 0,
+            "A2": 0,
+            "A3": 0,
+            "A4": 0,
+            "C1": 0,
+            "C2": 0,
+            "C3": 0,
+            "C5": 0,
+            "E1": 0,
+            "P1": 0,
+            "P2": 0,
+            "P4": 0,
+            "T1": 0,
+            "D4": 0,
+            "D5": 0
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 0,
+            "N2": 0,
+            "N3": 0,
+            "D4": 0
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 0,
+            "E1": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "T1": 0,
+            "D3": 0,
+            "D4": 0
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 0,
+            "C2": 0,
+            "C3": 0,
+            "C4": 0
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 0,
+            "D5": 0
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 0,
+            "C2": 0,
+            "C3": 0,
+            "C5": 0,
+            "L1": 0,
+            "P1": 0,
+            "P2": 0,
+            "P4": 0,
+            "T1": 0,
+            "D4": 0,
+            "D5": 0
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 0,
+            "C2": 0,
+            "C3": 0,
+            "C5": 0,
+            "L1": 0,
+            "P1": 0,
+            "P2": 0,
+            "P4": 0,
+            "T1": 0,
+            "D4": 0,
+            "D5": 0
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00006",
+      "name": "Abhyuday Tripathi",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 2,
+            "A2": 2,
+            "A3": 2,
+            "A4": 2,
+            "C1": 3,
+            "C2": 3,
+            "C3": 4,
+            "C5": 3,
+            "E1": 2,
+            "E3": 2,
+            "P1": 2,
+            "P2": 2,
+            "P3": 2,
+            "P4": 2,
+            "T1": 4,
+            "D4": 2,
+            "D5": 2
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 4,
+            "A3": 4,
+            "A4": 4,
+            "C1": 3,
+            "C2": 3,
+            "C3": 3,
+            "C5": 4,
+            "E1": 4,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 3,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 1,
+            "N2": 1,
+            "N3": 1,
+            "D4": 1
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 3,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 3,
+            "P4": 1,
+            "T1": 2,
+            "D3": 2,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 4,
+            "C2": 4,
+            "C3": 5,
+            "C4": 4.25
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 1,
+            "C2": 3,
+            "C3": 1,
+            "C5": 3,
+            "L1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P4": 2,
+            "T1": 1,
+            "D4": 1,
+            "D5": 3
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 5,
+            "C3": 4,
+            "C5": 5,
+            "L1": 5,
+            "P1": 5,
+            "P2": 5,
+            "P4": 5,
+            "T1": 5,
+            "D4": 5,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00007",
+      "name": "Adarsh G",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 3,
+            "A2": 3,
+            "A3": 3,
+            "A4": 3,
+            "C1": 3,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "E1": 3,
+            "E3": 3,
+            "P1": 3,
+            "P2": 3,
+            "P3": 3,
+            "P4": 3,
+            "T1": 2,
+            "D4": 3,
+            "D5": 4
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 4,
+            "A3": 4,
+            "A4": 4,
+            "C1": 4,
+            "C2": 4,
+            "C3": 5,
+            "C5": 4,
+            "E1": 3,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 3,
+            "D4": 5,
+            "D5": 5
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 2,
+            "N2": 2,
+            "N3": 2,
+            "D4": 2
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 3,
+            "E1": 2,
+            "P1": 2,
+            "P2": 1,
+            "P3": 2,
+            "P4": 1,
+            "T1": 2,
+            "D3": 2,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 3.5,
+            "C2": 3,
+            "C3": 5,
+            "C4": 3.75
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 3,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "L1": 3,
+            "P1": 3,
+            "P2": 4,
+            "P4": 3,
+            "T1": 1,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 5,
+            "C2": 5,
+            "C3": 5,
+            "C5": 5,
+            "L1": 4,
+            "P1": 5,
+            "P2": 5,
+            "P4": 5,
+            "T1": 5,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00008",
+      "name": "Adarsh Raj Barman",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 4,
+            "A2": 3,
+            "A3": 3,
+            "A4": 3,
+            "C1": 3,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "E1": 3,
+            "E3": 3,
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 3,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 2,
+            "A2": 2,
+            "A3": 3,
+            "A4": 3,
+            "C1": 2,
+            "C2": 3,
+            "C3": 2,
+            "C5": 2,
+            "E1": 2,
+            "P1": 3,
+            "P2": 3,
+            "P4": 3,
+            "T1": 3,
+            "D4": 3,
+            "D5": 3
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 3,
+            "N2": 2,
+            "N3": 3,
+            "D4": 3
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 2,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 3,
+            "P4": 1,
+            "T1": 2,
+            "D3": 2,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 3.5,
+            "C2": 3,
+            "C3": 5,
+            "C4": 3.75
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 3,
+            "C2": 3,
+            "C3": 4,
+            "C5": 3,
+            "L1": 3,
+            "P1": 4,
+            "P2": 4,
+            "P4": 2,
+            "T1": 1,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "L1": 4,
+            "P1": 5,
+            "P2": 5,
+            "P4": 4,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00009",
+      "name": "Aditi Kumari",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 2,
+            "A2": 3,
+            "A3": 2,
+            "A4": 2,
+            "C1": 2,
+            "C2": 2,
+            "C3": 3,
+            "C5": 2,
+            "E1": 2,
+            "E3": 2,
+            "P1": 2,
+            "P2": 2,
+            "P3": 2,
+            "P4": 2,
+            "T1": 2,
+            "D4": 3,
+            "D5": 3
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 3,
+            "A2": 3,
+            "A3": 3,
+            "A4": 3,
+            "C1": 2,
+            "C2": 3,
+            "C3": 3,
+            "C5": 3,
+            "E1": 3,
+            "P1": 3,
+            "P2": 3,
+            "P4": 3,
+            "T1": 2,
+            "D4": 3,
+            "D5": 3
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 3,
+            "N2": 2,
+            "N3": 3,
+            "D4": 3
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 1,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 1,
+            "P4": 1,
+            "T1": 1,
+            "D3": 1,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 3.5,
+            "C2": 4.5,
+            "C3": 5,
+            "C4": 4.125
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 2,
+            "C2": 3,
+            "C3": 4,
+            "C5": 3,
+            "L1": 3,
+            "P1": 2,
+            "P2": 3,
+            "P4": 2,
+            "T1": 1,
+            "D4": 4,
+            "D5": 3
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 4,
+            "C3": 4,
+            "C5": 4,
+            "L1": 4,
+            "P1": 4,
+            "P2": 5,
+            "P4": 5,
+            "T1": 4,
+            "D4": 4,
+            "D5": 4
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    },
+    {
+      "registration_no": "2024JULB00012",
+      "name": "Akarsh Narain",
+      "interventions": [
+        {
+          "intervention_name": "Storytelling Presentation",
+          "sheet": "Story Telling",
+          "microcompetency_scores": {
+            "A1": 3,
+            "A2": 3,
+            "A3": 3,
+            "A4": 2,
+            "C1": 2,
+            "C2": 3,
+            "C3": 2,
+            "C5": 4,
+            "E1": 4,
+            "E3": 4,
+            "P1": 3,
+            "P2": 3,
+            "P3": 3,
+            "P4": 3,
+            "T1": 0,
+            "D4": 0,
+            "D5": 0
+          },
+          "total_microcomps_scored": 17
+        },
+        {
+          "intervention_name": "Book Review Presentation",
+          "sheet": "Book Review Presentation",
+          "microcompetency_scores": {
+            "A1": 3,
+            "A2": 3,
+            "A3": 3,
+            "A4": 3,
+            "C1": 3,
+            "C2": 4,
+            "C3": 4,
+            "C5": 5,
+            "E1": 3,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 2,
+            "D4": 3,
+            "D5": 3
+          },
+          "total_microcomps_scored": 15
+        },
+        {
+          "intervention_name": "Interpersonal Role Play",
+          "sheet": "Inter personal",
+          "microcompetency_scores": {
+            "N1": 4,
+            "N2": 4,
+            "N3": 4,
+            "D4": 4
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Business Proposal Report",
+          "sheet": "Business Proposal Report",
+          "microcompetency_scores": {
+            "C4": 3,
+            "E1": 1,
+            "P1": 1,
+            "P2": 1,
+            "P3": 1,
+            "P4": 1,
+            "T1": 1,
+            "D3": 1,
+            "D4": 5
+          },
+          "total_microcomps_scored": 9
+        },
+        {
+          "intervention_name": "Email Writing",
+          "sheet": "Email Writing",
+          "microcompetency_scores": {
+            "C1": 3,
+            "C2": 4,
+            "C3": 4,
+            "C4": 3.5
+          },
+          "total_microcomps_scored": 4
+        },
+        {
+          "intervention_name": "Case Study Analysis",
+          "sheet": "Problem Solving",
+          "microcompetency_scores": {
+            "P1": 4,
+            "P2": 3,
+            "P3": 3,
+            "P4": 2,
+            "T1": 0,
+            "T2": 0,
+            "T3": 0,
+            "T4": 0,
+            "T5": 0,
+            "D4": 3,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Debating",
+          "sheet": "Debating",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 5,
+            "C3": 4,
+            "C5": 5,
+            "L1": 4,
+            "P1": 4,
+            "P2": 4,
+            "P4": 4,
+            "T1": 1,
+            "D4": 4,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        },
+        {
+          "intervention_name": "Capstone",
+          "sheet": "Capstone",
+          "microcompetency_scores": {
+            "A3": 4,
+            "C2": 4,
+            "C3": 5,
+            "C5": 4,
+            "L1": 5,
+            "P1": 5,
+            "P2": 4,
+            "P4": 5,
+            "T1": 4,
+            "D4": 5,
+            "D5": 5
+          },
+          "total_microcomps_scored": 11
+        }
+      ]
+    }
+  ]
+}
