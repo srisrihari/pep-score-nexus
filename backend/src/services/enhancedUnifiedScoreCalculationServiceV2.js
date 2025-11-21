@@ -1,4 +1,5 @@
 const { supabase, query } = require('../config/supabase');
+const { getNetDeedScore } = require('../helpers/deedScoreHelper');
 const enhancedWeightageService = require('./enhancedWeightageValidationService');
 
 /**
@@ -57,12 +58,16 @@ class EnhancedUnifiedScoreCalculationServiceV2 {
       const unifiedQuadrantScores = interventionScores;
       
       // Step 4: Calculate overall HPS using dynamic quadrant weightages
-      const totalHPS = this.calculateDynamicWeightedHPS(unifiedQuadrantScores, quadrantWeightages);
+      const baseTotalHPS = this.calculateDynamicWeightedHPS(unifiedQuadrantScores, quadrantWeightages);
+
+      // Step 5: Include Good/Bad deed impact
+      const deedImpact = await getNetDeedScore(studentId, termId);
+      const totalHPS = Math.max(0, Math.min(100, baseTotalHPS + deedImpact));
       
-      // Step 5: Update student_score_summary table
+      // Step 6: Update student_score_summary table
       await this.updateStudentScoreSummary(studentId, termId, unifiedQuadrantScores, totalHPS);
       
-      console.log(`✅ Enhanced Unified HPS V2 calculated: ${totalHPS.toFixed(2)}%`);
+      console.log(`✅ Enhanced Unified HPS V2 calculated: base ${baseTotalHPS.toFixed(2)}% + deed impact ${deedImpact.toFixed(2)} = ${totalHPS.toFixed(2)}%`);
       
       return {
         success: true,
@@ -72,6 +77,7 @@ class EnhancedUnifiedScoreCalculationServiceV2 {
         quadrantScores: unifiedQuadrantScores,
         quadrantWeightages: quadrantWeightages,
         totalHPS: totalHPS,
+        deedImpact,
         grade: this.calculateGrade(totalHPS),
         status: this.calculateStatus(totalHPS),
         weightageSource: quadrantWeightages[0]?.source || 'default_system',

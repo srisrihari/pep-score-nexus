@@ -1709,6 +1709,22 @@ export const adminAPI = {
     }>(url);
   },
 
+  getStudentDeeds: async (studentId: string, termId?: string) => {
+    const queryParams = termId ? `?termId=${termId}` : '';
+    return apiRequest<StudentDeed[]>(
+      `/api/v1/admin/students/${studentId}/deeds${queryParams}`
+    );
+  },
+
+  deleteStudentDeed: async (deedId: string) => {
+    return apiRequest<{
+      success: boolean;
+      message: string;
+    }>(`/api/v1/admin/deeds/${deedId}`, {
+      method: 'DELETE',
+    });
+  },
+
   getStudentFilterOptions: async () => {
     return apiRequest<{
       success: boolean;
@@ -3004,6 +3020,62 @@ export const teacherAPI = {
       };
       timestamp: string;
     }>(url);
+  },
+
+  // Get all students (not filtered by assignments)
+  getAllStudents: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    batch?: string;
+    section?: string;
+    course?: string;
+    termId?: string;
+  }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.batch) queryParams.append('batch', params.batch);
+    if (params?.section) queryParams.append('section', params.section);
+    if (params?.course) queryParams.append('course', params.course);
+    if (params?.termId) queryParams.append('termId', params.termId);
+
+    return apiRequest<{
+      success: boolean;
+      data: Array<{
+        id: string;
+        registration_no: string;
+        name: string;
+        course: string;
+        overall_score: number;
+        grade: string;
+        status: string;
+        batches: {
+          id: string;
+          name: string;
+          year: number;
+        } | null;
+        sections: {
+          id: string;
+          name: string;
+        } | null;
+        houses: {
+          id: string;
+          name: string;
+          color: string;
+        } | null;
+        current_term_id: string;
+        term_hps?: number | null;
+      }>;
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+      timestamp: string;
+    }>(`/api/v1/teachers/students/all${queryParams.toString() ? `?${queryParams.toString()}` : ''}`);
   },
 
   // Student Assessment Details
@@ -4778,4 +4850,78 @@ export default {
   upload: uploadAPI,
   term: termAPI,
   shlCompetency: shlCompetencyAPI,
+};
+
+// Student Deed API calls
+export interface StudentDeed {
+  id: string;
+  student_id: string;
+  teacher_id: string;
+  term_id: string;
+  deed_type: 'good' | 'bad';
+  score: number;
+  comment?: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  teacher?: {
+    id: string;
+    name: string;
+    employee_id: string;
+  };
+  term?: {
+    id: string;
+    name: string;
+  };
+}
+
+export const studentDeedAPI = {
+  // Add a deed for a student
+  addDeed: async (
+    studentId: string,
+    data: {
+      termId: string;
+      deedType: 'good' | 'bad';
+      score: number;
+      comment?: string;
+    }
+  ): Promise<ApiResponse<StudentDeed>> => {
+    return apiRequest<StudentDeed>(
+      `/api/v1/teachers/students/${studentId}/deeds`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  // Get all deeds for a student
+  getStudentDeeds: async (
+    studentId: string,
+    termId: string
+  ): Promise<ApiResponse<StudentDeed[]>> => {
+    return apiRequest<StudentDeed[]>(
+      `/api/v1/teachers/students/${studentId}/deeds?termId=${termId}`
+    );
+  },
+
+  // Get own deeds (student view)
+  getOwnDeeds: async (
+    termId: string
+  ): Promise<ApiResponse<StudentDeed[]>> => {
+    return apiRequest<StudentDeed[]>(
+      `/api/v1/students/me/deeds?termId=${termId}`
+    );
+  },
+
+  // Get my deeds for a student (teacher view - shows only deeds by current teacher)
+  getMyDeedsForStudent: async (
+    studentId: string,
+    termId?: string
+  ): Promise<ApiResponse<StudentDeed[]>> => {
+    const queryParams = termId ? `?termId=${termId}` : '';
+    return apiRequest<StudentDeed[]>(
+      `/api/v1/teachers/students/${studentId}/deeds/my${queryParams}`
+    );
+  },
 };

@@ -60,6 +60,7 @@ const hpsManagementRoutes = require('./routes/hpsManagement');
 const batchManagementRoutes = require('./routes/batchManagement');
 const sectionManagementRoutes = require('./routes/sectionManagement');
 const courseManagementRoutes = require('./routes/courseManagement');
+const studentDeedsRoutes = require('./routes/studentDeeds');
 const bulkTeacherAssignmentController = require('./controllers/bulkTeacherAssignmentController');
 const taskMicrocompetencyController = require('./controllers/taskMicrocompetencyController');
 const termTransitionService = require('./services/termTransitionService');
@@ -280,6 +281,7 @@ app.use(`${baseRoute}/admin/hps`, hpsManagementRoutes);
 app.use(`${baseRoute}/admin/batch-management`, batchManagementRoutes);
 app.use(`${baseRoute}/admin/section-management`, sectionManagementRoutes);
 app.use(`${baseRoute}/admin/course-management`, courseManagementRoutes);
+app.use(`${baseRoute}`, studentDeedsRoutes);
 
 // Bulk Teacher Assignment Routes
 app.post(`${baseRoute}/admin/bulk-teacher-assignment`, authenticateToken, requireRole('admin'), bulkTeacherAssignmentController.bulkAssignTeachers);

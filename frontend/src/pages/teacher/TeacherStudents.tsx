@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
 import {
   Search,
   ArrowLeft,
@@ -29,12 +27,17 @@ import {
   Eye,
   GraduationCap,
   Target,
-  Award
+  Award,
+  ThumbsUp,
+  ThumbsDown,
+  User
 } from "lucide-react";
 import { teacherAPI, interventionAPI } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTerm } from "@/contexts/TermContext";
 import { toast } from "sonner";
+import AddDeedDialog from "@/components/teacher/AddDeedDialog";
+import ViewDeedsDialog from "@/components/teacher/ViewDeedsDialog";
 
 // Types for student data
 interface AssignedStudent {
@@ -47,6 +50,8 @@ interface AssignedStudent {
   status: string;
   last_assessment?: string;
   average_score?: number;
+  overall_score?: number | null;
+  term_hps?: number | null;
   interventions: Array<{
     id: string;
     name: string;
@@ -110,17 +115,17 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001
 const TeacherStudents: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { selectedTerm } = useTerm();
+  const { selectedTerm, currentTerm } = useTerm();
+  const activeTerm = selectedTerm || currentTerm;
 
   // State management
   const [studentsData, setStudentsData] = useState<StudentsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTab, setSelectedTab] = useState("all");
-  const [selectedSection, setSelectedSection] = useState("all");
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [selectedIntervention, setSelectedIntervention] = useState("all");
+  const [availableBatches, setAvailableBatches] = useState<string[]>([]);
 
   // Student details dialog state
   const [showStudentDialog, setShowStudentDialog] = useState(false);
@@ -128,16 +133,42 @@ const TeacherStudents: React.FC = () => {
   const [studentDetailsData, setStudentDetailsData] = useState<StudentDetailsData | null>(null);
   const [loadingStudentDetails, setLoadingStudentDetails] = useState(false);
 
+  // Add Deed dialog state
+  const [showAddDeedDialog, setShowAddDeedDialog] = useState(false);
+  const [selectedStudentForDeed, setSelectedStudentForDeed] = useState<AssignedStudent | null>(null);
+  
+  // View Deeds dialog state
+  const [showViewDeedsDialog, setShowViewDeedsDialog] = useState(false);
+  const [selectedStudentForViewDeeds, setSelectedStudentForViewDeeds] = useState<AssignedStudent | null>(null);
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Fetch students data - Remove selectedTab from dependencies to prevent new API calls for tab changes
+  const getStudentHpsDisplay = (student: AssignedStudent) => {
+    const hpsValue = activeTerm?.id
+      ? student.term_hps
+      : (student.term_hps ?? student.overall_score);
+
+    if (hpsValue === null || hpsValue === undefined) {
+      return '—';
+    }
+
+    const numericValue = typeof hpsValue === 'number' ? hpsValue : parseFloat(hpsValue);
+
+    if (isNaN(numericValue)) {
+      return '—';
+    }
+
+    return `${numericValue.toFixed(2)}`;
+  };
+
+  // Fetch students data
   useEffect(() => {
     if (user?.id) {
       fetchStudents();
     }
-  }, [user, currentPage, pageSize, selectedSection, selectedBatch, selectedIntervention]);
+  }, [user, currentPage, pageSize, selectedBatch, selectedIntervention, activeTerm?.id]);
 
   const fetchStudents = async () => {
     try {
@@ -148,33 +179,74 @@ const TeacherStudents: React.FC = () => {
         throw new Error('User not authenticated');
       }
 
-      // Don't pass status to API - we'll filter client-side
-      const response = await teacherAPI.getAssignedStudents(user.id, {
+      // Use new getAllStudents endpoint to get all students
+      const response = await teacherAPI.getAllStudents({
         page: currentPage,
         limit: pageSize,
         search: searchQuery || undefined,
-        // Remove status filtering from API call
-        interventionId: selectedIntervention === 'all' ? undefined : selectedIntervention,
+        batch: selectedBatch === 'all' ? undefined : selectedBatch,
+        termId: activeTerm?.id,
       });
 
-      // Handle the response - backend returns students as an array in data property
-      const responseData = response.data;
-      const students = Array.isArray(responseData) ? responseData : (responseData.students || []);
+      // Handle the response - apiRequest returns the JSON response directly
+      // The API returns: { success: boolean, data: Array, pagination: {...} }
+      console.log('API Response:', response);
+      const students = response.data || [];
+      const pagination = response.pagination || {
+        page: currentPage,
+        limit: pageSize,
+        total: students.length,
+        totalPages: Math.ceil(students.length / pageSize)
+      };
       
-      // Cast response to any to access pagination property safely
-      const apiResponse = response as any;
+      // Ensure pagination.total is set correctly
+      if (pagination.total === 0 && students.length > 0) {
+        pagination.total = students.length;
+        pagination.totalPages = Math.ceil(students.length / pageSize);
+      }
+      
+      console.log('Parsed students:', students.length, 'Total:', pagination.total);
+      
+      // Transform students to match AssignedStudent interface
+      const transformedStudents: AssignedStudent[] = students.map((s: any) => ({
+        id: s.id,
+        name: s.name,
+        registration_no: s.registration_no,
+        course: s.course,
+        batch: s.batches?.name || s.batch || '-',
+        section: s.sections?.name || s.section || '-',
+        status: s.status,
+        overall_score: s.overall_score !== null && s.overall_score !== undefined ? Number(s.overall_score) : null,
+        term_hps: s.term_hps !== null && s.term_hps !== undefined ? Number(s.term_hps) : null,
+        grade: s.grade || 'N/A',
+        interventions: [] // Not included in all students endpoint
+      }));
       
       setStudentsData({
-        students: students,
-        pagination: responseData.pagination || apiResponse.pagination || {
-          page: currentPage,
-          limit: pageSize,
-          total: students.length,
-          totalPages: Math.ceil(students.length / pageSize)
+        students: transformedStudents,
+        pagination: pagination
+      });
+
+      const batchSet = new Set<string>();
+      transformedStudents.forEach((student) => {
+        if (student.batch && student.batch !== '-' && student.batch !== 'N/A') {
+          batchSet.add(student.batch);
         }
       });
+      setAvailableBatches(Array.from(batchSet).sort());
     } catch (err) {
+      console.error('Error fetching students:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch students');
+      // Set empty data on error to prevent showing "No Students" prematurely
+      setStudentsData({
+        students: [],
+        pagination: {
+          page: currentPage,
+          limit: pageSize,
+          total: 0,
+          totalPages: 0
+        }
+      });
     } finally {
       setLoading(false);
     }
@@ -194,7 +266,7 @@ const TeacherStudents: React.FC = () => {
       let detailedData: StudentDetailsData | null = null;
       
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/teachers/${user.id}/students/${student.id}/assessment?termId=${selectedTerm?.id || ''}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/teachers/${user.id}/students/${student.id}/assessment?termId=${activeTerm?.id || ''}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
             'Content-Type': 'application/json'
@@ -279,54 +351,17 @@ const TeacherStudents: React.FC = () => {
     fetchStudents();
   };
 
-  // Filter students based on search query, tab, and filters (client-side filtering)
+  // Filter students based on search query and filters (client-side filtering)
   const filteredStudents = studentsData?.students?.filter(student => {
     const matchesSearch =
       student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       student.registration_no.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesSection = selectedSection === "all" || student.section === selectedSection;
     const matchesBatch = selectedBatch === "all" || student.batch === selectedBatch;
 
-    // Client-side tab filtering
-    let matchesTab = true;
-    if (selectedTab !== 'all') {
-      switch (selectedTab) {
-        case 'pending':
-          matchesTab = student.status === 'Pending';
-          break;
-        case 'completed':
-          matchesTab = student.status === 'Completed';
-          break;
-        case 'incomplete': // Active students
-          matchesTab = student.status === 'Active' || student.status === 'Enrolled';
-          break;
-        default:
-          matchesTab = true;
-      }
-    }
-
-    return matchesSearch && matchesSection && matchesBatch && matchesTab;
+    return matchesSearch && matchesBatch;
   }) || [];
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Pending":
-        return <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" /> Pending</Badge>;
-      case "Completed":
-        return <Badge variant="default" className="flex items-center gap-1"><CheckCircle className="h-3 w-3" /> Completed</Badge>;
-      case "Active":
-        return <Badge variant="destructive" className="flex items-center gap-1"><AlertCircle className="h-3 w-3" /> Active</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const getProgressColor = (percentage: number) => {
-    if (percentage >= 80) return "bg-green-500";
-    if (percentage >= 60) return "bg-yellow-500";
-    return "bg-red-500";
-  };
 
   // Loading state
   if (loading) {
@@ -383,22 +418,22 @@ const TeacherStudents: React.FC = () => {
     );
   }
 
-  // No data state - only show if no students at all (not just for current filter)
-  if (!studentsData || !studentsData.students || studentsData.students.length === 0) {
+  // No data state - only show if loading is complete and no students found
+  if (!loading && (!studentsData || !studentsData.students || studentsData.students.length === 0)) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">My Students</h1>
-            <p className="text-muted-foreground">No students assigned yet</p>
+            <p className="text-muted-foreground">View and manage all students across all batches</p>
           </div>
         </div>
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Students Assigned</h3>
+            <h3 className="text-lg font-semibold mb-2">No Students Found</h3>
             <p className="text-muted-foreground text-center">
-              You don't have any students assigned to you yet. Contact your administrator for student assignments.
+              No students found matching your criteria. Try adjusting your filters or search query.
             </p>
           </CardContent>
         </Card>
@@ -420,7 +455,7 @@ const TeacherStudents: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold">My Students</h1>
           <p className="text-muted-foreground">
-            Manage and assess your assigned students
+            View and manage all students across all batches
           </p>
         </div>
       </div>
@@ -429,9 +464,9 @@ const TeacherStudents: React.FC = () => {
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle>Assigned Students ({filteredStudents.length})</CardTitle>
+              <CardTitle>All Students ({filteredStudents.length})</CardTitle>
               <CardDescription>
-                Students assigned to you for assessment across all interventions
+                View and manage all students across all batches and interventions
               </CardDescription>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -459,102 +494,98 @@ const TeacherStudents: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="all" value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-              <TabsList>
-                <TabsTrigger value="all">All Students</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
-                <TabsTrigger value="incomplete">Active</TabsTrigger>
-              </TabsList>
-              
-              <div className="flex flex-wrap gap-2">
-                <Select value={selectedSection} onValueChange={setSelectedSection}>
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue placeholder="Section" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Sections</SelectItem>
-                    <SelectItem value="A">Section A</SelectItem>
-                    <SelectItem value="B">Section B</SelectItem>
-                    <SelectItem value="C">Section C</SelectItem>
-                    <SelectItem value="D">Section D</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <Select value={selectedBatch} onValueChange={setSelectedBatch}>
-                  <SelectTrigger className="w-[120px]">
-                    <SelectValue placeholder="Batch" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Batches</SelectItem>
-                    <SelectItem value="2024">Batch 2024</SelectItem>
-                    <SelectItem value="2023">Batch 2023</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-4 mb-4">
+            <div className="flex flex-wrap gap-2">
+              <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="All Batches" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Batches</SelectItem>
+                  {availableBatches.map(batch => (
+                    <SelectItem key={batch} value={batch}>
+                      {batch}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            {/* Unified content for all tabs */}
-            {["all", "pending", "completed", "incomplete"].map((tabValue) => (
-              <TabsContent key={tabValue} value={tabValue} className="m-0">
-                <div className="rounded-md border">
-                  <div className="grid grid-cols-7 p-3 text-sm font-medium bg-muted/50">
-                    <div className="col-span-2">Student</div>
-                    <div>Reg. No</div>
-                    <div>Section</div>
-                    <div>Status</div>
-                    <div>Progress</div>
-                    <div className="text-right">Action</div>
-                  </div>
-                  <div className="divide-y">
-                    {filteredStudents && filteredStudents.length > 0 ? (
-                      filteredStudents.map((student) => (
-                        <div key={student.id} className="grid grid-cols-7 p-3 text-sm items-center">
-                          <div className="col-span-2">
-                            <div className="font-medium">{student.name}</div>
-                            <div className="text-xs text-muted-foreground">{student.course}</div>
-                          </div>
-                          <div className="font-mono text-xs">{student.registration_no}</div>
-                          <div>{student.section}</div>
-                          <div>{getStatusBadge(student.status)}</div>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1">
-                              <Progress 
-                                value={student.interventions?.[0]?.progress_percentage || 0} 
-                                className="h-2"
-                              />
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              {student.interventions?.[0]?.progress_percentage || 0}%
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => fetchStudentDetails(student)}
-                              className="gap-1"
-                            >
-                              <Eye className="h-3 w-3" />
-                              View Details
-                            </Button>
-                          </div>
+          </div>
+          
+          <div className="rounded-md border overflow-x-auto">
+            <table className="min-w-[920px] w-full border-collapse">
+              <thead>
+                <tr className="bg-muted/50">
+                  <th className="px-3 py-3 text-left text-sm font-medium border-b">Student</th>
+                  <th className="px-3 py-3 text-left text-sm font-medium border-b">Reg. No</th>
+                  <th className="px-3 py-3 text-left text-sm font-medium border-b">Batch</th>
+                  <th className="px-3 py-3 text-left text-sm font-medium border-b">HPS</th>
+                  <th className="px-3 py-3 text-right text-sm font-medium border-b">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredStudents && filteredStudents.length > 0 ? (
+                  filteredStudents.map((student) => (
+                    <tr key={student.id} className="border-b last:border-b-0">
+                      <td className="px-3 py-3 text-sm">
+                        <div>
+                          <div className="font-medium truncate">{student.name}</div>
+                          <div className="text-xs text-muted-foreground">{student.course}</div>
                         </div>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-muted-foreground">
-                        {selectedTab === 'all' 
-                          ? "No students found matching your search criteria"
-                          : `No ${selectedTab} students found matching your criteria`
-                        }
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+                      </td>
+                      <td className="px-3 py-3 text-sm font-mono text-xs">{student.registration_no}</td>
+                      <td className="px-3 py-3 text-sm">{student.batch}</td>
+                      <td className="px-3 py-3 text-sm font-mono">{getStudentHpsDisplay(student)}</td>
+                      <td className="px-3 py-3 text-sm">
+                        <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedStudentForViewDeeds(student);
+                              setShowViewDeedsDialog(true);
+                            }}
+                            className="gap-1 px-3"
+                            title="View my past deeds for this student"
+                          >
+                            <User className="h-3 w-3" />
+                            My Deeds
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedStudentForDeed(student);
+                              setShowAddDeedDialog(true);
+                            }}
+                            className="gap-1 px-3"
+                          >
+                            <ThumbsUp className="h-3 w-3" />
+                            Add Deed
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fetchStudentDetails(student)}
+                            className="gap-1 px-3"
+                          >
+                            <Eye className="h-3 w-3" />
+                            View Details
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                      No students found matching your search criteria
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
@@ -801,6 +832,31 @@ const TeacherStudents: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Add Deed Dialog */}
+      {selectedStudentForDeed && (
+        <AddDeedDialog
+          open={showAddDeedDialog}
+          onOpenChange={setShowAddDeedDialog}
+          studentId={selectedStudentForDeed.id}
+          studentName={selectedStudentForDeed.name}
+          onSuccess={() => {
+            // Refresh student list to show updated HPS
+            fetchStudents();
+            toast.success('Deed added and HPS updated successfully');
+          }}
+        />
+      )}
+
+      {/* View Deeds Dialog */}
+      {selectedStudentForViewDeeds && (
+        <ViewDeedsDialog
+          open={showViewDeedsDialog}
+          onOpenChange={setShowViewDeedsDialog}
+          studentId={selectedStudentForViewDeeds.id}
+          studentName={selectedStudentForViewDeeds.name}
+        />
       )}
     </div>
   );

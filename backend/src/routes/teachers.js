@@ -4,6 +4,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 const {
   getTeacherDashboard,
   getAssignedStudents,
+  getAllStudentsForTeachers,
   getStudentAssessmentDetails,
   submitStudentAssessment,
   saveAssessmentDraft,
@@ -33,6 +34,18 @@ router.get('/:teacherId/dashboard',
   authenticateToken,
   requireRole('teacher', 'admin'),
   getTeacherDashboard
+);
+
+/**
+ * @route   GET /api/v1/teachers/students/all
+ * @desc    Get all students (for teachers to see all students)
+ * @access  Teacher, Admin
+ * @query   page?: number, limit?: number, search?: string, batch?: string, section?: string, course?: string
+ */
+router.get('/students/all',
+  authenticateToken,
+  requireRole('teacher', 'admin'),
+  getAllStudentsForTeachers
 );
 
 /**

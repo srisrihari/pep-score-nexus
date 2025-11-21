@@ -1758,9 +1758,161 @@ const assignStudentsToTeacher = async (req, res) => {
 };
 
 // Export all functions
+/**
+ * Get all students for teachers (not filtered by assignments)
+ * GET /api/v1/teachers/students/all
+ */
+const getAllStudentsForTeachers = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+    const batch = req.query.batch || '';
+    const section = req.query.section || '';
+    const course = req.query.course || '';
+    const termId = req.query.termId || '';
+
+    // Get ALL active students (not filtered by teacher assignments)
+    let studentsQuery = supabase
+      .from('students')
+      .select(`
+        id,
+        registration_no,
+        name,
+        course,
+        overall_score,
+        grade,
+        status,
+        batches:batch_id(id, name, year),
+        sections:section_id(id, name),
+        houses:house_id(id, name, color),
+        current_term_id
+      `)
+      .eq('status', 'Active')
+      .order('name', { ascending: true });
+
+    // Apply search filter
+    if (search) {
+      studentsQuery = studentsQuery.or(
+        `name.ilike.%${search}%,registration_no.ilike.%${search}%,course.ilike.%${search}%`
+      );
+    }
+
+    // Look up batch_id and section_id if filters are provided
+    let batchIds = [];
+    let sectionIds = [];
+
+    if (batch) {
+      const batchResult = await query(
+        supabase
+          .from('batches')
+          .select('id')
+          .eq('name', batch)
+      );
+      batchIds = (batchResult.rows || []).map(b => b.id);
+    }
+
+    if (section) {
+      const sectionResult = await query(
+        supabase
+          .from('sections')
+          .select('id')
+          .eq('name', section)
+      );
+      sectionIds = (sectionResult.rows || []).map(s => s.id);
+    }
+
+    // Apply filters
+    if (batchIds.length > 0) {
+      studentsQuery = studentsQuery.in('batch_id', batchIds);
+    }
+    if (sectionIds.length > 0) {
+      studentsQuery = studentsQuery.in('section_id', sectionIds);
+    }
+    if (course) {
+      studentsQuery = studentsQuery.ilike('course', `%${course}%`);
+    }
+
+    // Get total count for pagination
+    let countQuery = supabase
+      .from('students')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'Active');
+
+    if (search) {
+      countQuery = countQuery.or(
+        `name.ilike.%${search}%,registration_no.ilike.%${search}%,course.ilike.%${search}%`
+      );
+    }
+    if (batchIds.length > 0) {
+      countQuery = countQuery.in('batch_id', batchIds);
+    }
+    if (sectionIds.length > 0) {
+      countQuery = countQuery.in('section_id', sectionIds);
+    }
+    if (course) {
+      countQuery = countQuery.ilike('course', `%${course}%`);
+    }
+
+    const [studentsResult, countResult] = await Promise.all([
+      query(studentsQuery.range(offset, offset + limit - 1)),
+      query(countQuery)
+    ]);
+
+    const students = studentsResult.rows || [];
+    const studentIds = students.map(student => student.id);
+
+    let termHpsMap = {};
+    if (termId && studentIds.length > 0) {
+      const summaryResult = await query(
+        supabase
+          .from('student_score_summary')
+          .select('student_id, term_id, total_hps')
+          .eq('term_id', termId)
+          .in('student_id', studentIds)
+      );
+
+      (summaryResult.rows || []).forEach(row => {
+        termHpsMap[row.student_id] = row.total_hps !== null && row.total_hps !== undefined
+          ? parseFloat(row.total_hps)
+          : null;
+      });
+    }
+
+    const studentsWithHps = students.map(student => ({
+      ...student,
+      term_hps: termId
+        ? (termHpsMap[student.id] !== undefined ? termHpsMap[student.id] : null)
+        : (student.overall_score ?? null)
+    }));
+
+    return res.json({
+      success: true,
+      data: studentsWithHps,
+      pagination: {
+        page,
+        limit,
+        total: countResult.count || 0,
+        totalPages: Math.ceil((countResult.count || 0) / limit)
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error in getAllStudentsForTeachers:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch students',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
 module.exports = {
   getTeacherDashboard,
   getAssignedStudents,
+  getAllStudentsForTeachers,
   getStudentAssessmentDetails,
   submitStudentAssessment,
   saveAssessmentDraft,

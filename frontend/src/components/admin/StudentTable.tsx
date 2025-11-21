@@ -1,7 +1,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, User } from "lucide-react";
 import StatusBadge, { StatusType } from "@/components/common/StatusBadge";
 
 interface Student {
@@ -43,6 +43,7 @@ interface StudentTableProps {
   onViewStudent: (student: Student) => void;
   onEditStudent: (student: Student) => void;
   onDeleteStudent: (student: Student) => void;
+  onViewDeeds?: (student: Student) => void;
   loading?: boolean;
 }
 
@@ -51,6 +52,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onViewStudent,
   onEditStudent,
   onDeleteStudent,
+  onViewDeeds,
   loading = false
 }) => {
   if (loading) {
@@ -123,6 +125,15 @@ const StudentTable: React.FC<StudentTableProps> = ({
               </td>
               <td className="p-3">
                 <div className="flex gap-2">
+                  {onViewDeeds && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewDeeds(student)}
+                    >
+                      <User className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

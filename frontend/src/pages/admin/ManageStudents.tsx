@@ -18,10 +18,10 @@ import { adminAPI, uploadAPI, apiRequest, unifiedScoreAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Search, ArrowUpDown, Eye, Edit, Trash2, Plus, UserPlus, Upload, Download, BookOpen, Building, GraduationCap, Settings, Calendar } from "lucide-react";
+import { Search, ArrowUpDown, Eye, Edit, Trash2, Plus, UserPlus, Upload, Download, BookOpen, Building, GraduationCap, Settings, Calendar, User } from "lucide-react";
 import { ErrorHandler, FormErrors } from "@/utils/errorHandling";
 import { FormValidator } from "@/utils/formValidation";
-import StudentTable from "@/components/admin/StudentTable";
+import AdminDeedsDialog from "@/components/admin/AdminDeedsDialog";
 import StudentForm from "@/components/admin/StudentForm";
 import StudentFilters from "@/components/admin/StudentFilters";
 import BatchManagementDialog from "@/components/admin/BatchManagementDialog";
@@ -110,6 +110,14 @@ const ManageStudents: React.FC = () => {
   const [deletingStudent, setDeletingStudent] = useState<Student | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeletingStudent, setIsDeletingStudent] = useState(false);
+  const [showDeedsDialog, setShowDeedsDialog] = useState(false);
+  const [studentForDeeds, setStudentForDeeds] = useState<Student | null>(null);
+
+  const handleViewDeeds = (student: Student) => {
+    setStudentForDeeds(student);
+    setShowDeedsDialog(true);
+  };
+
 
   // Attendance management state
   const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
@@ -551,9 +559,26 @@ const ManageStudents: React.FC = () => {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => handleViewDeeds(student)}
+                            className="gap-1"
+                          >
+                            <User className="h-3 w-3" />
+                            Deeds
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={() => handleViewStudent(student)}
                           >
                             <Eye className="h-3 w-3 mr-1" />
+      {studentForDeeds && (
+        <AdminDeedsDialog
+          open={showDeedsDialog}
+          onOpenChange={setShowDeedsDialog}
+          studentId={studentForDeeds.id}
+          studentName={studentForDeeds.name}
+        />
+      )}
                             View
                           </Button>
                           <Button

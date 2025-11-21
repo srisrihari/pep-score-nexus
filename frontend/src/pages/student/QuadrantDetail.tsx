@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatusBadge from "@/components/common/StatusBadge";
 import LeaderboardCard from "@/components/common/LeaderboardCard";
 import BehaviorRatingScale from "@/components/student/BehaviorRatingScale";
+import StudentDeedsList from "@/components/student/StudentDeedsList";
 import { studentAPI, unifiedScoreAPI } from "@/lib/api";
 import { useTerm } from "@/contexts/TermContext";
 import { transformStudentPerformanceData, transformLeaderboardData } from "@/lib/dataTransform";
@@ -50,6 +51,7 @@ const QuadrantDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeQuadrant, setActiveQuadrant] = useState<string>(quadrantId || "persona");
+  const [currentStudentId, setCurrentStudentId] = useState<string | null>(null);
 
   // Load data from API
   useEffect(() => {
@@ -61,6 +63,7 @@ const QuadrantDetail: React.FC = () => {
         // Get current student first
         const currentStudentResponse = await studentAPI.getCurrentStudent();
         const studentId = currentStudentResponse.data.id;
+        setCurrentStudentId(studentId);
 
         // Fetch performance data and quadrant details (using selected term)
         const [performanceResponse, leaderboardResponse, unifiedBreakdown] = await Promise.all([
@@ -554,8 +557,11 @@ const QuadrantDetail: React.FC = () => {
       </div>
 
       {activeQuadrant === "behavior" && (
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
           <BehaviorRatingScale />
+          {currentStudentId && (
+            <StudentDeedsList studentId={currentStudentId} />
+          )}
         </div>
       )}
 
